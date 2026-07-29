@@ -10,5 +10,5 @@ export default defineConfig({
   },
   integrations: [mdx()],
   devToolbar: { enabled: false },
-  site: 'https://luisarg.dev',
+  site: 'https://luisarg03.github.io',
 });
