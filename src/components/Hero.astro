@@ -8,39 +8,72 @@ const currentRole = experience.find((e) => e.endDate === null);
 const topCategories = skillCategories.length;
 ---
 
-<section class="panel p-8 md:p-12 lg:p-16 relative overflow-hidden card-accent-top">
-  <!-- Subtle background glow -->
-  <div class="absolute top-0 right-0 w-96 h-96 bg-[var(--color-accent)] opacity-[0.03] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
+<section class="relative min-h-[85vh] flex items-center py-16 md:py-20">
+  <!-- Background glow orb -->
+  <div class="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-accent)] opacity-[0.04] blur-[150px] rounded-full pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute top-0 left-0 w-[400px] h-[400px] bg-[var(--color-success)] opacity-[0.02] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
 
-  <div class="relative">
+  <div class="relative w-full">
     <!-- Status line -->
-    <div class="flex items-center gap-3 mb-8">
+    <div class="flex items-center gap-3 mb-10 reveal">
       <StatusIndicator status="active" label="online" />
-      <span class="h-px flex-1 bg-[var(--color-border)]"></span>
-      <span class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
+      <span class="h-px flex-1 bg-gradient-to-r from-[var(--color-border-active)] via-[var(--color-border)] to-transparent"></span>
+      <span class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)] tracking-wide">
         {siteConfig.location}
       </span>
     </div>
 
     <!-- Name + Role -->
-    <h1 class="text-[var(--text-3xl)] md:text-[var(--text-4xl)] font-bold tracking-tight text-[var(--color-text)] mb-2 leading-[1.1]">
-      {siteConfig.name}
-    </h1>
-    <p class="text-[var(--text-xl)] md:text-[var(--text-2xl)] text-[var(--color-accent)] font-mono mb-4 tracking-tight">
-      {siteConfig.role}
-    </p>
+    <div class="reveal">
+      <h1 class="text-[var(--text-3xl)] md:text-[var(--text-4xl)] lg:text-[5rem] font-bold tracking-tight text-[var(--color-text)] mb-3 leading-[1.05]">
+        {siteConfig.name}
+      </h1>
+      <p class="text-[var(--text-xl)] md:text-[var(--text-2xl)] text-[var(--color-accent)] font-mono mb-6 tracking-tight">
+        {siteConfig.role}
+      </p>
+    </div>
 
     <!-- Summary -->
-    <p class="text-[var(--text-base)] md:text-[var(--text-lg)] leading-relaxed text-[var(--color-text)] max-w-3xl mb-10 opacity-90">
+    <p class="text-[var(--text-base)] md:text-[var(--text-lg)] leading-relaxed text-[var(--color-text)] max-w-3xl mb-12 opacity-90 reveal">
       {siteConfig.summary}
     </p>
 
-    <!-- Stat cards — monitoring widgets -->
+    <!-- Stat cards — floating monitoring widgets -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
-      <StatCard label="experience" value={`${yearsExp}+ years`} />
-      <StatCard label="current role" value={currentRole?.company ?? '—'} status="active" />
-      <StatCard label="stack categories" value={String(topCategories)} />
-      <StatCard label="status" value={siteConfig.availability} status="active" />
+      <div class="widget-float p-4 card-accent-top glow-hover">
+        <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+          experience
+        </span>
+        <span class="block text-[var(--text-lg)] font-semibold text-[var(--color-text)] leading-tight">
+          {yearsExp}+ years
+        </span>
+      </div>
+      <div class="widget-float p-4 card-accent-top glow-hover">
+        <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+          current role
+        </span>
+        <span class="block text-[var(--text-lg)] font-semibold text-[var(--color-text)] leading-tight">
+          <StatusIndicator status="active" class="mr-1.5 inline-block align-middle" />
+          {currentRole?.company ?? '—'}
+        </span>
+      </div>
+      <div class="widget-float p-4 card-accent-top glow-hover">
+        <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+          stack categories
+        </span>
+        <span class="block text-[var(--text-lg)] font-semibold text-[var(--color-text)] leading-tight">
+          {topCategories}
+        </span>
+      </div>
+      <div class="widget-float p-4 card-accent-top glow-hover">
+        <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+          status
+        </span>
+        <span class="block text-[var(--text-sm)] font-medium text-[var(--color-text)] leading-tight">
+          <StatusIndicator status="active" class="mr-1.5 inline-block align-middle" />
+          {siteConfig.availability}
+        </span>
+      </div>
     </div>
   </div>
 </section>

@@ -7,9 +7,9 @@ function formatRange(start: string, end: string | null): string {
 }
 ---
 
-<SectionPanel title="Experience" id="experience">
+<SectionPanel title="Experience" id="experience" class="md:max-w-[66%] md:ml-auto">
   <ol class="relative pl-8">
-    <!-- Timeline spine -->
+    <!-- Timeline spine with gradient -->
     <span
       class="absolute left-3 top-2 bottom-2 w-px"
       aria-hidden="true"
@@ -17,12 +17,12 @@ function formatRange(start: string, end: string | null): string {
       <span class="block w-full h-full bg-gradient-to-b from-[var(--color-border-active)] via-[var(--color-border)] to-transparent"></span>
     </span>
 
-    {experience.map((job, i) => {
+    {experience.map((job) => {
       const isCurrent = job.endDate === null;
       return (
         <li class:list={[
-          'relative mb-10 last:mb-0',
-          isCurrent && 'pl-4 -ml-4 py-4 -mx-4 px-4 rounded-lg bg-[var(--color-accent-glow)] border border-[var(--color-border-active)]',
+          'relative mb-8 last:mb-0',
+          isCurrent && 'pl-4 -ml-4 py-4 -mx-2 px-4 rounded-lg bg-[var(--color-accent-glow)] border border-[var(--color-border-active)]',
         ]}>
           <!-- Timeline node -->
           <span
@@ -37,10 +37,7 @@ function formatRange(start: string, end: string | null): string {
 
           <!-- Role header -->
           <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
-            <h3 class:list={[
-              'text-[var(--text-base)] font-semibold',
-              isCurrent ? 'text-[var(--color-text)]' : 'text-[var(--color-text)]',
-            ]}>
+            <h3 class="text-[var(--text-base)] font-semibold text-[var(--color-text)]">
               {job.role}
             </h3>
             {isCurrent && (
@@ -60,7 +57,7 @@ function formatRange(start: string, end: string | null): string {
             {formatRange(job.startDate, job.endDate)}
           </p>
 
-          <!-- Responsibilities -->
+          <!-- Responsibilities — deployment log style -->
           <ul class="list-none pl-0 space-y-1.5 text-[var(--text-sm)] text-[var(--color-text)]">
             {job.responsibilities.map((r) => (
               <li class="relative pl-4">

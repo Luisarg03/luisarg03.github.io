@@ -11,10 +11,17 @@ import { siteConfig } from '../content/cv';
   title={`${siteConfig.name} — ${siteConfig.role}`}
   description={siteConfig.summary}
 >
-  <div class="space-y-10 md:space-y-14">
-    <Hero />
-    <ExperienceTimeline />
-    <SkillMap />
-    <ContactSection />
-  </div>
+  <Hero />
+
+  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
+
+  <ExperienceTimeline />
+
+  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
+
+  <SkillMap />
+
+  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
+
+  <ContactSection />
 </BaseLayout>

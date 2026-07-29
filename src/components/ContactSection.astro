@@ -35,8 +35,8 @@ const links = [
 ];
 ---
 
-<SectionPanel title="Contact" id="contact">
-  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger">
+<SectionPanel title="Contact" id="contact" class="contact-centered top-glow max-w-3xl mx-auto">
+  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     {links.map((link) => (
       <li>
         <a
@@ -45,12 +45,10 @@ const links = [
           {...(link.download ? { download: true } : {})}
           class="panel flex items-center gap-4 p-4 glow-hover group no-underline transition-all"
         >
-          <!-- Icon -->
           <span class="flex-shrink-0 w-8 h-8 rounded bg-[var(--color-surface-alt)] border border-[var(--color-border)] flex items-center justify-center text-sm group-hover:border-[var(--color-accent)] group-hover:text-[var(--color-accent)] transition-colors">
             {link.icon}
           </span>
 
-          <!-- Content -->
           <div class="min-w-0 flex-1">
             <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">
               {link.label}
@@ -60,7 +58,6 @@ const links = [
             </span>
           </div>
 
-          <!-- Arrow indicator -->
           {link.external && (
             <span class="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors flex-shrink-0" aria-hidden="true">
               ↗
