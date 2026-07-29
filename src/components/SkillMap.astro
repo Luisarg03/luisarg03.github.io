@@ -1,5 +1,7 @@
 ---
 import SectionPanel from './SectionPanel.astro';
+import SkillRadar from './SkillRadar.astro';
+import SkillGroupList from './SkillGroupList.astro';
 import { skillCategories } from '../content/cv';
 
 const categoryAccents: Record<string, string> = {
@@ -17,41 +19,87 @@ const categoryAccents: Record<string, string> = {
 ---
 
 <SectionPanel title="Infrastructure" id="skills">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 reveal">
-    {skillCategories.map((cat) => {
-      const accent = categoryAccents[cat.category] || 'var(--color-accent)';
-      return (
-        <div class="topology-cluster">
-          <!-- Category header -->
-          <div class="flex items-center gap-2 mb-3">
-            <span
-              class="w-2 h-2 rounded-sm flex-shrink-0"
-              style={`background-color: ${accent}; box-shadow: 0 0 8px ${accent}40`}
-              aria-hidden="true"
-            ></span>
-            <h3 class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
-              {cat.category}
-            </h3>
-            <span class="font-mono text-[10px] text-[var(--color-text-muted)] ml-auto opacity-50">
-              {cat.skills.length}
-            </span>
-          </div>
-
-          <!-- Skills as topology nodes -->
-          <ul class="flex flex-wrap gap-1.5">
-            {cat.skills.map((skill) => (
-              <li>
-                <span
-                  class="inline-block px-2 py-0.5 text-[var(--text-xs)] font-mono text-[var(--color-text)] bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded hover:border-[var(--color-border-active)] transition-colors cursor-default"
-                  style={`border-color: color-mix(in srgb, ${accent} 18%, var(--color-border))`}
-                >
-                  {skill}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    })}
+  <div class="skills-content" id="skills-content" data-active-category="">
+    <div class="skills-radar-col">
+      <SkillRadar categories={skillCategories} />
+    </div>
+    <div class="skills-list-col">
+      <SkillGroupList categories={skillCategories} categoryAccents={categoryAccents} />
+    </div>
   </div>
 </SectionPanel>
+
+<script>
+  (function () {
+    var container = document.getElementById('skills-content');
+    if (!container) return;
+
+    // Listen for the custom event bubbling up from either child
+    container.addEventListener('skill-category-focus', function (e) {
+      var category = e.detail ? e.detail.category : null;
+
+      if (category) {
+        container.setAttribute('data-active-category', category);
+
+        // Sync radar axis highlighting via data-category attributes
+        var axes = container.querySelectorAll('[data-category]');
+        for (var i = 0; i < axes.length; i++) {
+          if (axes[i].getAttribute('data-category') === category) {
+            axes[i].setAttribute('data-highlighted', '');
+          } else {
+            axes[i].removeAttribute('data-highlighted');
+          }
+        }
+      } else {
+        container.removeAttribute('data-active-category');
+
+        var axes = container.querySelectorAll('[data-category]');
+        for (var i = 0; i < axes.length; i++) {
+          axes[i].removeAttribute('data-highlighted');
+        }
+      }
+    });
+  })();
+</script>
+
+<style>
+  .skills-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .skills-content {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .skills-content {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  /* Align tops */
+  .skills-radar-col {
+    align-self: start;
+  }
+
+  /* Radar axis highlighting via shared data-active-category */
+  [data-category][data-highlighted] .radar-axis-hit {
+    stroke: var(--color-accent-warm);
+    stroke-opacity: 0.3;
+  }
+
+  /* When any category is active, dim non-active axes */
+  .skills-content[data-active-category]:not([data-active-category=""])
+    [data-category]:not([data-highlighted]) {
+    opacity: 0.35;
+    transition: opacity 0.25s ease;
+  }
+  .skills-content[data-active-category]:not([data-active-category=""])
+    [data-category][data-highlighted] {
+    opacity: 1;
+  }
+</style>

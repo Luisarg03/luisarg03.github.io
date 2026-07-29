@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import BlueprintGrid from '../components/BlueprintGrid.astro';
+import CommandPalette from '../components/CommandPalette.astro';
 
 export interface Props {
   title: string;
@@ -10,6 +12,7 @@ export interface Props {
 const { title, description = 'Cloud Engineer — building platforms, pipelines, and infrastructure that lasts.' } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const isNow = Astro.url.pathname === '/now';
+const ogImageURL = `${canonicalURL.origin}/monogram.svg`;
 ---
 
 <!doctype html>
@@ -26,10 +29,14 @@ const isNow = Astro.url.pathname === '/now';
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImageURL} />
+    <ClientRouter />
   </head>
-  <body class="min-h-screen relative">
-    <BlueprintGrid />
+  <body class="min-h-screen relative" aria-keyshortcuts="Meta+K Control+K">
+    <!-- ponytail: transition:animate="none" prevents BlueprintGrid canvas state glitching mid-flight -->
+    <BlueprintGrid transition:animate="none" />
 
     <!-- Vertical connector line (desktop only) -->
     <div class="vertical-connector" aria-hidden="true"></div>
@@ -98,12 +105,30 @@ const isNow = Astro.url.pathname === '/now';
     </header>
 
     <main class="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-16 lg:py-20">
+      <!-- TODO(lane 3): add transition:name="hero-block" to the hero <section> in Hero.astro -->
       <slot />
     </main>
 
     <!-- Footer — system status bar -->
     <footer class="relative z-10 border-t border-[var(--color-border)] mt-24">
       <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
+
+      <!-- Dynamic status row: section, scroll progress, local time -->
+      <div
+        id="status-bar"
+        class="flex items-center justify-between max-w-6xl mx-auto px-6 py-2 border-b border-[var(--color-border)]/50 font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]"
+      >
+        <div class="flex items-center gap-3">
+          <span id="status-section" class="text-[var(--color-accent)]">section: —</span>
+          <span class="text-[var(--color-border)]" aria-hidden="true">|</span>
+          <span id="status-scroll">0%</span>
+        </div>
+        <div>
+          <span id="status-time">--:--</span>
+          <span class="text-[var(--color-border)] mx-2" aria-hidden="true">·</span>
+          <span class="text-[var(--color-text-muted)]/60">UTC</span>
+        </div>
+      </div>
 
       <div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
         <div class="flex items-center gap-2">
@@ -122,11 +147,77 @@ const isNow = Astro.url.pathname === '/now';
       </div>
     </footer>
 
+    <!-- Command palette mount -->
+    <div id="command-palette-root">
+      <CommandPalette />
+    </div>
+
+    <!-- Status bar updates: section, scroll progress, local time (rAF-throttled) -->
+    <script>
+      // @ts-nocheck
+      (function () {
+        var sectionEl = document.getElementById('status-section');
+        var scrollEl = document.getElementById('status-scroll');
+        var timeEl = document.getElementById('status-time');
+        if (!sectionEl && !scrollEl && !timeEl) return;
+
+        var sections = [
+          { id: 'experience', label: 'experience' },
+          { id: 'skills', label: 'infrastructure' },
+          { id: 'contact', label: 'contact' },
+        ];
+        var currentSection = 'hero';
+
+        function updateSection(id) {
+          for (var i = 0; i < sections.length; i++) {
+            if (sections[i].id === id) { currentSection = sections[i].label; return; }
+          }
+          currentSection = '—';
+        }
+
+        if ('IntersectionObserver' in window) {
+          var io = new IntersectionObserver(
+            function (entries) {
+              var best = null, bestRatio = 0;
+              for (var i = 0; i < entries.length; i++) {
+                if (entries[i].isIntersecting && entries[i].intersectionRatio > bestRatio) {
+                  best = entries[i].target.id;
+                  bestRatio = entries[i].intersectionRatio;
+                }
+              }
+              currentSection = window.scrollY < 300 ? 'hero' : best ? (updateSection(best), currentSection) : currentSection;
+            },
+            { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.75] }
+          );
+          for (var i = 0; i < sections.length; i++) {
+            var el = document.getElementById(sections[i].id);
+            if (el) io.observe(el);
+          }
+        }
+
+        function tick() {
+          var scrollTop = window.scrollY;
+          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          var pct = docHeight > 0 ? Math.min(Math.round((scrollTop / docHeight) * 100), 100) : 0;
+          var now = new Date();
+          var hh = String(now.getHours()).padStart(2, '0');
+          var mm = String(now.getMinutes()).padStart(2, '0');
+
+          if (sectionEl) sectionEl.textContent = 'section: ' + currentSection;
+          if (scrollEl) scrollEl.textContent = pct + '%';
+          if (timeEl) timeEl.textContent = hh + ':' + mm;
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      })();
+    </script>
+
     <!-- Scroll observer: reveal sections on scroll, track velocity for blueprint -->
     <script>
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Reveal on scroll using IntersectionObserver
+      const scrollRevealSelectors = '.reveal, .reveal-on-view, .reveal-on-view-delay-1, .reveal-on-view-delay-2, .reveal-on-view-delay-3, .reveal-on-view-delay-4, .draw-on-scroll';
       if (!reduceMotion && 'IntersectionObserver' in window) {
         const observer = new IntersectionObserver(
           (entries) => {
@@ -139,10 +230,10 @@ const isNow = Astro.url.pathname === '/now';
           },
           { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
         );
-        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+        document.querySelectorAll(scrollRevealSelectors).forEach((el) => observer.observe(el));
       } else {
         // Fallback: show everything immediately
-        document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+        document.querySelectorAll(scrollRevealSelectors).forEach((el) => el.classList.add('is-visible'));
       }
 
       // Scroll velocity tracker for blueprint

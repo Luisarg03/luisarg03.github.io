@@ -1,0 +1,26 @@
+---
+export interface Props {
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { size = 'md' } = Astro.props;
+
+const sizeClasses: Record<string, string> = {
+  sm: 'scale-75 origin-center',
+  md: '',
+  lg: 'scale-125 origin-center',
+};
+
+// ASCII art derived from the ~/luisarg shell prompt metaphor
+const ascii = `██╗     ██╗   ██╗██╗███████╗
+██║     ██║   ██║██║██╔════╝
+██║     ██║   ██║██║███████╗
+██║     ╚██╗ ██╔╝██║╚════██║
+███████╗ ╚████╔╝ ██║███████║
+╚══════╝  ╚═══╝  ╚═╝╚══════╝`;
+---
+
+<figure class={sizeClasses[size]} role="figure" aria-label="LP monogram">
+  <pre class="text-[var(--color-accent)] drop-shadow-[0_0_8px_var(--color-accent-glow)] font-mono leading-tight text-[clamp(0.35rem,2vw,0.65rem)] select-none" aria-hidden="true">{ascii}</pre>
+  <figcaption class="sr-only">LP monogram</figcaption>
+</figure>

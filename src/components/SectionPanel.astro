@@ -3,9 +3,10 @@ export interface Props {
   title?: string;
   id?: string;
   class?: string;
+  bento?: boolean;
 }
 
-const { title, id, class: className = '' } = Astro.props;
+const { title, id, class: className = '', bento = false } = Astro.props;
 ---
 
 <section id={id} class:list={['panel p-6 md:p-8 lg:p-10', className]}>
@@ -16,5 +17,13 @@ const { title, id, class: className = '' } = Astro.props;
       </h2>
     </div>
   )}
-  <slot />
+  {
+    bento ? (
+      <div class="bento">
+        <slot />
+      </div>
+    ) : (
+      <slot />
+    )
+  }
 </section>

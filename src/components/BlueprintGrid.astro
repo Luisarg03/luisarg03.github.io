@@ -33,6 +33,14 @@
   let dpr = 1;
   let lastTime = 0;
 
+  // Cursor gravity state
+  let cursorX: number | null = null;
+  let cursorY: number | null = null;
+  let cursorInfluence = 0;
+  let lastCursorTime = 0;
+  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+  const gravityEnabled = !reduceMotion && !isTouchDevice;
+
   function seedNodes() {
     nodes = Array.from({ length: NODE_COUNT }, () => ({
       x: Math.random() * width,
@@ -103,7 +111,33 @@
   }
 
   function drawNodes(t: number) {
+    // Decay cursor influence when mouse stops
+    if (gravityEnabled && cursorInfluence > 0) {
+      const now = performance.now();
+      if (now - lastCursorTime > 120) {
+        cursorInfluence *= 0.92;
+        if (cursorInfluence < 0.005) {
+          cursorInfluence = 0;
+          cursorX = null;
+          cursorY = null;
+        }
+      }
+    }
+
     for (const n of nodes) {
+      // Cursor gravity: gentle attraction toward mouse within 200px
+      if (gravityEnabled && cursorX !== null && cursorY !== null && cursorInfluence > 0) {
+        const dx = cursorX - n.x;
+        const dy = cursorY - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 200 && dist > 0.5) {
+          // Max force 0.2 at distance 0, decreases linearly to 0 at 200px
+          const force = (1 - dist / 200) * 0.2 * cursorInfluence;
+          n.vx += (dx / dist) * force;
+          n.vy += (dy / dist) * force;
+        }
+      }
+
       n.x += n.vx;
       n.y += n.vy;
       if (n.x < 0 || n.x > width) n.vx *= -1;
@@ -181,6 +215,18 @@
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
+
+  // Cursor gravity: track mouse position for gentle node attraction
+  if (gravityEnabled) {
+    window.addEventListener('mousemove', (e: MouseEvent) => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      lastCursorTime = performance.now();
+      // Ramp influence up quickly
+      cursorInfluence = Math.min(cursorInfluence + 0.1, 1);
+    });
+  }
+
   if (!reduceMotion) {
     requestAnimationFrame(loop);
   }

@@ -1,5 +1,5 @@
 ---
-import StatCard from './StatCard.astro';
+import Monogram from './Monogram.astro';
 import StatusIndicator from './StatusIndicator.astro';
 import { siteConfig, experience, skillCategories } from '../content/cv';
 
@@ -8,7 +8,10 @@ const currentRole = experience.find((e) => e.endDate === null);
 const topCategories = skillCategories.length;
 ---
 
-<section class="relative min-h-[85vh] flex items-center py-16 md:py-20">
+<section
+  class="relative min-h-[85vh] flex items-center py-16 md:py-20"
+  transition:name="hero-block"
+>
   <!-- Background glow orb -->
   <div class="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-accent)] opacity-[0.04] blur-[150px] rounded-full pointer-events-none" aria-hidden="true"></div>
   <div class="absolute top-0 left-0 w-[400px] h-[400px] bg-[var(--color-success)] opacity-[0.02] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
@@ -23,13 +26,18 @@ const topCategories = skillCategories.length;
       </span>
     </div>
 
-    <!-- Name + Role -->
+    <!-- Monogram + Name + Typewriter Role -->
     <div class="reveal">
+      <Monogram size="lg" />
       <h1 class="text-[var(--text-3xl)] md:text-[var(--text-4xl)] lg:text-[5rem] font-bold tracking-tight text-[var(--color-text)] mb-3 leading-[1.05]">
         {siteConfig.name}
       </h1>
-      <p class="text-[var(--text-xl)] md:text-[var(--text-2xl)] text-[var(--color-accent)] font-mono mb-6 tracking-tight">
-        {siteConfig.role}
+      <p
+        class="role-typewriter font-mono text-[var(--text-xl)] md:text-[var(--text-2xl)] text-[var(--color-accent)] mb-8 tracking-tight"
+        aria-live="polite"
+        aria-label="Current role: {currentRole?.role ?? 'Cloud Platform Engineer'}"
+      >
+        >&nbsp;<span id="typewriter-text"></span><span id="typewriter-caret">▌</span>
       </p>
     </div>
 
@@ -38,9 +46,9 @@ const topCategories = skillCategories.length;
       {siteConfig.summary}
     </p>
 
-    <!-- Stat cards — floating monitoring widgets -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
-      <div class="widget-float p-4 card-accent-top glow-hover">
+    <!-- Bento stat grid — col spans on lg+ (4-col bento); mobile single-column -->
+    <div class="bento stat-grid stagger">
+      <div class="widget-float p-4 card-accent-top glow-hover lg:col-span-2">
         <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
           experience
         </span>
@@ -48,7 +56,7 @@ const topCategories = skillCategories.length;
           {yearsExp}+ years
         </span>
       </div>
-      <div class="widget-float p-4 card-accent-top glow-hover">
+      <div class="widget-float p-4 card-accent-top glow-hover lg:col-span-2">
         <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
           current role
         </span>
@@ -57,7 +65,7 @@ const topCategories = skillCategories.length;
           {currentRole?.company ?? '—'}
         </span>
       </div>
-      <div class="widget-float p-4 card-accent-top glow-hover">
+      <div class="widget-float p-4 card-accent-top glow-hover lg:col-span-1">
         <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
           stack categories
         </span>
@@ -65,7 +73,7 @@ const topCategories = skillCategories.length;
           {topCategories}
         </span>
       </div>
-      <div class="widget-float p-4 card-accent-top glow-hover">
+      <div class="widget-float p-4 card-accent-top glow-hover lg:col-span-3">
         <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
           status
         </span>
@@ -77,3 +85,76 @@ const topCategories = skillCategories.length;
     </div>
   </div>
 </section>
+
+<style>
+  #typewriter-caret {
+    animation: blink-caret 0.7s step-end infinite;
+  }
+
+  @keyframes blink-caret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #typewriter-caret {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const textEl = document.getElementById('typewriter-text');
+  const caretEl = document.getElementById('typewriter-caret');
+
+  if (textEl) {
+    // Reduced motion: show first role statically, keep caret static
+    if (reduceMotion) {
+      textEl.textContent = 'Cloud Platform Engineer';
+    } else {
+      // Typewriter: rotate through roles char-by-char
+      const roles = ['Cloud Platform Engineer', 'IDP builder', 'Data pipelines'];
+      let roleIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+
+      function type() {
+        const currentRole = roles[roleIndex];
+        const el = textEl!;
+
+        if (!isDeleting) {
+          // Typing phase
+          charIndex++;
+          el.textContent = currentRole.substring(0, charIndex);
+
+          if (charIndex === currentRole.length) {
+            // Pause before deleting
+            isDeleting = true;
+            setTimeout(type, 1500);
+            return;
+          }
+
+          setTimeout(type, 50);
+        } else {
+          // Deleting phase
+          charIndex--;
+          el.textContent = currentRole.substring(0, charIndex);
+
+          if (charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            setTimeout(type, 100);
+            return;
+          }
+
+          setTimeout(type, 25);
+        }
+      }
+
+      // Brief delay then start
+      setTimeout(type, 500);
+    }
+  }
+</script>
