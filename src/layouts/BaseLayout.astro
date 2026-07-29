@@ -9,6 +9,7 @@ export interface Props {
 
 const { title, description = 'Cloud Engineer — building platforms, pipelines, and infrastructure that lasts.' } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const isNow = Astro.url.pathname === '/now';
 ---
 
 <!doctype html>
@@ -29,26 +30,95 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body class="min-h-screen relative">
     <BlueprintGrid />
-    <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-sm sticky top-0">
-      <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="/" class="font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors">
-          ~/luisarg
+
+    <!-- Control Panel Header -->
+    <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur-md sticky top-0">
+      <!-- Top accent line -->
+      <div class="h-[2px] bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent opacity-40"></div>
+
+      <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <!-- Brand — terminal prompt style -->
+        <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors group">
+          <span class="w-2 h-2 rounded-full bg-[var(--color-success)] group-hover:shadow-[0_0_8px_var(--color-success-glow)] transition-shadow" aria-hidden="true"></span>
+          <span>~/luisarg</span>
         </a>
-        <ul class="flex items-center gap-6 text-sm font-mono">
-          <li><a href="/" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">index</a></li>
-          <li><a href="/now" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">/now</a></li>
-          <li><a href="https://github.com/luisarg03" target="_blank" rel="noopener" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">github</a></li>
-          <li><a href="https://linkedin.com/in/luisarg03" target="_blank" rel="noopener" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">linkedin</a></li>
+
+        <!-- Nav links -->
+        <ul class="flex items-center gap-1 text-sm font-mono">
+          <li>
+            <a
+              href="/"
+              class:list={[
+                'px-3 py-1.5 rounded transition-colors',
+                !isNow
+                  ? 'text-[var(--color-text)] bg-[var(--color-surface-alt)]'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]',
+              ]}
+            >
+              index
+            </a>
+          </li>
+          <li>
+            <a
+              href="/now"
+              class:list={[
+                'px-3 py-1.5 rounded transition-colors flex items-center gap-1.5',
+                isNow
+                  ? 'text-[var(--color-text)] bg-[var(--color-surface-alt)]'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]',
+              ]}
+            >
+              /now
+              <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] status-dot status-dot--active" aria-hidden="true"></span>
+            </a>
+          </li>
+          <li class="w-px h-4 bg-[var(--color-border)] mx-1" aria-hidden="true"></li>
+          <li>
+            <a
+              href="https://github.com/luisarg03"
+              target="_blank"
+              rel="noopener"
+              class="px-3 py-1.5 rounded text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] transition-colors"
+            >
+              github ↗
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://linkedin.com/in/luisarg03"
+              target="_blank"
+              rel="noopener"
+              class="px-3 py-1.5 rounded text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] transition-colors"
+            >
+              linkedin ↗
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
-    <main class="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-16 lg:py-20">
+
+    <!-- Main content -->
+    <main class="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-16 lg:py-20">
       <slot />
     </main>
+
+    <!-- Footer — minimal control panel status bar -->
     <footer class="relative z-10 border-t border-[var(--color-border)] mt-20">
-      <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--color-text-muted)]">
-        <span>© 2026 Luis Meyehen Paz</span>
-        <span>built with astro · deployed via github pages</span>
+      <!-- Top accent line -->
+      <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
+
+      <div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" aria-hidden="true"></span>
+          <span>© 2026 Luis Meyehen Paz</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span>built with astro</span>
+          <span class="text-[var(--color-border)]">·</span>
+          <span>deployed via github pages</span>
+          <span class="text-[var(--color-border)]">·</span>
+          <span class="text-[var(--color-accent)]">v1.0</span>
+        </div>
       </div>
     </footer>
   </body>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/SectionPanel.astro';
+import StatusIndicator from '../components/StatusIndicator.astro';
 import { getEntry, render } from 'astro:content';
 
 const entry = await getEntry('now', 'now');
@@ -16,10 +17,64 @@ const formattedDate = updated.toLocaleDateString('en-US', {
 ---
 
 <BaseLayout title="/now — Luis Meyehen Paz">
-  <SectionPanel title="/now">
-    <p class="font-mono text-xs text-[var(--color-text-muted)] mb-6">
+  <!-- System status header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <StatusIndicator status="active" label="operational" />
+      <span class="h-px flex-1 bg-[var(--color-border)]"></span>
+    </div>
+    <p class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
       Last updated: {formattedDate}
     </p>
+  </div>
+
+  <!-- Active projects — dashboard cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 stagger">
+    <!-- Study progress -->
+    <div class="panel p-5 card-accent-top">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+          AWS DevOps Cert
+        </span>
+        <StatusIndicator status="in-progress" />
+      </div>
+      <div class="progress-bar mb-2">
+        <div class="progress-bar__fill" style="width: 40%"></div>
+      </div>
+      <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Target: Q4 2026</p>
+    </div>
+
+    <!-- English -->
+    <div class="panel p-5 card-accent-top">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+          English
+        </span>
+        <StatusIndicator status="in-progress" />
+      </div>
+      <div class="progress-bar mb-2">
+        <div class="progress-bar__fill" style="width: 30%"></div>
+      </div>
+      <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Daily practice</p>
+    </div>
+
+    <!-- Japan -->
+    <div class="panel p-5 card-accent-top">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+          Japan Trip
+        </span>
+        <StatusIndicator status="planned" />
+      </div>
+      <div class="progress-bar mb-2">
+        <div class="progress-bar__fill" style="width: 15%"></div>
+      </div>
+      <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Planning phase</p>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <SectionPanel title="/now" class="noise-overlay">
     <article class="prose-content">
       <Content />
     </article>
@@ -29,33 +84,65 @@ const formattedDate = updated.toLocaleDateString('en-US', {
 <style>
   .prose-content :global(h2) {
     font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-size: var(--text-xs);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     color: var(--color-text-muted);
     margin-top: 2rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
+
+  .prose-content :global(h2)::before {
+    content: '›';
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
   .prose-content :global(p),
   .prose-content :global(li) {
     color: var(--color-text);
     line-height: 1.7;
+    font-size: var(--text-sm);
   }
+
   .prose-content :global(ul) {
-    list-style: disc;
-    padding-left: 1.25rem;
+    list-style: none;
+    padding-left: 0;
     margin: 0.5rem 0 1rem;
   }
+
   .prose-content :global(li) {
-    margin: 0.25rem 0;
+    margin: 0.35rem 0;
+    padding-left: 1rem;
+    position: relative;
   }
+
+  .prose-content :global(li)::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
   .prose-content :global(strong) {
     color: var(--color-text);
     font-weight: 600;
   }
+
   .prose-content :global(a) {
     color: var(--color-accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .prose-content :global(a:hover) {
+    border-bottom-color: var(--color-accent);
   }
 </style>

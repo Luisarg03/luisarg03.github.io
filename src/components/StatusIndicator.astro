@@ -17,10 +17,13 @@ const { status, label, class: className = '' } = Astro.props;
 
 <span class:list={['inline-flex items-center gap-1.5', className]}>
   <span
-    class="inline-block w-2 h-2 rounded-full"
+    class:list={[
+      'inline-block w-2 h-2 rounded-full relative',
+      status === 'active' && 'status-dot status-dot--active',
+    ]}
     style={`background-color: ${statusColors[status]}`}
     role="status"
     aria-label={label ?? status}
   ></span>
-  {label && <span class="text-xs text-[var(--color-text-muted)]">{label}</span>}
+  {label && <span class="text-xs text-[var(--color-text-muted)] font-mono">{label}</span>}
 </span>

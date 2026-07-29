@@ -1,25 +1,58 @@
 ---
 import SectionPanel from './SectionPanel.astro';
 import { skillCategories } from '../content/cv';
+
+// Category accent mapping — each domain gets a subtle color identity
+const categoryAccents: Record<string, string> = {
+  'Cloud & IaC': 'var(--color-accent)',
+  'CI/CD & DevOps': 'var(--color-success)',
+  'Data & Processing': 'var(--color-warning)',
+  'Python Libraries': '#a371f7',
+  'Databases': '#f97583',
+  'Data Visualization': '#56d4dd',
+  'Platform Engineering': 'var(--color-accent)',
+  'AI Tooling': '#d2a8ff',
+  'Web Dev': '#7ee787',
+  'Languages': 'var(--color-text-muted)',
+};
 ---
 
 <SectionPanel title="Infrastructure" id="skills">
-  <div class="space-y-6">
-    {skillCategories.map((cat) => (
-      <div>
-        <h3 class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-          {cat.category}
-        </h3>
-        <ul class="flex flex-wrap gap-2">
-          {cat.skills.map((skill) => (
-            <li>
-              <span class="inline-block px-2.5 py-1 text-xs font-mono text-[var(--color-text)] bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded hover:border-[var(--color-border-active)] transition-colors">
-                {skill}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5 stagger">
+    {skillCategories.map((cat) => {
+      const accent = categoryAccents[cat.category] || 'var(--color-accent)';
+      return (
+        <div class="panel p-4 glow-hover">
+          <!-- Category header -->
+          <div class="flex items-center gap-2 mb-3">
+            <span
+              class="w-2 h-2 rounded-sm flex-shrink-0"
+              style={`background-color: ${accent}`}
+              aria-hidden="true"
+            ></span>
+            <h3 class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+              {cat.category}
+            </h3>
+            <span class="font-mono text-[10px] text-[var(--color-text-muted)] ml-auto opacity-50">
+              {cat.skills.length}
+            </span>
+          </div>
+
+          <!-- Skills grid -->
+          <ul class="flex flex-wrap gap-1.5">
+            {cat.skills.map((skill) => (
+              <li>
+                <span
+                  class="inline-block px-2 py-0.5 text-[var(--text-xs)] font-mono text-[var(--color-text)] bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded hover:border-[var(--color-border-active)] transition-colors cursor-default"
+                  style={`--tw-border-opacity: 1; border-color: color-mix(in srgb, ${accent} 15%, var(--color-border))`}
+                >
+                  {skill}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    })}
   </div>
 </SectionPanel>

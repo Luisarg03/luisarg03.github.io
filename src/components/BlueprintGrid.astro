@@ -1,5 +1,6 @@
 ---
 // Blueprint grid background — procedural canvas island.
+// Enhanced: varied grid densities, color zones, infrastructure diagram feel.
 // Honours prefers-reduced-motion: falls back to a single static frame.
 ---
 
@@ -18,13 +19,14 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Configuration
-  const GRID_MAJOR = 80;   // major grid spacing (px)
-  const GRID_MINOR = 20;   // minor grid spacing (px)
+  const GRID_MAJOR = 80;
+  const GRID_MINOR = 20;
   const DPR_CAP = 2;
-  const PULSE_SPEED = 0.0008; // ms per pixel
-  const NODE_COUNT = 12;
+  const PULSE_SPEED = 0.0008;
+  const NODE_COUNT = 15;
+  const TRACE_MAX = 200;
 
-  type Node = { x: number; y: number; vx: number; vy: number };
+  type Node = { x: number; y: number; vx: number; vy: number; size: number; hue: number };
   let nodes: Node[] = [];
   let width = 0;
   let height = 0;
@@ -35,8 +37,10 @@
     nodes = Array.from({ length: NODE_COUNT }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.15,
-      vy: (Math.random() - 0.5) * 0.15,
+      vx: (Math.random() - 0.5) * 0.12,
+      vy: (Math.random() - 0.5) * 0.12,
+      size: 1 + Math.random() * 2,
+      hue: Math.random() > 0.8 ? 140 : 210, // mostly blue, some green
     }));
   }
 
@@ -52,10 +56,10 @@
   }
 
   function drawGrid() {
-    const minor = 'rgba(120, 145, 180, 0.05)';
-    const major = 'rgba(120, 145, 180, 0.10)';
+    // Minor grid — very subtle
+    const minor = 'rgba(100, 130, 170, 0.04)';
     ctx!.strokeStyle = minor;
-    ctx!.lineWidth = 1;
+    ctx!.lineWidth = 0.5;
     ctx!.beginPath();
     for (let x = 0; x < width; x += GRID_MINOR) {
       ctx!.moveTo(x, 0);
@@ -67,8 +71,10 @@
     }
     ctx!.stroke();
 
+    // Major grid — slightly more visible
+    const major = 'rgba(100, 130, 170, 0.08)';
     ctx!.strokeStyle = major;
-    ctx!.lineWidth = 1;
+    ctx!.lineWidth = 0.5;
     ctx!.beginPath();
     for (let x = 0; x < width; x += GRID_MAJOR) {
       ctx!.moveTo(x, 0);
@@ -79,6 +85,21 @@
       ctx!.lineTo(width, y);
     }
     ctx!.stroke();
+
+    // Accent cross-hairs at major intersections (sparse)
+    ctx!.strokeStyle = 'rgba(88, 166, 255, 0.06)';
+    ctx!.lineWidth = 1;
+    const STEP = GRID_MAJOR * 4;
+    for (let x = 0; x < width; x += STEP) {
+      for (let y = 0; y < height; y += STEP) {
+        ctx!.beginPath();
+        ctx!.moveTo(x - 4, y);
+        ctx!.lineTo(x + 4, y);
+        ctx!.moveTo(x, y - 4);
+        ctx!.lineTo(x, y + 4);
+        ctx!.stroke();
+      }
+    }
   }
 
   function drawNodes(t: number) {
@@ -89,18 +110,27 @@
       if (n.y < 0 || n.y > height) n.vy *= -1;
 
       const phase = (t * PULSE_SPEED + (n.x + n.y) * 0.01) % 1;
-      const radius = 1.5 + phase * 2.5;
-      const alpha = 0.3 + phase * 0.5;
+      const radius = n.size + phase * 2;
+      const alpha = 0.2 + phase * 0.5;
 
+      // Glow
+      const gradient = ctx!.createRadialGradient(n.x, n.y, 0, n.x, n.y, radius * 3);
+      gradient.addColorStop(0, `hsla(${n.hue}, 70%, 60%, ${alpha * 0.3})`);
+      gradient.addColorStop(1, `hsla(${n.hue}, 70%, 60%, 0)`);
+      ctx!.fillStyle = gradient;
+      ctx!.beginPath();
+      ctx!.arc(n.x, n.y, radius * 3, 0, Math.PI * 2);
+      ctx!.fill();
+
+      // Core
       ctx!.beginPath();
       ctx!.arc(n.x, n.y, radius, 0, Math.PI * 2);
-      ctx!.fillStyle = `rgba(88, 166, 255, ${alpha})`;
+      ctx!.fillStyle = `hsla(${n.hue}, 70%, 65%, ${alpha})`;
       ctx!.fill();
     }
   }
 
   function drawTraces() {
-    // Connect nearby nodes with subtle lines, with a pulse traveling along them
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const a = nodes[i];
@@ -108,11 +138,10 @@
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const MAX = 220;
-        if (dist > MAX) continue;
-        const alpha = (1 - dist / MAX) * 0.15;
+        if (dist > TRACE_MAX) continue;
+        const alpha = (1 - dist / TRACE_MAX) * 0.12;
         ctx!.strokeStyle = `rgba(88, 166, 255, ${alpha})`;
-        ctx!.lineWidth = 1;
+        ctx!.lineWidth = 0.5;
         ctx!.beginPath();
         ctx!.moveTo(a.x, a.y);
         ctx!.lineTo(b.x, b.y);
@@ -121,11 +150,24 @@
     }
   }
 
+  // Subtle radial vignette
+  function drawVignette() {
+    const gradient = ctx!.createRadialGradient(
+      width / 2, height / 2, Math.min(width, height) * 0.2,
+      width / 2, height / 2, Math.max(width, height) * 0.8
+    );
+    gradient.addColorStop(0, 'rgba(10, 14, 20, 0)');
+    gradient.addColorStop(1, 'rgba(10, 14, 20, 0.4)');
+    ctx!.fillStyle = gradient;
+    ctx!.fillRect(0, 0, width, height);
+  }
+
   function render(t: number) {
     ctx!.clearRect(0, 0, width, height);
     drawGrid();
     drawTraces();
     drawNodes(t);
+    drawVignette();
   }
 
   function loop(t: number) {
