@@ -1,0 +1,25 @@
+---
+import SectionPanel from './SectionPanel.astro';
+import { skillCategories } from '../content/cv';
+---
+
+<SectionPanel title="Infrastructure" id="skills">
+  <div class="space-y-6">
+    {skillCategories.map((cat) => (
+      <div>
+        <h3 class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+          {cat.category}
+        </h3>
+        <ul class="flex flex-wrap gap-2">
+          {cat.skills.map((skill) => (
+            <li>
+              <span class="inline-block px-2.5 py-1 text-xs font-mono text-[var(--color-text)] bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded hover:border-[var(--color-border-active)] transition-colors">
+                {skill}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</SectionPanel>

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ── Design Tokens (dark theme) ─────────────────────────────────────── */
+:root {
+  --color-bg: #0a0e14;
+  --color-surface: #131820;
+  --color-surface-alt: #1a2230;
+  --color-border: #232d3d;
+  --color-border-active: #344860;
+  --color-text: #c9d1d9;
+  --color-text-muted: #6e7681;
+  --color-accent: #58a6ff;
+  --color-accent-dim: #1f6feb;
+  --color-success: #3fb950;
+  --color-warning: #d29922;
+  --color-danger: #f85149;
+  --color-info: #58a6ff;
+
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', 'JetBrains Mono', monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+}
+
+/* ── Utility ─────────────────────────────────────────────────────────── */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}

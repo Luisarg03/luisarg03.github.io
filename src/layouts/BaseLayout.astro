@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+import BlueprintGrid from '../components/BlueprintGrid.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Cloud Engineer — building platforms, pipelines, and infrastructure that lasts.' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body class="min-h-screen relative">
+    <BlueprintGrid />
+    <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-sm sticky top-0">
+      <nav class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="/" class="font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors">
+          ~/luisarg
+        </a>
+        <ul class="flex items-center gap-6 text-sm font-mono">
+          <li><a href="/" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">index</a></li>
+          <li><a href="/now" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">/now</a></li>
+          <li><a href="https://github.com/luisarg03" target="_blank" rel="noopener" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">github</a></li>
+          <li><a href="https://linkedin.com/in/luisarg03" target="_blank" rel="noopener" class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors">linkedin</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main class="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-16 lg:py-20">
+      <slot />
+    </main>
+    <footer class="relative z-10 border-t border-[var(--color-border)] mt-20">
+      <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--color-text-muted)]">
+        <span>© 2026 Luis Meyehen Paz</span>
+        <span>built with astro · deployed via github pages</span>
+      </div>
+    </footer>
+  </body>
+</html>
