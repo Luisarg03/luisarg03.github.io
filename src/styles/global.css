@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* ── Design Tokens (dark theme) ─────────────────────────────────────── */
+/* ── Design Tokens (dark theme — Control Panel) ─────────────────────── */
 :root {
+  /* Core palette */
   --color-bg: #0a0e14;
   --color-surface: #131820;
   --color-surface-alt: #1a2230;
@@ -16,8 +17,42 @@
   --color-danger: #f85149;
   --color-info: #58a6ff;
 
+  /* Extended palette */
+  --color-accent-glow: rgba(88, 166, 255, 0.12);
+  --color-success-glow: rgba(63, 185, 80, 0.12);
+  --color-surface-glow: rgba(88, 166, 255, 0.04);
+
+  /* Typography */
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', 'JetBrains Mono', monospace;
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Type scale — tighter control */
+  --text-xs: 0.6875rem;    /* 11px — labels, tags */
+  --text-sm: 0.8125rem;    /* 13px — body secondary */
+  --text-base: 0.9375rem;  /* 15px — body primary */
+  --text-lg: 1.125rem;     /* 18px — section titles */
+  --text-xl: 1.5rem;       /* 24px — page subtitles */
+  --text-2xl: 2rem;        /* 32px — hero sub */
+  --text-3xl: 2.75rem;     /* 44px — hero */
+  --text-4xl: 3.5rem;      /* 56px — hero large */
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Panel */
+  --panel-radius: 6px;
+  --panel-border: 1px solid var(--color-border);
+  --panel-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 /* ── Base ────────────────────────────────────────────────────────────── */
@@ -25,24 +60,257 @@ html {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 16px;
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
 }
 
-/* ── Utility ─────────────────────────────────────────────────────────── */
+/* Selection */
+::selection {
+  background: var(--color-accent-dim);
+  color: #fff;
+}
+
+/* Scrollbar — thin, on-brand */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-active);
+}
+
+/* ── Utility Classes ─────────────────────────────────────────────────── */
+
+/* Section label — terminal-style header tag */
 .section-label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: var(--text-xs);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 0.75em;
+  background: var(--color-accent);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+/* Surface — base panel */
 .surface {
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+}
+
+/* ── Panel with corner accents ───────────────────────────────────────── */
+.panel {
+  position: relative;
+  background: var(--color-surface);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+}
+
+/* Corner accents — top-left and bottom-right */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--color-accent);
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+  border-top-left-radius: var(--panel-radius);
+}
+
+.panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  border-bottom-right-radius: var(--panel-radius);
+}
+
+.panel:hover::before,
+.panel:hover::after {
+  opacity: 0.6;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────── */
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes border-glow {
+  0%, 100% { border-color: var(--color-border); }
+  50% { border-color: var(--color-border-active); }
+}
+
+/* Staggered entrance for children */
+.stagger > * {
+  animation: fade-in-up 0.5s ease both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    animation: none;
+  }
+}
+
+/* ── Status dot animation ────────────────────────────────────────────── */
+.status-dot {
+  position: relative;
+}
+
+.status-dot--active::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1px solid var(--color-success);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ── Accent line ─────────────────────────────────────────────────────── */
+.accent-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-accent) 20%,
+    var(--color-accent) 80%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
+/* ── Glow hover ──────────────────────────────────────────────────────── */
+.glow-hover {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 20px var(--color-accent-glow), var(--panel-shadow);
+  border-color: var(--color-border-active);
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────── */
+.progress-bar {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent));
+  transition: width 0.6s ease;
+}
+
+/* ── Terminal prompt ─────────────────────────────────────────────────── */
+.terminal-prompt::before {
+  content: '$ ';
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* ── Card accent top border ──────────────────────────────────────────── */
+.card-accent-top {
+  position: relative;
+}
+
+.card-accent-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent), var(--color-accent-dim));
+  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+}
+
+/* ── Grid noise overlay ──────────────────────────────────────────────── */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.5;
 }

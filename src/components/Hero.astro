@@ -3,31 +3,44 @@ import StatCard from './StatCard.astro';
 import StatusIndicator from './StatusIndicator.astro';
 import { siteConfig, experience, skillCategories } from '../content/cv';
 
-const yearsExp = new Date().getFullYear() - 2019; // first role 09/2019
+const yearsExp = new Date().getFullYear() - 2019;
 const currentRole = experience.find((e) => e.endDate === null);
 const topCategories = skillCategories.length;
 ---
 
-<section class="surface p-8 md:p-12 lg:p-16 relative">
-  <div class="flex items-center gap-2 mb-6">
-    <StatusIndicator status="active" label="online" />
-  </div>
-  <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text)] mb-3">
-    {siteConfig.name}
-  </h1>
-  <p class="text-lg md:text-xl text-[var(--color-accent)] font-mono mb-2">
-    {siteConfig.role}
-  </p>
-  <p class="text-sm text-[var(--color-text-muted)] mb-8">
-    {siteConfig.location} · {siteConfig.email}
-  </p>
-  <p class="text-base md:text-lg leading-relaxed text-[var(--color-text)] max-w-3xl mb-10">
-    {siteConfig.summary}
-  </p>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-    <StatCard label="experience" value={`${yearsExp}+ years`} />
-    <StatCard label="current role" value={currentRole?.company ?? '—'} status="active" />
-    <StatCard label="skill categories" value={String(topCategories)} />
-    <StatCard label="status" value={siteConfig.availability} status="active" />
+<section class="panel p-8 md:p-12 lg:p-16 relative overflow-hidden card-accent-top">
+  <!-- Subtle background glow -->
+  <div class="absolute top-0 right-0 w-96 h-96 bg-[var(--color-accent)] opacity-[0.03] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative">
+    <!-- Status line -->
+    <div class="flex items-center gap-3 mb-8">
+      <StatusIndicator status="active" label="online" />
+      <span class="h-px flex-1 bg-[var(--color-border)]"></span>
+      <span class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
+        {siteConfig.location}
+      </span>
+    </div>
+
+    <!-- Name + Role -->
+    <h1 class="text-[var(--text-3xl)] md:text-[var(--text-4xl)] font-bold tracking-tight text-[var(--color-text)] mb-2 leading-[1.1]">
+      {siteConfig.name}
+    </h1>
+    <p class="text-[var(--text-xl)] md:text-[var(--text-2xl)] text-[var(--color-accent)] font-mono mb-4 tracking-tight">
+      {siteConfig.role}
+    </p>
+
+    <!-- Summary -->
+    <p class="text-[var(--text-base)] md:text-[var(--text-lg)] leading-relaxed text-[var(--color-text)] max-w-3xl mb-10 opacity-90">
+      {siteConfig.summary}
+    </p>
+
+    <!-- Stat cards — monitoring widgets -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
+      <StatCard label="experience" value={`${yearsExp}+ years`} />
+      <StatCard label="current role" value={currentRole?.company ?? '—'} status="active" />
+      <StatCard label="stack categories" value={String(topCategories)} />
+      <StatCard label="status" value={siteConfig.availability} status="active" />
+    </div>
   </div>
 </section>

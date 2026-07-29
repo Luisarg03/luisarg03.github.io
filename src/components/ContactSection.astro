@@ -1,50 +1,73 @@
 ---
 import SectionPanel from './SectionPanel.astro';
 import { siteConfig } from '../content/cv';
+
+const links = [
+  {
+    label: 'email',
+    value: siteConfig.email,
+    href: `mailto:${siteConfig.email}`,
+    icon: '✉',
+    external: false,
+  },
+  {
+    label: 'linkedin',
+    value: 'linkedin.com/in/luisarg03',
+    href: siteConfig.linkedin,
+    icon: '⊞',
+    external: true,
+  },
+  {
+    label: 'github',
+    value: 'github.com/luisarg03',
+    href: siteConfig.github,
+    icon: '⌥',
+    external: true,
+  },
+  {
+    label: 'cv',
+    value: 'Download PDF →',
+    href: '/cv.pdf',
+    icon: '📄',
+    external: false,
+    download: true,
+  },
+];
 ---
 
 <SectionPanel title="Contact" id="contact">
-  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <li>
-      <a
-        href={`mailto:${siteConfig.email}`}
-        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
-      >
-        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">email</span>
-        <span class="text-sm text-[var(--color-text)] truncate">{siteConfig.email}</span>
-      </a>
-    </li>
-    <li>
-      <a
-        href={siteConfig.linkedin}
-        target="_blank"
-        rel="noopener"
-        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
-      >
-        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">linkedin</span>
-        <span class="text-sm text-[var(--color-text)] truncate">linkedin.com/in/luisarg03</span>
-      </a>
-    </li>
-    <li>
-      <a
-        href={siteConfig.github}
-        target="_blank"
-        rel="noopener"
-        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
-      >
-        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">github</span>
-        <span class="text-sm text-[var(--color-text)] truncate">github.com/luisarg03</span>
-      </a>
-    </li>
-    <li>
-      <a
-        href="/cv.pdf"
-        download
-        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
-      >
-        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">cv</span>
-        <span class="text-sm text-[var(--color-text)]">Download PDF →</span>
-      </a>
-    </li>
+  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger">
+    {links.map((link) => (
+      <li>
+        <a
+          href={link.href}
+          {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
+          {...(link.download ? { download: true } : {})}
+          class="panel flex items-center gap-4 p-4 glow-hover group no-underline transition-all"
+        >
+          <!-- Icon -->
+          <span class="flex-shrink-0 w-8 h-8 rounded bg-[var(--color-surface-alt)] border border-[var(--color-border)] flex items-center justify-center text-sm group-hover:border-[var(--color-accent)] group-hover:text-[var(--color-accent)] transition-colors">
+            {link.icon}
+          </span>
+
+          <!-- Content -->
+          <div class="min-w-0 flex-1">
+            <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">
+              {link.label}
+            </span>
+            <span class="block text-[var(--text-sm)] text-[var(--color-text)] truncate group-hover:text-[var(--color-accent)] transition-colors">
+              {link.value}
+            </span>
+          </div>
+
+          <!-- Arrow indicator -->
+          {link.external && (
+            <span class="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors flex-shrink-0" aria-hidden="true">
+              ↗
+            </span>
+          )}
+        </a>
+      </li>
+    ))}
   </ul>
 </SectionPanel>
