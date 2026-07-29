@@ -31,19 +31,19 @@ const isNow = Astro.url.pathname === '/now';
   <body class="min-h-screen relative">
     <BlueprintGrid />
 
+    <!-- Vertical connector line (desktop only) -->
+    <div class="vertical-connector" aria-hidden="true"></div>
+
     <!-- Control Panel Header -->
     <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur-md sticky top-0">
-      <!-- Top accent line -->
       <div class="h-[2px] bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent opacity-40"></div>
 
       <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-        <!-- Brand — terminal prompt style -->
         <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors group">
           <span class="w-2 h-2 rounded-full bg-[var(--color-success)] group-hover:shadow-[0_0_8px_var(--color-success-glow)] transition-shadow" aria-hidden="true"></span>
           <span>~/luisarg</span>
         </a>
 
-        <!-- Nav links -->
         <ul class="flex items-center gap-1 text-sm font-mono">
           <li>
             <a
@@ -97,29 +97,86 @@ const isNow = Astro.url.pathname === '/now';
       </nav>
     </header>
 
-    <!-- Main content -->
     <main class="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-16 lg:py-20">
       <slot />
     </main>
 
-    <!-- Footer — minimal control panel status bar -->
-    <footer class="relative z-10 border-t border-[var(--color-border)] mt-20">
-      <!-- Top accent line -->
+    <!-- Footer — system status bar -->
+    <footer class="relative z-10 border-t border-[var(--color-border)] mt-24">
       <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
 
       <div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
         <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]" aria-hidden="true"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] status-dot status-dot--active" aria-hidden="true"></span>
+          <span class="text-[var(--color-success)]">SYSTEM STATUS: ONLINE</span>
+          <span class="text-[var(--color-border)]">·</span>
           <span>© 2026 Luis Meyehen Paz</span>
         </div>
-        <div class="flex items-center gap-4">
-          <span>built with astro</span>
+        <div class="flex items-center gap-3">
+          <span>astro</span>
           <span class="text-[var(--color-border)]">·</span>
-          <span>deployed via github pages</span>
+          <span>github pages</span>
           <span class="text-[var(--color-border)]">·</span>
-          <span class="text-[var(--color-accent)]">v1.0</span>
+          <span class="text-[var(--color-accent)] border border-[var(--color-border-active)] rounded px-2 py-0.5">v1.0.0</span>
         </div>
       </div>
     </footer>
+
+    <!-- Scroll observer: reveal sections on scroll, track velocity for blueprint -->
+    <script>
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Reveal on scroll using IntersectionObserver
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
+        );
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      } else {
+        // Fallback: show everything immediately
+        document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+      }
+
+      // Scroll velocity tracker for blueprint
+      let lastScrollY = 0;
+      let velocity = 0;
+      const DECAY = 0.92;
+
+      function onScroll() {
+        const y = window.scrollY;
+        velocity = Math.abs(y - lastScrollY);
+        lastScrollY = y;
+        // Clamp velocity to [0, 1] range
+        const v = Math.min(velocity / 30, 1);
+        document.documentElement.style.setProperty('--scroll-velocity', v.toFixed(3));
+        requestAnimationFrame(offScroll);
+      }
+
+      let ticking = false;
+      function offScroll() { ticking = false; }
+      function throttledScroll() {
+        if (!ticking) {
+          requestAnimationFrame(onScroll);
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', throttledScroll, { passive: true });
+
+      // Decay velocity when not scrolling
+      setInterval(() => {
+        velocity *= DECAY;
+        const v = Math.min(velocity / 30, 1);
+        document.documentElement.style.setProperty('--scroll-velocity', v.toFixed(3));
+      }, 50);
+    </script>
   </body>
 </html>
