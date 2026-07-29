@@ -1,0 +1,22 @@
+---
+import StatusIndicator from './StatusIndicator.astro';
+
+export interface Props {
+  label: string;
+  value: string;
+  status?: 'active' | 'in-progress' | 'planned' | 'offline';
+  class?: string;
+}
+
+const { label, value, status, class: className = '' } = Astro.props;
+---
+
+<div class:list={['surface p-4 text-center min-w-0', className]}>
+  <span class="block font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)] mb-1">
+    {label}
+  </span>
+  <span class="block text-lg font-semibold text-[var(--color-text)]">
+    {status && <StatusIndicator status={status} class="mr-1.5 inline-block align-middle" />}
+    {value}
+  </span>
+</div>

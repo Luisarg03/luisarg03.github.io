@@ -1,0 +1,33 @@
+---
+import StatCard from './StatCard.astro';
+import StatusIndicator from './StatusIndicator.astro';
+import { siteConfig, experience, skillCategories } from '../content/cv';
+
+const yearsExp = new Date().getFullYear() - 2019; // first role 09/2019
+const currentRole = experience.find((e) => e.endDate === null);
+const topCategories = skillCategories.length;
+---
+
+<section class="surface p-8 md:p-12 lg:p-16 relative">
+  <div class="flex items-center gap-2 mb-6">
+    <StatusIndicator status="active" label="online" />
+  </div>
+  <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-text)] mb-3">
+    {siteConfig.name}
+  </h1>
+  <p class="text-lg md:text-xl text-[var(--color-accent)] font-mono mb-2">
+    {siteConfig.role}
+  </p>
+  <p class="text-sm text-[var(--color-text-muted)] mb-8">
+    {siteConfig.location} · {siteConfig.email}
+  </p>
+  <p class="text-base md:text-lg leading-relaxed text-[var(--color-text)] max-w-3xl mb-10">
+    {siteConfig.summary}
+  </p>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <StatCard label="experience" value={`${yearsExp}+ years`} />
+    <StatCard label="current role" value={currentRole?.company ?? '—'} status="active" />
+    <StatCard label="skill categories" value={String(topCategories)} />
+    <StatCard label="status" value={siteConfig.availability} status="active" />
+  </div>
+</section>

@@ -1,0 +1,50 @@
+---
+import SectionPanel from './SectionPanel.astro';
+import { siteConfig } from '../content/cv';
+---
+
+<SectionPanel title="Contact" id="contact">
+  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <li>
+      <a
+        href={`mailto:${siteConfig.email}`}
+        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
+      >
+        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">email</span>
+        <span class="text-sm text-[var(--color-text)] truncate">{siteConfig.email}</span>
+      </a>
+    </li>
+    <li>
+      <a
+        href={siteConfig.linkedin}
+        target="_blank"
+        rel="noopener"
+        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
+      >
+        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">linkedin</span>
+        <span class="text-sm text-[var(--color-text)] truncate">linkedin.com/in/luisarg03</span>
+      </a>
+    </li>
+    <li>
+      <a
+        href={siteConfig.github}
+        target="_blank"
+        rel="noopener"
+        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
+      >
+        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">github</span>
+        <span class="text-sm text-[var(--color-text)] truncate">github.com/luisarg03</span>
+      </a>
+    </li>
+    <li>
+      <a
+        href="/cv.pdf"
+        download
+        class="surface flex items-center gap-3 p-4 hover:border-[var(--color-border-active)] transition-colors"
+      >
+        <span class="font-mono text-xs text-[var(--color-text-muted)] w-16">cv</span>
+        <span class="text-sm text-[var(--color-text)]">Download PDF →</span>
+      </a>
+    </li>
+  </ul>
+</SectionPanel>
