@@ -10,5 +10,9 @@ export default defineConfig({
   },
   integrations: [mdx()],
   devToolbar: { enabled: false },
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: 'viewport',
+  },
   site: 'https://luisarg03.github.io',
 });

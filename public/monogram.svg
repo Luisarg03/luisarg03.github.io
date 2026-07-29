@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" fill="currentColor">
+  <!-- LP monogram — clean vector derivative of ASCII box-drawing form -->
+  <rect width="200" height="120" fill="#0a0e14" rx="8"/>
+  <g font-family="ui-monospace, 'Cascadia Code', monospace" font-weight="900">
+    <!-- L -->
+    <text x="38" y="76" font-size="64" fill="currentColor">L</text>
+    <!-- P -->
+    <text x="102" y="76" font-size="64" fill="currentColor">P</text>
+  </g>
+</svg>

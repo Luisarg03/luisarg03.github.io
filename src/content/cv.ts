@@ -15,6 +15,7 @@ export interface Experience {
 export interface SkillCategory {
   category: string;
   skills: string[];
+  proficiency: number;
 }
 
 export interface Education {
@@ -133,42 +134,52 @@ export const skillCategories: SkillCategory[] = [
   {
     category: 'Cloud & IaC',
     skills: 'AWS · Terraform · AWS CDK · AWS CloudFormation · Lambda · ECS · S3 · Step Functions · SageMaker · Glue · DynamoDB · IAM · ECR · CloudWatch · EMR · SQS · SNS · EventBridge · RDS'.split(' · '),
+    proficiency: 5,
   },
   {
     category: 'CI/CD & DevOps',
     skills: 'GitHub Actions · GitLab CI · Bitbucket Pipelines · Docker · Git · Secrets Manager · Parameter Store'.split(' · '),
+    proficiency: 5,
   },
   {
     category: 'Data & Processing',
     skills: 'Athena · QuickSight · Databricks · Trino · Data Lake · Batch Processing · SQL · ETL · PySpark · SSIS · Pentaho Data Integration'.split(' · '),
+    proficiency: 4,
   },
   {
     category: 'Python Libraries',
     skills: 'Pandas · NumPy · Boto3 · Requests · OCI'.split(' · '),
+    proficiency: 4,
   },
   {
     category: 'Databases',
     skills: 'SQL Server · Oracle · BigQuery · ElasticSearch'.split(' · '),
+    proficiency: 4,
   },
   {
     category: 'Data Visualization',
     skills: 'Power BI · Metabase · Elastic-Kibana'.split(' · '),
+    proficiency: 3,
   },
   {
     category: 'Platform Engineering',
     skills: 'Internal Developer Platforms · FastAPI · React · Cost Observability · Workload Monitoring · Developer Enablement'.split(' · '),
+    proficiency: 5,
   },
   {
     category: 'AI Tooling',
     skills: 'AWS Bedrock · MCP · OpenAI APIs · GitHub Copilot · Prompt Engineering'.split(' · '),
+    proficiency: 4,
   },
   {
     category: 'Web Dev',
     skills: 'Flask · Bootstrap · HTML5'.split(' · '),
+    proficiency: 3,
   },
   {
     category: 'Languages',
     skills: 'Python · SQL · Bash · YAML'.split(' · '),
+    proficiency: 4,
   },
 ];
 
