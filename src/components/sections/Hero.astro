@@ -54,7 +54,7 @@ const archAscii = [
         <pre class="neofetch-ascii font-mono text-[var(--color-accent)]" aria-hidden="true">{archAscii}</pre>
         <div class="neofetch-info">
           <div class="neofetch-row">
-            <span class="neofetch-user">{siteConfig.name}</span>
+            <h1 class="neofetch-user">{siteConfig.name}</h1>
           </div>
           <div class="neofetch-row"><span class="neofetch-key">OS</span><span class="neofetch-sep">:</span><span class="neofetch-val">{siteConfig.role}</span></div>
           <div class="neofetch-row"><span class="neofetch-key">Host</span><span class="neofetch-sep">:</span><span class="neofetch-val">{siteConfig.location}</span></div>
@@ -152,6 +152,8 @@ const archAscii = [
   .neofetch-user {
     color: var(--color-accent);
     font-weight: 600;
+    font-size: inherit;
+    margin: 0;
   }
 
   .neofetch-key {
