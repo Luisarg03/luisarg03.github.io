@@ -4,11 +4,14 @@
 // Honours prefers-reduced-motion: falls back to a single static frame.
 ---
 
-<canvas
-  id="blueprint-grid"
-  class="fixed inset-0 w-full h-full pointer-events-none z-0"
-  aria-hidden="true"
-></canvas>
+<div style="content-visibility: auto; contain: paint;" aria-hidden="true">
+  <canvas
+    id="blueprint-grid"
+    class="fixed inset-0 w-full h-full pointer-events-none z-0"
+    style="will-change: transform;"
+    aria-hidden="true"
+  ></canvas>
+</div>
 
 <script>
   const canvas = document.getElementById('blueprint-grid') as HTMLCanvasElement | null;
