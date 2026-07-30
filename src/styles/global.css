@@ -13,34 +13,34 @@
   --color-border-active: #344860;
   --color-text: #c9d1d9;
   --color-text-muted: #6e7681;
-  --color-accent: #58a6ff;
-  --color-accent-dim: #1f6feb;
+  --color-accent: #f0b429;
+  --color-accent-dim: #c4941a;
   --color-success: #3fb950;
   --color-warning: #d29922;
   --color-danger: #f85149;
-  --color-info: #58a6ff;
+  --color-info: #f0b429;
 
   /* Extended palette */
-  --color-accent-glow: rgba(88, 166, 255, 0.12);
+  --color-accent-glow: rgba(240, 180, 41, 0.12);
   --color-success-glow: rgba(63, 185, 80, 0.12);
-  --color-surface-glow: rgba(88, 166, 255, 0.04);
+  --color-surface-glow: rgba(240, 180, 41, 0.04);
 
   /* Copper accent — emphasis only, not body copy */
   --color-accent-warm: #f0b429;
 
-  /* Typography */
-  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', 'JetBrains Mono', monospace;
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Typography — imported via @fontsource-variable */
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Cascadia Code', 'Source Code Pro', ui-monospace, monospace;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
-  /* Type scale */
-  --text-xs: 0.6875rem;
-  --text-sm: 0.8125rem;
-  --text-base: 0.9375rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.5rem;
-  --text-2xl: 2rem;
-  --text-3xl: 2.75rem;
-  --text-4xl: 3.5rem;
+  /* Type scale — adjusted for readability */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.1875rem;   /* 19px */
+  --text-xl: 1.5rem;      /* 24px */
+  --text-2xl: 2rem;       /* 32px */
+  --text-3xl: 2.75rem;    /* 44px */
+  --text-4xl: 3.5rem;     /* 56px */
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -62,6 +62,16 @@
   --panel-border: 1px solid var(--color-border);
   --panel-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.1);
   --scroll-velocity: 0;
+
+  /* Section layout */
+  --section-padding-y-mobile: 2rem;
+  --section-padding-y-desktop: 3rem;
+  --section-gap: 1rem;
+
+  /* Terminal tab bar */
+  --tab-bar-height: 28px;
+  --tab-dot-size: 6px;
+  --tab-dot-color: var(--color-border-active);
 }
 
 /* ── Base ────────────────────────────────────────────────────────────── */
@@ -164,7 +174,7 @@ body {
 .bento {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-4);
+  gap: var(--space-3);
   grid-auto-flow: dense;
 }
 
@@ -384,13 +394,6 @@ body {
   animation: pulse-ring 2s ease-out infinite;
 }
 
-/* ── Accent line ─────────────────────────────────────────────────────── */
-.accent-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 20%, var(--color-accent) 80%, transparent 100%);
-  opacity: 0.3;
-}
-
 /* ── Glow hover ──────────────────────────────────────────────────────── */
 .glow-hover {
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
@@ -398,7 +401,7 @@ body {
 
 .glow-hover:hover {
   box-shadow: 0 0 20px var(--color-accent-glow), var(--panel-shadow);
-  border-color: var(--color-border-active);
+  border-color: var(--color-accent-warm);
 }
 
 /* ── Progress bar ────────────────────────────────────────────────────── */
@@ -416,14 +419,6 @@ body {
   transition: width 0.6s ease;
 }
 
-/* ── Terminal prompt ─────────────────────────────────────────────────── */
-.terminal-prompt::before {
-  content: '$ ';
-  color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-weight: 600;
-}
-
 /* ── Card accent top border ──────────────────────────────────────────── */
 .card-accent-top {
   position: relative;
@@ -438,6 +433,42 @@ body {
   height: 2px;
   background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent), var(--color-accent-dim));
   border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+}
+
+/* ── Glass card ─────────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(19, 24, 32, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0.5rem 0;
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  .glass-card {
+    background: var(--color-surface);
+  }
+}
+
+/* ── Output fade-in ─────────────────────────────────────────────────── */
+@keyframes output-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.output-fade-in {
+  animation: output-fade-in 200ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .output-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ── Noise overlay ───────────────────────────────────────────────────── */
@@ -458,25 +489,32 @@ body {
 /* ── Section gradient connectors ─────────────────────────────────────── */
 .section-connector {
   height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 30%, var(--color-accent) 70%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--color-accent) 30%, var(--color-accent-warm) 50%, var(--color-accent) 70%, transparent 100%);
   opacity: 0.15;
   margin: 0 auto;
   max-width: 60%;
+}
+
+@media (max-width: 639px) {
+  .section-connector {
+    max-width: 90%;
+  }
 }
 
 /* ── Vertical connector line (desktop) ───────────────────────────────── */
 @media (min-width: 768px) {
   .vertical-connector {
     position: fixed;
-    left: 2rem;
+    left: max(2rem, calc((100vw - 72rem) / 2 - 1rem));
     top: 4rem;
     bottom: 2rem;
     width: 1px;
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      var(--color-border) 10%,
-      var(--color-border) 90%,
+      var(--color-accent-warm) 15%,
+      var(--color-border) 50%,
+      var(--color-accent-warm) 85%,
       transparent 100%
     );
     z-index: 5;
@@ -527,28 +565,6 @@ body {
   .widget-float {
     animation: none;
   }
-}
-
-/* ── Skill topology cluster ──────────────────────────────────────────── */
-.topology-cluster {
-  position: relative;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--panel-radius);
-  padding: 1rem;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.topology-cluster:hover {
-  border-color: var(--color-border-active);
-  box-shadow: 0 0 16px rgba(88, 166, 255, 0.06);
-}
-
-/* ── Contact centered narrow ─────────────────────────────────────────── */
-.contact-centered {
-  max-width: 36rem;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 /* ── Top accent glow (contact) ───────────────────────────────────────── */

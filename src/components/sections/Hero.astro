@@ -1,0 +1,282 @@
+---
+import { siteConfig, experience } from '../../content/cv';
+
+const yearsExp = new Date().getFullYear() - 2019;
+const currentRole = experience.find((e) => e.endDate === null);
+
+const archAscii = [
+  '                   -`',
+  '                  .o+`',
+  '                 `ooo/',
+  '                `+oooo:',
+  '               `+oooooo:',
+  '               -+oooooo+:',
+  '             `/:-:++oooo+:',
+  '            `/++++/+++++++:',
+  '           `/++++++++++++++:',
+  '          `/+++ooooooooooooo/`',
+  '         ./ooosssso++osssssso+`',
+  '        .oossssso-````/ossssss+`',
+  '       -osssssso.      :ssssssso.',
+  '      :osssssss/        osssso+++.',
+  '     /ossssssss/        +ssssooo/-',
+  '   `/ossssso+/:-        -:/+osssso+-',
+  '  `+sso+:-`                 `.-/+oso:',
+  ' `++:.                           `-/+/  `',
+  ' .`                                 `/',
+].join('\n');
+
+---
+
+<section
+  class="relative py-8 md:py-10"
+  transition:name="hero-block"
+>
+  <div class="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--color-accent)] opacity-[0.04] blur-[150px] rounded-full pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute top-0 left-0 w-[400px] h-[400px] bg-[var(--color-success)] opacity-[0.02] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
+
+  <div class="relative w-full">
+    <!-- Status line -->
+    <div class="flex items-center gap-3 mb-6">
+      <span class="inline-flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-[var(--color-success)] status-dot status-dot--active"></span>
+        <span class="text-xs text-[var(--color-text-muted)] font-mono">online</span>
+      </span>
+      <span class="h-px flex-1 bg-gradient-to-r from-[var(--color-border-active)] via-[var(--color-border)] to-transparent"></span>
+      <span class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)] tracking-wide">
+        {siteConfig.location}
+      </span>
+    </div>
+
+    <!-- Neofetch-style identity card -->
+    <div class="neofetch-card panel p-4 md:p-6 mb-6">
+      <div class="neofetch-grid">
+        <pre class="neofetch-ascii font-mono text-[var(--color-accent)]" aria-hidden="true">{archAscii}</pre>
+        <div class="neofetch-info">
+          <div class="neofetch-row">
+            <span class="neofetch-user">{siteConfig.name}</span>
+          </div>
+          <div class="neofetch-row"><span class="neofetch-key">OS</span><span class="neofetch-sep">:</span><span class="neofetch-val">{siteConfig.role}</span></div>
+          <div class="neofetch-row"><span class="neofetch-key">Host</span><span class="neofetch-sep">:</span><span class="neofetch-val">{siteConfig.location}</span></div>
+          <div class="neofetch-row"><span class="neofetch-key">Kernel</span><span class="neofetch-sep">:</span><span class="neofetch-val">{yearsExp}+ years of building platforms</span></div>
+          <div class="neofetch-row"><span class="neofetch-key">Uptime</span><span class="neofetch-sep">:</span><span class="neofetch-val">{currentRole?.company ?? '—'}</span></div>
+
+          <div class="neofetch-row" aria-hidden="true" style="height: 0.5rem"></div>
+          <div id="client-neofetch" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact toolbar -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+      <a href={`mailto:${siteConfig.email}`} class="contact-btn">
+        <span class="text-[var(--color-accent)]">✉</span>
+        <span>email</span>
+      </a>
+      <a href={siteConfig.linkedin} target="_blank" rel="noopener" class="contact-btn">
+        <span class="text-[var(--color-accent)]">⊞</span>
+        <span>linkedin</span>
+        <span class="text-[var(--color-text-muted)] text-[10px]" aria-hidden="true">↗</span>
+      </a>
+      <a href={siteConfig.github} target="_blank" rel="noopener" class="contact-btn">
+        <span class="text-[var(--color-accent)]">⌥</span>
+        <span>github</span>
+        <span class="text-[var(--color-text-muted)] text-[10px]" aria-hidden="true">↗</span>
+      </a>
+      <a href="/cv.pdf" download class="contact-btn">
+        <span class="text-[var(--color-accent)]">📄</span>
+        <span>cv</span>
+      </a>
+    </div>
+    <p class="font-mono text-[10px] text-[var(--color-text-muted)] text-center mb-6">
+      {yearsExp}+ years · {currentRole?.company ?? '—'}
+    </p>
+
+    <!-- Summary -->
+    <p class="text-[var(--text-base)] md:text-[var(--text-lg)] leading-relaxed text-[var(--color-text)] max-w-4xl mb-6">
+      {siteConfig.summary}
+    </p>
+  </div>
+</section>
+
+<style is:global>
+  .neofetch-card {
+    animation: neofetch-fade 0.6s ease both;
+  }
+
+  .neofetch-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (min-width: 640px) {
+    .neofetch-grid {
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .neofetch-ascii {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin: 0;
+    font-family: var(--font-mono);
+    text-shadow: 0 0 8px var(--color-accent-glow);
+    white-space: pre;
+    user-select: none;
+  }
+
+  .neofetch-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .neofetch-row {
+    display: flex;
+    align-items: baseline;
+    animation: neofetch-row-fade 0.4s ease both;
+  }
+
+  .neofetch-row:nth-child(1) { animation-delay: 0.05s; }
+  .neofetch-row:nth-child(2) { animation-delay: 0.1s; }
+  .neofetch-row:nth-child(3) { animation-delay: 0.15s; }
+  .neofetch-row:nth-child(4) { animation-delay: 0.2s; }
+  .neofetch-row:nth-child(5) { animation-delay: 0.25s; }
+  .neofetch-row:nth-child(6) { animation-delay: 0.3s; }
+
+  .neofetch-user {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .neofetch-key {
+    color: var(--color-accent);
+    font-weight: 600;
+    min-width: 7rem;
+  }
+
+  .neofetch-sep {
+    color: var(--color-text-muted);
+    margin-right: 0.375rem;
+  }
+
+  .neofetch-val {
+    color: var(--color-text);
+  }
+
+  @keyframes neofetch-fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes neofetch-row-fade {
+    from { opacity: 0; transform: translateX(-4px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .neofetch-card,
+    .neofetch-row {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  #client-neofetch .neofetch-row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+
+  .contact-btn:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-active);
+    background: var(--color-surface-alt);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function renderClientNeofetch() {
+      const container = document.getElementById('client-neofetch');
+      if (!container) return;
+
+      // GPU via WebGL
+      const gpu = (() => {
+        try {
+          const canvas = document.createElement('canvas');
+          const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+          if (!gl) return null;
+          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+          return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null;
+        } catch { return null; }
+      })();
+
+      // Memory (Chrome only)
+      const mem = navigator.deviceMemory ? navigator.deviceMemory + ' GB' : null;
+
+      // CPU cores
+      const cores = navigator.hardwareConcurrency;
+
+      // Resolution
+      const res = screen.width + '\u00d7' + screen.height + ' @ ' + devicePixelRatio + 'x';
+
+      // Timezone
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const ua = navigator.userAgent;
+
+      // Browser + version
+      const detectBrowser = () => {
+        if (ua.includes('Firefox/')) return 'Firefox ' + ua.split('Firefox/')[1].split(' ')[0];
+        if (ua.includes('Edg/')) return 'Edge ' + ua.split('Edg/')[1].split(' ')[0];
+        if (ua.includes('OPR/') || ua.includes('Opera')) return 'Opera ' + (ua.split('OPR/')[1] || '').split(' ')[0];
+        if (ua.includes('Chrome/') && !ua.includes('Edg/')) return 'Chrome ' + ua.split('Chrome/')[1].split(' ')[0];
+        if (ua.includes('Safari/') && !ua.includes('Chrome')) return 'Safari ' + (ua.split('Version/')[1] || '').split(' ')[0];
+        return 'Unknown';
+      };
+
+      const browser = detectBrowser();
+
+      const rows = [
+        { key: 'Browser', val: browser },
+        { key: 'Resolution', val: res },
+        cores ? { key: 'CPU', val: cores + ' cores' } : null,
+        gpu ? { key: 'GPU', val: gpu } : null,
+        mem ? { key: 'Memory', val: mem } : null,
+        { key: 'Language', val: navigator.language || '—' },
+        { key: 'Timezone', val: tz },
+      ].filter(Boolean);
+
+      container.innerHTML = rows.map(function (r) {
+        return '<div class="neofetch-row"><span class="neofetch-key">' + r.key + '</span><span class="neofetch-sep">:</span><span class="neofetch-val">' + r.val + '</span></div>';
+      }).join('');
+    }
+
+    renderClientNeofetch();
+    document.addEventListener('astro:page-load', renderClientNeofetch);
+  })();
+</script>

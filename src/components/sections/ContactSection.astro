@@ -1,0 +1,70 @@
+---
+import SectionPanel from '../layout/SectionPanel.astro';
+import { siteConfig } from '../../content/cv';
+
+const links = [
+  {
+    label: 'email',
+    value: siteConfig.email,
+    href: `mailto:${siteConfig.email}`,
+    icon: '✉',
+    external: false,
+  },
+  {
+    label: 'linkedin',
+    value: 'linkedin.com/in/luisarg03',
+    href: siteConfig.linkedin,
+    icon: '⊞',
+    external: true,
+  },
+  {
+    label: 'github',
+    value: 'github.com/luisarg03',
+    href: siteConfig.github,
+    icon: '⌥',
+    external: true,
+  },
+  {
+    label: 'cv',
+    value: 'Download PDF →',
+    href: '/cv.pdf',
+    icon: '📄',
+    external: false,
+    download: true,
+  },
+];
+---
+
+<SectionPanel title="Contact" id="contact" class="top-glow">
+  <ul class="bento gap-2">
+    {links.map((link, i) => (
+      <li class="reveal-on-view lg:col-span-2">
+        <a
+          href={link.href}
+          {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
+          {...(link.download ? { download: true } : {})}
+          class="panel flex items-center gap-3 p-3 glow-hover group no-underline transition-all"
+        >
+          <span class="flex-shrink-0 w-7 h-7 rounded bg-[var(--color-surface-alt)] border border-[var(--color-border)] flex items-center justify-center text-xs group-hover:border-[var(--color-accent)] group-hover:text-[var(--color-accent)] transition-colors">
+            {link.icon}
+          </span>
+
+          <div class="min-w-0 flex-1">
+            <span class="block font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">
+              {link.label}
+            </span>
+            <span class="block text-[var(--text-sm)] text-[var(--color-text)] truncate group-hover:text-[var(--color-accent)] transition-colors">
+              {link.value}
+            </span>
+          </div>
+
+          {link.external && (
+            <span class="text-[var(--color-text-muted)] group-hover:text-[var(--color-accent)] transition-colors flex-shrink-0" aria-hidden="true">
+              ↗
+            </span>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</SectionPanel>

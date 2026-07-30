@@ -1,0 +1,489 @@
+---
+// Command palette: ⌘K / Ctrl+K keyboard-first navigation
+// Hand-rolled vanilla JS (no cmdk dependency — Option B)
+// Spec: site-navigation § Command palette
+// ARIA: combobox + listbox pattern per WAI-APG
+---
+
+<!-- The overlay serves as both backdrop and focus trap container -->
+<div
+  id="command-palette-overlay"
+  class="command-palette-overlay"
+  hidden
+  aria-hidden="true"
+  role="presentation"
+>
+  <!-- Clickable backdrop — clicks bubble up to overlay listener -->
+  <div class="command-palette-backdrop" data-close-palette role="presentation"></div>
+
+  <div
+    class="command-palette-dialog"
+    role="combobox"
+    aria-expanded="false"
+    aria-controls="command-palette-listbox"
+    aria-haspopup="listbox"
+    aria-label="Command palette"
+  >
+    <div class="command-palette-input-wrapper">
+      <svg class="command-palette-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M11 11 14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input
+        id="command-palette-input"
+        class="command-palette-input"
+        type="text"
+        role="searchbox"
+        aria-label="Search commands"
+        aria-autocomplete="list"
+        aria-controls="command-palette-listbox"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Type a command…"
+      />
+      <kbd class="command-palette-hint">ESC</kbd>
+    </div>
+
+    <ul id="command-palette-listbox" class="command-palette-list" role="listbox" aria-label="Commands">
+      <!-- Populated by JS -->
+    </ul>
+
+    <div class="command-palette-footer" aria-hidden="true">
+      <span class="command-palette-footer-hint"><kbd>↑↓</kbd> navigate</span>
+      <span class="command-palette-footer-hint"><kbd>↵</kbd> select</span>
+      <span class="command-palette-footer-hint"><kbd>ESC</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .command-palette-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+  }
+
+  .command-palette-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 14, 20, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .command-palette-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(90vw, 36rem);
+    background: var(--color-surface, #131820);
+    border: 1px solid var(--color-border-active, #344860);
+    border-radius: 10px;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(88, 166, 255, 0.08);
+    overflow: hidden;
+    animation: palette-enter 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes palette-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .command-palette-dialog {
+      animation: none;
+    }
+  }
+
+  .command-palette-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border, #232d3d);
+  }
+
+  .command-palette-search-icon {
+    flex-shrink: 0;
+    color: var(--color-text-muted, #6e7681);
+  }
+
+  .command-palette-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text, #c9d1d9);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: var(--text-sm, 0.8125rem);
+    caret-color: var(--color-accent, #58a6ff);
+  }
+
+  .command-palette-input::placeholder {
+    color: var(--color-text-muted, #6e7681);
+    opacity: 0.6;
+  }
+
+  .command-palette-hint {
+    flex-shrink: 0;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--color-surface-alt, #1a2230);
+    color: var(--color-text-muted, #6e7681);
+    border: 1px solid var(--color-border, #232d3d);
+    line-height: 1.4;
+  }
+
+  .command-palette-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.375rem;
+    max-height: 320px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border, #232d3d) transparent;
+  }
+
+  .command-palette-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .command-palette-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .command-palette-list::-webkit-scrollbar-thumb {
+    background: var(--color-border, #232d3d);
+    border-radius: 2px;
+  }
+
+  .command-palette-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    scroll-margin: 4px;
+    transition: background 0.05s ease;
+  }
+
+  .command-palette-item--active {
+    background: var(--color-surface-alt, #1a2230);
+    outline: 1px solid var(--color-border-active, #344860);
+  }
+
+  .command-palette-item-label {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: var(--text-sm, 0.8125rem);
+    color: var(--color-text, #c9d1d9);
+  }
+
+  .command-palette-item-section {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    color: var(--color-text-muted, #6e7681);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--color-surface-alt, #1a2230);
+    border: 1px solid var(--color-border, #232d3d);
+  }
+
+  .command-palette-empty {
+    padding: 1.5rem 0.75rem;
+    text-align: center;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: var(--text-sm, 0.8125rem);
+    color: var(--color-text-muted, #6e7681);
+  }
+
+  .command-palette-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--color-border, #232d3d);
+    background: var(--color-bg, #0a0e14);
+  }
+
+  .command-palette-footer-hint {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    color: var(--color-text-muted, #6e7681);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .command-palette-footer-hint kbd {
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--color-surface-alt, #1a2230);
+    border: 1px solid var(--color-border, #232d3d);
+    font-family: inherit;
+    font-size: inherit;
+    color: var(--color-text, #c9d1d9);
+  }
+</style>
+
+<script>
+  // @ts-nocheck — inline script, strict DOM checks add no value
+  (function () {
+    'use strict';
+
+    // ── Data ──────────────────────────────────────────────────────────────
+    const commands = [
+      { id: 'experience', label: 'Jump to Experience', section: 'Sections', action: 'navigate', value: '/#experience' },
+      { id: 'skills', label: 'Jump to Skills', section: 'Sections', action: 'navigate', value: '/#skills' },
+      { id: 'now', label: 'Go to /now', section: 'Pages', action: 'navigate', value: '/now' },
+      { id: 'linkedin', label: 'Open LinkedIn', section: 'Links', action: 'external', value: 'https://linkedin.com/in/luisarg03' },
+      { id: 'github', label: 'Open GitHub', section: 'Links', action: 'external', value: 'https://github.com/luisarg03' },
+      { id: 'email', label: 'Copy email', section: 'Actions', action: 'clipboard', value: 'luis.m.paz.03@gmail.com' },
+      { id: 'terminal', label: 'Open Terminal', section: 'Actions', action: 'navigate', value: '/terminal' },
+      { id: 'cv', label: 'Download CV', section: 'Actions', action: 'download', value: '/cv.pdf' },
+    ];
+
+    // ── Refs ──────────────────────────────────────────────────────────────
+    const overlay = document.getElementById('command-palette-overlay');
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById('command-palette-input'));
+    const listbox = document.getElementById('command-palette-listbox');
+    const dialog = overlay ? overlay.querySelector('[role="combobox"]') : null;
+
+    let activeIndex = -1;
+    let lastActiveElement = /** @type {Element|null} */ (null);
+    let isOpen = false;
+
+    if (!overlay || !input || !listbox || !dialog) {
+      console.warn('CommandPalette: required elements not found');
+      return;
+    }
+
+    // ── Fuzzy match (subset match maintaining order) ──────────────────────
+    function fuzzyMatch(text, query) {
+      if (!query) return true;
+      const lower = text.toLowerCase();
+      const q = query.toLowerCase();
+      let qi = 0;
+      for (let i = 0; i < lower.length && qi < q.length; i++) {
+        if (lower[i] === q[qi]) qi++;
+      }
+      return qi === q.length;
+    }
+
+    // ── Get filtered list ─────────────────────────────────────────────────
+    function getFiltered() {
+      const query = input.value;
+      if (!query) return commands;
+      return commands.filter(function (c) {
+        return fuzzyMatch(c.label, query) || fuzzyMatch(c.section, query);
+      });
+    }
+
+    // ── Render list items ─────────────────────────────────────────────────
+    function renderList(query) {
+      var filtered = getFiltered();
+
+      listbox.innerHTML = '';
+      activeIndex = -1;
+
+      if (filtered.length === 0) {
+        var empty = document.createElement('li');
+        empty.className = 'command-palette-empty';
+        empty.textContent = 'No results found';
+        empty.setAttribute('role', 'option');
+        empty.setAttribute('aria-selected', 'false');
+        listbox.appendChild(empty);
+        if (dialog) dialog.setAttribute('aria-activedescendant', '');
+        return;
+      }
+
+      for (var i = 0; i < filtered.length; i++) {
+        var cmd = filtered[i];
+        var li = document.createElement('li');
+        li.className = 'command-palette-item';
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', 'false');
+        li.dataset.index = String(i);
+        li.dataset.commandId = cmd.id;
+
+        // Not assigning ids to avoid conflicts; we use index-based activedescendant
+        var labelSpan = document.createElement('span');
+        labelSpan.className = 'command-palette-item-label';
+        labelSpan.textContent = cmd.label;
+
+        var sectionSpan = document.createElement('span');
+        sectionSpan.className = 'command-palette-item-section';
+        sectionSpan.textContent = cmd.section;
+
+        li.appendChild(labelSpan);
+        li.appendChild(sectionSpan);
+
+        li.addEventListener('click', function (idx) {
+          return function () { executeCommand(idx); };
+        }(i));
+
+        li.addEventListener('mousemove', function (idx) {
+          return function () { setActive(idx); };
+        }(i));
+
+        listbox.appendChild(li);
+      }
+    }
+
+    // ── Set active item ──────────────────────────────────────────────────
+    function setActive(index) {
+      var items = listbox.querySelectorAll('.command-palette-item');
+      var filtered = getFiltered();
+      if (index < 0) index = 0;
+      if (index >= filtered.length) index = filtered.length - 1;
+
+      for (var i = 0; i < items.length; i++) {
+        var sel = i === index;
+        items[i].classList.toggle('command-palette-item--active', sel);
+        items[i].setAttribute('aria-selected', String(sel));
+      }
+      activeIndex = index;
+
+      var activeEl = items[index];
+      if (activeEl) {
+        // Use a generated id for aria-activedescendant
+        var aid = 'cp-option-' + index;
+        activeEl.id = aid;
+        dialog.setAttribute('aria-activedescendant', aid);
+        activeEl.scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    // ── Execute command ───────────────────────────────────────────────────
+    function executeCommand(index) {
+      var filtered = getFiltered();
+      if (index < 0 || index >= filtered.length) return;
+      var cmd = filtered[index];
+      closePalette();
+
+      // Delay slightly to let close animation settle
+      setTimeout(function () {
+        switch (cmd.action) {
+          case 'navigate':
+            window.location.href = cmd.value;
+            break;
+          case 'external':
+            window.open(cmd.value, '_blank', 'noopener');
+            break;
+          case 'clipboard':
+            navigator.clipboard.writeText(cmd.value).catch(function () {});
+            break;
+          case 'download':
+            window.location.href = cmd.value;
+            break;
+        }
+      }, 80);
+    }
+
+    // ── Open ──────────────────────────────────────────────────────────────
+    function openPalette() {
+      if (isOpen) return;
+      isOpen = true;
+      lastActiveElement = document.activeElement;
+      overlay.removeAttribute('hidden');
+      overlay.setAttribute('aria-hidden', 'false');
+      dialog.setAttribute('aria-expanded', 'true');
+      renderList('');
+      // Focus input on next frame
+      requestAnimationFrame(function () { input.focus(); });
+    }
+
+    // ── Close ─────────────────────────────────────────────────────────────
+    function closePalette() {
+      if (!isOpen) return;
+      isOpen = false;
+      overlay.setAttribute('hidden', '');
+      overlay.setAttribute('aria-hidden', 'true');
+      dialog.setAttribute('aria-expanded', 'false');
+      dialog.setAttribute('aria-activedescendant', '');
+      listbox.innerHTML = '';
+      // Restore focus
+      if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
+        lastActiveElement.focus();
+      }
+    }
+
+    // ── Global keydown handler ───────────────────────────────────────────
+    document.addEventListener('keydown', function (e) {
+      // ⌘K / Ctrl+K toggle
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (isOpen) {
+          closePalette();
+        } else {
+          openPalette();
+        }
+        return;
+      }
+
+      // Navigation (only when open)
+      if (!isOpen) return;
+
+      var filtered = getFiltered();
+      var maxIndex = filtered.length - 1;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setActive(activeIndex < maxIndex ? activeIndex + 1 : 0);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setActive(activeIndex > 0 ? activeIndex - 1 : maxIndex);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          executeCommand(activeIndex);
+          break;
+        case 'Escape':
+          e.preventDefault();
+          closePalette();
+          break;
+        case 'Tab':
+          e.preventDefault();
+          {
+            var dir = e.shiftKey ? -1 : 1;
+            var next = activeIndex + dir;
+            if (next < 0) setActive(maxIndex);
+            else if (next > maxIndex) setActive(0);
+            else setActive(next);
+          }
+          break;
+      }
+    });
+
+    // ── Backdrop click ────────────────────────────────────────────────────
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay || e.target.closest('[data-close-palette]')) {
+        closePalette();
+      }
+    });
+
+    // ── Input events ──────────────────────────────────────────────────────
+    input.addEventListener('input', function () {
+      renderList(input.value);
+      // Reset active to first item
+      if (getFiltered().length > 0) {
+        setActive(0);
+      }
+    });
+  })();
+</script>

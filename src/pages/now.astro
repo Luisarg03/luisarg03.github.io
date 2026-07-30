@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionPanel from '../components/SectionPanel.astro';
-import StatusIndicator from '../components/StatusIndicator.astro';
+import SectionPanel from '../components/layout/SectionPanel.astro';
+import StatusIndicator from '../components/ui/StatusIndicator.astro';
 import { getEntry, render } from 'astro:content';
 
 const entry = await getEntry('now', 'now');
@@ -18,7 +18,7 @@ const formattedDate = updated.toLocaleDateString('en-US', {
 
 <BaseLayout title="/now — Luis Meyehen Paz">
   <!-- System status header -->
-  <div class="mb-8">
+  <div class="mb-4">
     <div class="flex items-center gap-3 mb-2">
       <StatusIndicator status="active" label="operational" />
       <span class="h-px flex-1 bg-[var(--color-border)]"></span>
@@ -29,9 +29,9 @@ const formattedDate = updated.toLocaleDateString('en-US', {
   </div>
 
   <!-- Active projects — dashboard cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 stagger">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 stagger">
     <!-- Study progress -->
-    <div class="panel p-5 card-accent-top">
+    <div class="panel p-4 card-accent-top">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           AWS DevOps Cert
@@ -45,7 +45,7 @@ const formattedDate = updated.toLocaleDateString('en-US', {
     </div>
 
     <!-- English -->
-    <div class="panel p-5 card-accent-top">
+    <div class="panel p-4 card-accent-top">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           English
@@ -59,7 +59,7 @@ const formattedDate = updated.toLocaleDateString('en-US', {
     </div>
 
     <!-- Japan -->
-    <div class="panel p-5 card-accent-top">
+    <div class="panel p-4 card-accent-top">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           Japan Trip
@@ -88,9 +88,9 @@ const formattedDate = updated.toLocaleDateString('en-US', {
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--color-text-muted);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.375rem;
     border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
@@ -113,11 +113,11 @@ const formattedDate = updated.toLocaleDateString('en-US', {
   .prose-content :global(ul) {
     list-style: none;
     padding-left: 0;
-    margin: 0.5rem 0 1rem;
+    margin: 0.375rem 0 0.75rem;
   }
 
   .prose-content :global(li) {
-    margin: 0.35rem 0;
+    margin: 0.25rem 0;
     padding-left: 1rem;
     position: relative;
   }

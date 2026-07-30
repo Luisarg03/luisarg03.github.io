@@ -214,5 +214,5 @@ export const siteConfig: SiteConfig = {
   github: 'https://github.com/luisarg03',
   availability: 'Currently at Interbank',
   summary:
-    'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms.',
+    'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms. Experience spanning cloud infrastructure, internal developer platforms, cost and workload observability, and AI-assisted developer workflows. Track record enabling Data Science and engineering teams through reusable infrastructure, self-service tooling, and platform engineering.',
 };
