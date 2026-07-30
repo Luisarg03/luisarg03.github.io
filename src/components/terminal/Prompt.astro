@@ -1,0 +1,58 @@
+---
+export interface Props {
+  user?: string;
+  host?: string;
+  path?: string;
+}
+
+const { user = 'luis', host = 'arch', path = '~' } = Astro.props;
+---
+
+<span class="prompt-user">{user}</span><!--
+--><span class="prompt-at">@</span><!--
+--><span class="prompt-host">{host}</span><!--
+--><span class="prompt-colon">:</span><!--
+--><span class="prompt-path">{path}</span><!--
+--><span class="prompt-dollar">$ </span><!--
+--><span class="cursor">&#9608;</span>
+
+<style>
+  .prompt-user {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .prompt-at {
+    color: var(--color-text-muted);
+  }
+  .prompt-host {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .prompt-colon {
+    color: var(--color-text-muted);
+  }
+  .prompt-path {
+    color: var(--color-text);
+  }
+  .prompt-dollar {
+    color: var(--color-accent);
+  }
+  .cursor {
+    color: var(--color-text);
+    animation: cursor-blink 1s step-end infinite;
+  }
+  @keyframes cursor-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cursor {
+      animation: none;
+    }
+  }
+</style>

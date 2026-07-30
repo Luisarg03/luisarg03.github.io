@@ -1,8 +1,8 @@
 ---
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
-import BlueprintGrid from '../components/BlueprintGrid.astro';
-import CommandPalette from '../components/CommandPalette.astro';
+import BlueprintGrid from '../components/layout/BlueprintGrid.astro';
+import CommandPalette from '../components/ui/CommandPalette.astro';
 
 export interface Props {
   title: string;
@@ -104,13 +104,13 @@ const ogImageURL = `${canonicalURL.origin}/monogram.svg`;
       </nav>
     </header>
 
-    <main class="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-16 lg:py-20">
+    <main class="relative z-10 max-w-6xl mx-auto px-6 py-6 md:py-8 lg:py-10">
       <!-- TODO(lane 3): add transition:name="hero-block" to the hero <section> in Hero.astro -->
       <slot />
     </main>
 
     <!-- Footer — system status bar -->
-    <footer class="relative z-10 border-t border-[var(--color-border)] mt-24">
+    <footer class="relative z-10 border-t border-[var(--color-border)] mt-6 md:mt-8">
       <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
 
       <!-- Dynamic status row: section, scroll progress, local time -->
@@ -130,12 +130,20 @@ const ogImageURL = `${canonicalURL.origin}/monogram.svg`;
         </div>
       </div>
 
-      <div class="max-w-6xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
         <div class="flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] status-dot status-dot--active" aria-hidden="true"></span>
           <span class="text-[var(--color-success)]">SYSTEM STATUS: ONLINE</span>
           <span class="text-[var(--color-border)]">·</span>
           <span>© 2026 Luis Meyehen Paz</span>
+          <span class="text-[var(--color-border)]">·</span>
+          <a
+            href="/terminal"
+            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors"
+            title="Open terminal"
+          >
+            <span class="text-[var(--color-accent)]">$</span> terminal
+          </a>
         </div>
         <div class="flex items-center gap-3">
           <span>astro</span>
@@ -152,122 +160,13 @@ const ogImageURL = `${canonicalURL.origin}/monogram.svg`;
       <CommandPalette />
     </div>
 
-    <!-- Status bar updates: section, scroll progress, local time (rAF-throttled) -->
-    <script>
-      // @ts-nocheck
-      (function () {
-        var sectionEl = document.getElementById('status-section');
-        var scrollEl = document.getElementById('status-scroll');
-        var timeEl = document.getElementById('status-time');
-        if (!sectionEl && !scrollEl && !timeEl) return;
+    <!-- Status bar: section, scroll progress, local time (rAF-throttled) -->
+    <script is:inline src="/scripts/status-bar.js"></script>
 
-        var sections = [
-          { id: 'experience', label: 'experience' },
-          { id: 'skills', label: 'infrastructure' },
-          { id: 'contact', label: 'contact' },
-        ];
-        var currentSection = 'hero';
+    <!-- Scroll reveal: IntersectionObserver for .reveal / .reveal-on-view* / .draw-on-scroll -->
+    <script is:inline src="/scripts/scroll-observer.js"></script>
 
-        function updateSection(id) {
-          for (var i = 0; i < sections.length; i++) {
-            if (sections[i].id === id) { currentSection = sections[i].label; return; }
-          }
-          currentSection = '—';
-        }
-
-        if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(
-            function (entries) {
-              var best = null, bestRatio = 0;
-              for (var i = 0; i < entries.length; i++) {
-                if (entries[i].isIntersecting && entries[i].intersectionRatio > bestRatio) {
-                  best = entries[i].target.id;
-                  bestRatio = entries[i].intersectionRatio;
-                }
-              }
-              currentSection = window.scrollY < 300 ? 'hero' : best ? (updateSection(best), currentSection) : currentSection;
-            },
-            { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.75] }
-          );
-          for (var i = 0; i < sections.length; i++) {
-            var el = document.getElementById(sections[i].id);
-            if (el) io.observe(el);
-          }
-        }
-
-        function tick() {
-          var scrollTop = window.scrollY;
-          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-          var pct = docHeight > 0 ? Math.min(Math.round((scrollTop / docHeight) * 100), 100) : 0;
-          var now = new Date();
-          var hh = String(now.getHours()).padStart(2, '0');
-          var mm = String(now.getMinutes()).padStart(2, '0');
-
-          if (sectionEl) sectionEl.textContent = 'section: ' + currentSection;
-          if (scrollEl) scrollEl.textContent = pct + '%';
-          if (timeEl) timeEl.textContent = hh + ':' + mm;
-          requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      })();
-    </script>
-
-    <!-- Scroll observer: reveal sections on scroll, track velocity for blueprint -->
-    <script>
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // Reveal on scroll using IntersectionObserver
-      const scrollRevealSelectors = '.reveal, .reveal-on-view, .reveal-on-view-delay-1, .reveal-on-view-delay-2, .reveal-on-view-delay-3, .reveal-on-view-delay-4, .draw-on-scroll';
-      if (!reduceMotion && 'IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            }
-          },
-          { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
-        );
-        document.querySelectorAll(scrollRevealSelectors).forEach((el) => observer.observe(el));
-      } else {
-        // Fallback: show everything immediately
-        document.querySelectorAll(scrollRevealSelectors).forEach((el) => el.classList.add('is-visible'));
-      }
-
-      // Scroll velocity tracker for blueprint
-      let lastScrollY = 0;
-      let velocity = 0;
-      const DECAY = 0.92;
-
-      function onScroll() {
-        const y = window.scrollY;
-        velocity = Math.abs(y - lastScrollY);
-        lastScrollY = y;
-        // Clamp velocity to [0, 1] range
-        const v = Math.min(velocity / 30, 1);
-        document.documentElement.style.setProperty('--scroll-velocity', v.toFixed(3));
-        requestAnimationFrame(offScroll);
-      }
-
-      let ticking = false;
-      function offScroll() { ticking = false; }
-      function throttledScroll() {
-        if (!ticking) {
-          requestAnimationFrame(onScroll);
-          ticking = true;
-        }
-      }
-
-      window.addEventListener('scroll', throttledScroll, { passive: true });
-
-      // Decay velocity when not scrolling
-      setInterval(() => {
-        velocity *= DECAY;
-        const v = Math.min(velocity / 30, 1);
-        document.documentElement.style.setProperty('--scroll-velocity', v.toFixed(3));
-      }, 50);
-    </script>
+    <!-- Scroll velocity tracker: sets --scroll-velocity for blueprint background -->
+    <script is:inline src="/scripts/velocity-tracker.js"></script>
   </body>
 </html>

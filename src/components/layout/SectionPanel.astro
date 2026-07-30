@@ -1,0 +1,82 @@
+---
+export interface Props {
+  title?: string;
+  id?: string;
+  class?: string;
+}
+
+const { title, id, class: className = '' } = Astro.props;
+const tabPath = title ? `~/${title.toLowerCase().replace(/\s+/g, '-')}` : null;
+---
+
+<section id={id} class:list={['panel relative', className]}>
+  {title && tabPath && (
+    <div class="section-tab" aria-hidden="true">
+      <span class="section-tab-path">{tabPath}</span>
+      <span class="section-tab-dots">
+        <span class="section-tab-dot"></span>
+        <span class="section-tab-dot"></span>
+        <span class="section-tab-dot"></span>
+      </span>
+    </div>
+  )}
+  <div class="p-4 md:p-6 lg:p-8">
+    {title && (
+      <h2 class="section-label mb-4">
+        {title}
+      </h2>
+    )}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section-tab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--tab-bar-height);
+    padding: 0 1rem;
+    background: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .section-tab-path {
+    letter-spacing: 0.02em;
+  }
+
+  .section-tab-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .section-tab-dot {
+    width: var(--tab-dot-size);
+    height: var(--tab-dot-size);
+    border-radius: 50%;
+    background: var(--tab-dot-color);
+    display: block;
+  }
+
+  .section-label {
+    color: var(--color-text-muted);
+  }
+
+  .section-label::before {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 639px) {
+    .section-tab {
+      padding: 0 0.75rem;
+    }
+    .section-tab-dots {
+      gap: 6px;
+    }
+  }
+</style>

@@ -1,27 +1,13 @@
 ---
+import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import ExperienceTimeline from '../components/ExperienceTimeline.astro';
-import SkillMap from '../components/SkillMap.astro';
-import ContactSection from '../components/ContactSection.astro';
-import { siteConfig } from '../content/cv';
+import Hero from '../components/sections/Hero.astro';
+import ExperienceTimeline from '../components/sections/ExperienceTimeline.astro';
+import SkillMap from '../components/sections/SkillMap.astro';
 ---
 
-<BaseLayout
-  title={`${siteConfig.name} — ${siteConfig.role}`}
-  description={siteConfig.summary}
->
+<BaseLayout title="Luis Meyehen Paz — Cloud Engineer">
   <Hero />
-
-  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
-
   <ExperienceTimeline />
-
-  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
-
   <SkillMap />
-
-  <div class="section-connector my-8 md:my-12" aria-hidden="true"></div>
-
-  <ContactSection />
 </BaseLayout>
