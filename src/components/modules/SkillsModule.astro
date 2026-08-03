@@ -24,7 +24,6 @@ function profToPercent(p: number): number {
     <!-- Table header -->
     <div class="skills-table-header">
       <span class="skills-col-pid">PID</span>
-      <span class="skills-col-user">USER</span>
       <span class="skills-col-cpu">CPU%</span>
       <span class="skills-col-mem">MEM%</span>
       <span class="skills-col-cmd">COMMAND</span>
@@ -36,19 +35,18 @@ function profToPercent(p: number): number {
         const pid = String(i + 1).padStart(3, '0');
         const cpu = profToPercent(cat.proficiency);
         const mem = profToPercent(cat.proficiency) - 5;
-        const isExpanded = i < 4; // first 4 expanded by default on desktop
+        // Collapsed by default on all viewports (D5); expand on click
         const rowId = `skill-row-${i}`;
 
         return (
           <div class="skills-row-wrap" data-index={i}>
             <button
               class="skills-row skills-row-toggle"
-              aria-expanded={isExpanded ? 'true' : 'false'}
+              aria-expanded="false"
               aria-controls={`${rowId}-details`}
               data-row-id={rowId}
             >
               <span class="skills-col-pid">{pid}</span>
-              <span class="skills-col-user">luis</span>
               <span class="skills-col-cpu">
                 <span class="skills-bar-wrap">
                   <span class="skills-bar" style={`width: ${cpu}%`}></span>
@@ -72,7 +70,7 @@ function profToPercent(p: number): number {
               class="skills-details"
               role="region"
               aria-labelledby={rowId}
-              hidden={!isExpanded}
+              hidden
             >
               <div class="skills-detail-inner">
                 {cat.skills.map((skill) => (
@@ -90,49 +88,27 @@ function profToPercent(p: number): number {
 <script>
   // @ts-nocheck
   (function () {
-    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var isMobile = window.matchMedia('(max-width: 639px)').matches;
+    // Rows render collapsed server-side on all viewports (D5). Single
+    // document-level listener (delegation): survives the full DOM swaps of
+    // Astro view transitions, which drop per-button listeners after nav.
+    document.addEventListener('click', function (event) {
+      var btn = event.target.closest ? event.target.closest('.skills-row-toggle') : null;
+      if (!btn) return;
 
-    // On mobile, collapse all rows initially
-    if (isMobile) {
-      document.querySelectorAll('.skills-row-toggle').forEach(function (btn) {
-        btn.setAttribute('aria-expanded', 'false');
-        var id = btn.getAttribute('aria-controls');
-        var panel = id ? document.getElementById(id) : null;
-        if (panel) panel.hidden = true;
-      });
-    }
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      var id = btn.getAttribute('aria-controls');
+      var panel = id ? document.getElementById(id) : null;
+      if (!panel) return;
 
-    // Toggle rows
-    document.querySelectorAll('.skills-row-toggle').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var expanded = this.getAttribute('aria-expanded') === 'true';
-        var id = this.getAttribute('aria-controls');
-        var panel = id ? document.getElementById(id) : null;
-        if (!panel) return;
+      btn.setAttribute('aria-expanded', String(!expanded));
+      panel.hidden = expanded;
 
-        this.setAttribute('aria-expanded', String(!expanded));
-        panel.hidden = expanded;
-
-        // Rotate chevron
-        var chevron = this.querySelector('.skills-chevron');
-        if (chevron) {
-          chevron.style.transform = expanded ? '' : 'rotate(90deg)';
-        }
-      });
+      // Rotate chevron
+      var chevron = btn.querySelector('.skills-chevron');
+      if (chevron) {
+        chevron.style.transform = expanded ? '' : 'rotate(90deg)';
+      }
     });
-
-    // Desktop: expand all rows by default (override the isExpanded from server)
-    if (!isMobile) {
-      document.querySelectorAll('.skills-row-toggle').forEach(function (btn) {
-        btn.setAttribute('aria-expanded', 'true');
-        var id = btn.getAttribute('aria-controls');
-        var panel = id ? document.getElementById(id) : null;
-        if (panel) panel.hidden = false;
-        var chevron = btn.querySelector('.skills-chevron');
-        if (chevron) chevron.style.transform = 'rotate(90deg)';
-      });
-    }
   })();
 </script>
 
@@ -156,7 +132,7 @@ function profToPercent(p: number): number {
   /* ── Table header ────────────────────────────────────────────────────── */
   .skills-table-header {
     display: grid;
-    grid-template-columns: 3.5rem 4rem 1fr 1fr 1fr;
+    grid-template-columns: 3.5rem 1fr 1fr 1fr;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
     font-family: var(--font-mono);
@@ -180,7 +156,7 @@ function profToPercent(p: number): number {
 
   .skills-row {
     display: grid;
-    grid-template-columns: 3.5rem 4rem 1fr 1fr 1fr;
+    grid-template-columns: 3.5rem 1fr 1fr 1fr;
     gap: var(--space-2);
     align-items: center;
     width: 100%;
@@ -205,10 +181,6 @@ function profToPercent(p: number): number {
   }
 
   .skills-col-pid {
-    color: var(--color-text-muted);
-  }
-
-  .skills-col-user {
     color: var(--color-text-muted);
   }
 
@@ -327,10 +299,6 @@ function profToPercent(p: number): number {
       grid-column: 1;
       grid-row: 1;
       font-size: var(--text-xs);
-    }
-
-    .skills-col-user {
-      display: none;
     }
 
     .skills-col-cmd {

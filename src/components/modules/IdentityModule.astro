@@ -92,7 +92,7 @@ const currentRole = experience.find((e) => e.endDate === null);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     margin: 0 0 var(--space-4);
-    opacity: 0.6;
+    /* Full opacity: 0.6 x #7d8794 blends to ~3:1, failing WCAG AA */
   }
 
   /* ── Name ────────────────────────────────────────────────────────────── */
