@@ -1,9 +1,5 @@
-# Home Hero
+## MODIFIED Requirements
 
-## Purpose
-
-The hero section of the landing page. Presents identity facts (name, role, seniority, current company, location) with a clear visual hierarchy so a recruiter can grasp who this is within ten seconds, followed by the professional summary and unambiguous contact actions — with decorative and footer chrome kept subordinate.
-## Requirements
 ### Requirement: Hero identity hierarchy
 
 The identity module SHALL present the full name, role, seniority, current company, and location in plain language in the first viewport without scrolling. The identity module MAY include a decorative neofetch-style card (Arch ASCII art plus persona-mapped rows) alongside the identity content; the card SHALL NOT displace the required identity fields from the first viewport at any viewport width.
@@ -24,7 +20,7 @@ The identity module SHALL present the full name, role, seniority, current compan
 
 #### Scenario: Neofetch card renders alongside identity
 - **WHEN** the identity module renders
-- **THEN** the Arch ASCII art is positioned alongside the name and role fields
+- **THEN** the neofetch card shows the Arch ASCII art and persona rows
 - **AND** the name, role, years, company, and location remain visible in the first viewport without scrolling
 
 #### Scenario: Neofetch card is decorative
@@ -32,23 +28,9 @@ The identity module SHALL present the full name, role, seniority, current compan
 - **THEN** it is aria-hidden
 - **AND** carries no required information
 
-### Requirement: Summary placement
-The professional summary (`siteConfig.summary`) SHALL render directly below the name/role block and above the contact actions within the whoami module.
-
-#### Scenario: Summary before actions
-- **WHEN** the whoami module renders
-- **THEN** document order is: name/role → summary → contact actions
-
-### Requirement: Contact affordances
-Whoami module contact actions SHALL use unambiguous text labels (Email, LinkedIn, GitHub, CV) rendered as an `ls /contact/` file listing, and SHALL be visible in the first viewport alongside the identity block; the boot overlay does not delay them.
-
-#### Scenario: Zero-click clarity
-- **WHEN** a recruiter views the whoami module
-- **THEN** each contact action's destination is obvious from its label without relying on icon glyph knowledge
-
 ### Requirement: Hero decoration budget
 
-Decorative terminal elements (boot overlay, terminal prompts, Arch ASCII art) SHALL NOT carry required information and SHALL NOT displace identity content: the boot overlay plays over the identity content and fades within 2.5 seconds and is skippable; the Arch ASCII art SHALL sit alongside the identity fields on desktop and stack above them on mobile, keeping all identity fields in the first viewport with no horizontal overflow.
+Decorative terminal elements (boot overlay, terminal prompts, neofetch card) SHALL NOT carry required information and SHALL NOT displace identity content: the boot overlay plays over the identity content and fades within 2.5 seconds and is skippable; the neofetch card SHALL keep the identity fields in the first viewport and SHALL collapse gracefully on mobile (ASCII art hidden, rows stacked, no horizontal overflow).
 
 #### Scenario: No dominant decoration
 - **WHEN** the identity module renders
@@ -61,19 +43,11 @@ Decorative terminal elements (boot overlay, terminal prompts, Arch ASCII art) SH
 - **AND** the user can skip it with a single interaction
 - **AND** after fade the identity content occupies the first viewport
 
-#### Scenario: Neofetch art stacks on mobile
-- **WHEN** the identity module renders at 390px
+#### Scenario: Neofetch card does not displace identity
+- **WHEN** the neofetch card renders at 390px
 - **THEN** the identity fields remain in the first viewport
-- **AND** the Arch ASCII art is stacked above the name/details without horizontal overflow
+- **AND** the ASCII art is hidden without horizontal overflow
 
 #### Scenario: Neofetch ASCII art is copper and mono
 - **WHEN** the ASCII art renders
 - **THEN** it uses the monospace stack in the copper accent color (contrast >= 4.5:1 against the page background)
-
-### Requirement: Landing footer chrome
-The landing footer SHALL show only copyright and social links (LinkedIn, GitHub); technical diagnostics (scroll percentage, UTC clock, version string, terminal link) SHALL NOT be displayed.
-
-#### Scenario: Recruiter-relevant footer
-- **WHEN** a visitor reaches the page footer
-- **THEN** only copyright and social/profile links are present
-
