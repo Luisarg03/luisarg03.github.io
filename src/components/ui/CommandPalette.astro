@@ -71,8 +71,6 @@
     position: absolute;
     inset: 0;
     background: rgba(10, 14, 20, 0.75);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
   }
 
   .command-palette-dialog {
@@ -246,13 +244,16 @@
 
     // ── Data ──────────────────────────────────────────────────────────────
     const commands = [
-      { id: 'experience', label: 'Jump to Experience', section: 'Sections', action: 'navigate', value: '/#experience' },
-      { id: 'skills', label: 'Jump to Skills', section: 'Sections', action: 'navigate', value: '/#skills' },
+      { id: 'identity', label: 'cd /identity', section: 'Jump', action: 'navigate', value: '/#identity' },
+      { id: 'skills', label: 'cd /skills', section: 'Jump', action: 'navigate', value: '/#skills' },
+      { id: 'experience', label: 'cd /experience', section: 'Jump', action: 'navigate', value: '/#experience' },
+      { id: 'contact', label: 'cd /contact', section: 'Jump', action: 'navigate', value: '/#contact' },
+      { id: 'shutdown', label: 'shutdown', section: 'System', action: 'scroll-bottom', value: '' },
       { id: 'now', label: 'Go to /now', section: 'Pages', action: 'navigate', value: '/now' },
+      { id: 'terminal', label: 'Open Terminal', section: 'Pages', action: 'navigate', value: '/terminal' },
       { id: 'linkedin', label: 'Open LinkedIn', section: 'Links', action: 'external', value: 'https://linkedin.com/in/luisarg03' },
       { id: 'github', label: 'Open GitHub', section: 'Links', action: 'external', value: 'https://github.com/luisarg03' },
       { id: 'email', label: 'Copy email', section: 'Actions', action: 'clipboard', value: 'luis.m.paz.03@gmail.com' },
-      { id: 'terminal', label: 'Open Terminal', section: 'Actions', action: 'navigate', value: '/terminal' },
       { id: 'cv', label: 'Download CV', section: 'Actions', action: 'download', value: '/cv.pdf' },
     ];
 
@@ -388,6 +389,9 @@
             break;
           case 'download':
             window.location.href = cmd.value;
+            break;
+          case 'scroll-bottom':
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             break;
         }
       }, 80);

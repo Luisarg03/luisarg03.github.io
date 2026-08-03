@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ── Fonts (self-hosted via @fontsource-variable) ─────────── */
-@import "@fontsource-variable/inter/index.css";
+/* ponytail: Inter removed — mono-only identity; --font-sans kept for WorkspaceBar compat */
 @import "@fontsource-variable/jetbrains-mono/index.css";
 
 @theme {
@@ -12,7 +12,7 @@
   --color-border: #232d3d;
   --color-border-active: #344860;
   --color-text: #c9d1d9;
-  --color-text-muted: #6e7681;
+  --color-text-muted: #7d8794; /* WCAG AA (5.3:1) on --color-bg; #6e7681 was 4.2:1 */
   --color-accent: #f0b429;
   --color-accent-dim: #c4941a;
   --color-success: #3fb950;
@@ -33,14 +33,18 @@
   --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   /* Type scale — adjusted for readability */
-  --text-xs: 0.75rem;     /* 12px */
-  --text-sm: 0.875rem;    /* 14px */
+  --text-xs: 0.75rem;     /* 12px — fixed mono labels */
+  --text-sm: 0.875rem;    /* 14px — fixed mono labels */
   --text-base: 1rem;      /* 16px */
   --text-lg: 1.1875rem;   /* 19px */
   --text-xl: 1.5rem;      /* 24px */
   --text-2xl: 2rem;       /* 32px */
   --text-3xl: 2.75rem;    /* 44px */
   --text-4xl: 3.5rem;     /* 56px */
+
+  /* Fluid display scale — oversized hero heading */
+  --text-display: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+  --text-display-sm: clamp(1.75rem, 4vw + 0.5rem, 3.5rem);
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -78,9 +82,14 @@
 html {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 16px;
+  line-height: 1.6;
   scroll-behavior: smooth;
+  /* Reserve the scrollbar gutter so the boot overlay's scroll lock
+     (overflow: hidden) doesn't shift the layout when the bar disappears
+     and reappears (CLS). */
+  scrollbar-gutter: stable;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -436,21 +445,14 @@ body {
 }
 
 /* ── Glass card ─────────────────────────────────────────────────────── */
+/* ponytail: backdrop-filter removed — depth via border + shadow */
 .glass-card {
-  background: rgba(19, 24, 32, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1rem 1.25rem;
   margin: 0.5rem 0;
-}
-
-/* Fallback for browsers without backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  .glass-card {
-    background: var(--color-surface);
-  }
+  box-shadow: var(--panel-shadow);
 }
 
 /* ── Output fade-in ─────────────────────────────────────────────────── */
@@ -548,9 +550,7 @@ body {
 
 /* ── Floating widget ─────────────────────────────────────────────────── */
 .widget-float {
-  background: rgba(19, 24, 32, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--panel-radius);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);
@@ -583,4 +583,129 @@ body {
   opacity: 0.4;
   border-radius: 1px;
   filter: blur(1px);
+}
+
+/* ── Module divider (horizontal line that draws left-to-right) ──────── */
+.module-divider svg {
+  display: block;
+  width: 100%;
+  height: 2px;
+}
+
+.module-divider line {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  opacity: 0.25;
+}
+
+.module-divider.is-visible line {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@supports (animation-timeline: view()) {
+  .module-divider line {
+    transition: none;
+    animation: draw-scroll-path linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .module-divider line {
+    stroke-dashoffset: 0;
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ── Module content (reveal with staggered children) ────────────────── */
+.module-content {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.module-content.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.module-content.is-visible > *:nth-child(1) { transition-delay: 0.05s; }
+.module-content.is-visible > *:nth-child(2) { transition-delay: 0.1s; }
+.module-content.is-visible > *:nth-child(3) { transition-delay: 0.15s; }
+.module-content.is-visible > *:nth-child(4) { transition-delay: 0.2s; }
+.module-content.is-visible > *:nth-child(5) { transition-delay: 0.25s; }
+.module-content.is-visible > *:nth-child(6) { transition-delay: 0.3s; }
+.module-content.is-visible > *:nth-child(7) { transition-delay: 0.35s; }
+.module-content.is-visible > *:nth-child(8) { transition-delay: 0.4s; }
+
+@supports (animation-timeline: view()) {
+  .module-content {
+    transition: none;
+  }
+
+  .module-content {
+    animation: fade-in-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .module-content {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ── Prose tokens ────────────────────────────────────────────────────── */
+.prose p {
+  font-size: var(--text-base);
+  line-height: 1.7;
+  max-width: 65ch;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  line-height: 1.2;
+}
+
+/* ── View transition: terminal wipe crossfade ────────────────────────── */
+@keyframes terminal-wipe-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes terminal-wipe-out {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+::view-transition-old(main) {
+  animation: terminal-wipe-out 0.25s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+::view-transition-new(main) {
+  animation: terminal-wipe-in 0.25s cubic-bezier(0.76, 0, 0.24, 1) 0.05s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(main),
+  ::view-transition-new(main) {
+    animation: none;
+  }
 }

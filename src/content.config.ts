@@ -10,4 +10,15 @@ const now = defineCollection({
   }),
 });
 
-export const collections = { now };
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    repo: z.string().url(),
+    tags: z.array(z.string()).default([]),
+    order: z.number().default(0),
+  }),
+});
+
+export const collections = { now, projects };

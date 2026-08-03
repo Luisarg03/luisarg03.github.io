@@ -7,11 +7,16 @@ import CommandPalette from '../components/ui/CommandPalette.astro';
 export interface Props {
   title: string;
   description?: string;
+  hideFooter?: boolean;
+  /** Homepage only: shows the `[LOADED]` boot indicator chip in the header. */
+  showBootChip?: boolean;
 }
 
-const { title, description = 'Cloud Engineer — building platforms, pipelines, and infrastructure that lasts.' } = Astro.props;
+const { title, description = 'Cloud Engineer — building platforms, pipelines, and infrastructure that lasts.', hideFooter = false, showBootChip = false } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const isNow = Astro.url.pathname === '/now';
+const isProjects = Astro.url.pathname === '/projects' || Astro.url.pathname.startsWith('/projects/');
+const isIndex = !isNow && !isProjects;
 const ogImageURL = `${canonicalURL.origin}/og-default.png`;
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -73,14 +78,27 @@ const jsonLd = {
     <div class="vertical-connector" aria-hidden="true"></div>
 
     <!-- Control Panel Header -->
-    <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)]/90 backdrop-blur-md sticky top-0">
+    <header class="relative z-10 border-b border-[var(--color-border)] bg-[var(--color-bg)] sticky top-0" transition:name="site-header">
       <div class="h-[2px] bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent opacity-40"></div>
 
       <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors group">
-          <span class="w-2 h-2 rounded-full bg-[var(--color-success)] group-hover:shadow-[0_0_8px_var(--color-success-glow)] transition-shadow" aria-hidden="true"></span>
-          <span>~/luisarg</span>
-        </a>
+        <div class="flex items-center gap-3">
+          <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors group">
+            <span class="w-2 h-2 rounded-full bg-[var(--color-success)] group-hover:shadow-[0_0_8px_var(--color-success-glow)] transition-shadow" aria-hidden="true"></span>
+            <span>~/luisarg</span>
+          </a>
+
+          <!-- Boot loaded indicator (homepage only). Statically visible: the
+               opaque boot overlay covers it during play, the fade reveals it —
+               no JS wiring needed, and no-JS/reduced-motion/quick-mode all
+               show it immediately. -->
+          {showBootChip && (
+            <span class="hidden md:inline-flex items-center gap-1.5 font-mono text-xs tracking-wider border border-[var(--color-border)] rounded px-2 py-1" aria-hidden="true">
+              <span class="text-[var(--color-accent)]">◆</span>
+              <span class="text-[var(--color-success)]">[LOADED] LuisOS v7.0.0</span>
+            </span>
+          )}
+        </div>
 
         <ul class="flex items-center gap-1 text-sm font-mono">
           <li>
@@ -88,7 +106,7 @@ const jsonLd = {
               href="/"
               class:list={[
                 'px-3 py-1.5 rounded transition-colors',
-                !isNow
+                isIndex
                   ? 'text-[var(--color-text)] bg-[var(--color-surface-alt)]'
                   : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]',
               ]}
@@ -110,8 +128,21 @@ const jsonLd = {
               <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] status-dot status-dot--active" aria-hidden="true"></span>
             </a>
           </li>
-          <li class="w-px h-4 bg-[var(--color-border)] mx-1" aria-hidden="true"></li>
           <li>
+            <a
+              href="/projects"
+              class:list={[
+                'px-3 py-1.5 rounded transition-colors',
+                isProjects
+                  ? 'text-[var(--color-text)] bg-[var(--color-surface-alt)]'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]',
+              ]}
+            >
+              /projects
+            </a>
+          </li>
+          <li class="w-px h-4 bg-[var(--color-border)] mx-1 hidden sm:block" aria-hidden="true"></li>
+          <li class="hidden sm:block">
             <a
               href="https://github.com/luisarg03"
               target="_blank"
@@ -121,7 +152,7 @@ const jsonLd = {
               github ↗
             </a>
           </li>
-          <li>
+          <li class="hidden sm:block">
             <a
               href="https://linkedin.com/in/luisarg03"
               target="_blank"
@@ -135,69 +166,52 @@ const jsonLd = {
       </nav>
     </header>
 
-    <main class="relative z-10 max-w-6xl mx-auto px-6 py-6 md:py-8 lg:py-10">
+    <main class="relative z-10 max-w-6xl mx-auto px-6 py-6 md:py-8 lg:py-10" transition:name="main">
       <!-- TODO(lane 3): add transition:name="hero-block" to the hero <section> in Hero.astro -->
       <slot />
     </main>
 
-    <!-- Footer — system status bar -->
+    <!-- Footer (hidden on homepage where ShutdownModule replaces it) -->
+    {!hideFooter && (
     <footer class="relative z-10 border-t border-[var(--color-border)] mt-6 md:mt-8">
       <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
 
-      <!-- Dynamic status row: section, scroll progress, local time -->
-      <div
-        id="status-bar"
-        class="flex items-center justify-between max-w-6xl mx-auto px-6 py-2 border-b border-[var(--color-border)]/50 font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]"
-      >
-        <div class="flex items-center gap-3">
-          <span id="status-section" class="text-[var(--color-accent)]">section: —</span>
-          <span class="text-[var(--color-border)]" aria-hidden="true">|</span>
-          <span id="status-scroll">0%</span>
-        </div>
-        <div>
-          <span id="status-time">--:--</span>
-          <span class="text-[var(--color-border)] mx-2" aria-hidden="true">·</span>
-          <span class="text-[var(--color-text-muted)]/60">UTC</span>
-        </div>
-      </div>
-
       <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] status-dot status-dot--active" aria-hidden="true"></span>
-          <span class="text-[var(--color-success)]">SYSTEM STATUS: ONLINE</span>
-          <span class="text-[var(--color-border)]">·</span>
-          <span>© 2026 Luis Meyehen Paz</span>
-          <span class="text-[var(--color-border)]">·</span>
+        <span>© 2026 Luis Meyehen Paz</span>
+        <div class="flex items-center gap-4">
           <a
-            href="/terminal"
-            class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors"
-            title="Open terminal"
+            href="https://github.com/luisarg03"
+            target="_blank"
+            rel="noopener"
+            class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
           >
-            <span class="text-[var(--color-accent)]">$</span> terminal
+            github ↗
           </a>
-        </div>
-        <div class="flex items-center gap-3">
-          <span>astro</span>
-          <span class="text-[var(--color-border)]">·</span>
-          <span>github pages</span>
-          <span class="text-[var(--color-border)]">·</span>
-          <span class="text-[var(--color-accent)] border border-[var(--color-border-active)] rounded px-2 py-0.5">v1.0.0</span>
+          <a
+            href="https://linkedin.com/in/luisarg03"
+            target="_blank"
+            rel="noopener"
+            class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
+          >
+            linkedin ↗
+          </a>
         </div>
       </div>
     </footer>
+    )}
 
     <!-- Command palette mount -->
     <div id="command-palette-root">
       <CommandPalette />
     </div>
 
-    <!-- Status bar: section, scroll progress, local time (rAF-throttled) -->
-    <script defer src="/scripts/status-bar.js"></script>
-
     <!-- Scroll reveal: IntersectionObserver for .reveal / .reveal-on-view* / .draw-on-scroll -->
     <script defer src="/scripts/scroll-observer.js"></script>
 
     <!-- Scroll velocity tracker: sets --scroll-velocity for blueprint background -->
     <script defer src="/scripts/velocity-tracker.js"></script>
+
+    <!-- Code copy: per-code-block copy button for prose content -->
+    <script defer src="/scripts/copy-code.js"></script>
   </body>
 </html>

@@ -2,13 +2,12 @@
 import Prompt from './Prompt.astro';
 import Output from './Output.astro';
 import WorkspaceBar from '../workspace/WorkspaceBar.astro';
-import BootSequence from '../boot/BootSequence.astro';
 ---
 
 <div class="terminal-shell" id="terminal-shell">
   <div class="shell-accent-line" aria-hidden="true"></div>
   <WorkspaceBar />
-  <BootSequence />
+  <div id="boot-sequence" class="boot-sequence"></div>
   <Output style="display:none">
   </Output>
 
@@ -39,6 +38,9 @@ import BootSequence from '../boot/BootSequence.astro';
 </div>
 
 <script>
+  // @ts-ignore — astro check cannot resolve cross-directory side-effect imports;
+  // vite resolves '../../scripts/boot' to boot.js at build time.
+  import '../../scripts/boot';
   import { CommandParser } from './CommandParser';
   import { fileSystem, resolvePath, isDirectory } from './FileSystem';
   import type { ParseResult } from './CommandParser';
@@ -401,8 +403,17 @@ import BootSequence from '../boot/BootSequence.astro';
     switchWorkspace(1);
   }
 
+  function startBoot() {
+    if (window.initBootSequence) {
+      window.initBootSequence(bootEl, {});
+    } else {
+      initShell();
+    }
+  }
+
   if (bootEl) {
     bootEl.addEventListener('boot-complete', initShell, { once: true });
+    startBoot();
   } else {
     initShell();
   }
@@ -428,6 +439,33 @@ import BootSequence from '../boot/BootSequence.astro';
     background: linear-gradient(90deg, transparent, var(--color-accent) 30%, var(--color-accent-warm) 50%, var(--color-accent) 70%, transparent);
     opacity: 0.5;
     flex-shrink: 0;
+  }
+
+  :global(.boot-sequence) {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  :global(.boot-line) {
+    animation: boot-fade-in 0.15s ease-out;
+  }
+
+  @keyframes boot-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.boot-line) {
+      animation: none;
+    }
   }
 
   .terminal-input-line {

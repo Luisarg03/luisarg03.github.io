@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionPanel from '../components/layout/SectionPanel.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="/projects — Luis Meyehen Paz"
+  description="Selected projects — knowledge systems, infrastructure, and tooling."
+>
+  <SectionPanel title="/projects" class="noise-overlay">
+    {projects.length === 0 ? (
+      <p class="font-mono text-[var(--text-sm)] text-[var(--color-text-muted)]">No projects yet.</p>
+    ) : (
+      <ul class="divide-y divide-[var(--color-border)]">
+        {projects.map((project) => (
+          <li class="py-4">
+            <h2 class="font-mono text-[var(--text-sm)] text-[var(--color-accent)]">
+              {project.data.title}
+            </h2>
+            <p class="mt-1 text-[var(--text-sm)] text-[var(--color-text-muted)]">
+              {project.data.description}
+            </p>
+            <div class="mt-2 flex flex-wrap items-center gap-3 font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
+              <a
+                href={project.data.repo}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors"
+              >
+                github ↗
+              </a>
+              {project.data.tags.length > 0 && (
+                <span class="flex items-center gap-1.5">
+                  {project.data.tags.map((tag) => (
+                    <span class="rounded border border-[var(--color-border)] px-1.5 py-0.5">
+                      {tag}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </SectionPanel>
+</BaseLayout>
