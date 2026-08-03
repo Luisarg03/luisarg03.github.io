@@ -125,21 +125,25 @@ const EXPANDED_COUNT = 3;
 <script>
   // @ts-nocheck
   (function () {
-    document.querySelectorAll('.experience-toggle').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var expanded = this.getAttribute('aria-expanded') === 'true';
-        var id = this.getAttribute('aria-controls');
-        var panel = id ? document.getElementById(id) : null;
-        if (!panel) return;
+    // Single document-level listener (delegation): survives the full DOM
+    // swaps of Astro view transitions, which drop per-button listeners
+    // after client-side navigation (same pattern as SkillsModule).
+    document.addEventListener('click', function (event) {
+      var btn = event.target.closest ? event.target.closest('.experience-toggle') : null;
+      if (!btn) return;
 
-        this.setAttribute('aria-expanded', String(!expanded));
-        panel.hidden = expanded;
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      var id = btn.getAttribute('aria-controls');
+      var panel = id ? document.getElementById(id) : null;
+      if (!panel) return;
 
-        var label = this.querySelector('.experience-toggle-label');
-        if (label) {
-          label.textContent = expanded ? 'Show details' : 'Hide details';
-        }
-      });
+      btn.setAttribute('aria-expanded', String(!expanded));
+      panel.hidden = expanded;
+
+      var label = btn.querySelector('.experience-toggle-label');
+      if (label) {
+        label.textContent = expanded ? 'Show details' : 'Hide details';
+      }
     });
   })();
 </script>

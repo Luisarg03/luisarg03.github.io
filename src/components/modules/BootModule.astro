@@ -114,7 +114,10 @@
     inset: 0;
     z-index: 40;
     display: flex;
-    align-items: center;
+    /* Top-anchored terminal: typed lines append downward so existing
+       content never moves (centered growth shifts every line and counts
+       toward CLS). */
+    align-items: flex-start;
     justify-content: center;
     padding: var(--space-8) var(--space-6);
     background: var(--color-bg);

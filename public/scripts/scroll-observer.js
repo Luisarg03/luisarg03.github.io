@@ -16,7 +16,10 @@
           }
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -80px 0px' }
+      // 1% threshold: after scroll restoration a module may be only
+      // partially in the viewport; 10% would leave it hidden until scroll
+      // (rootMargin -80px still sets the reveal distance while scrolling).
+      { threshold: 0.01, rootMargin: '0px 0px -80px 0px' }
     );
     document.querySelectorAll(scrollRevealSelectors).forEach((el) => {
       if (!el.classList.contains('is-visible')) {

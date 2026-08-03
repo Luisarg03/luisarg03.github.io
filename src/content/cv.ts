@@ -133,48 +133,38 @@ export const experience: Experience[] = [
 export const skillCategories: SkillCategory[] = [
   {
     category: 'Cloud & IaC',
-    skills: 'AWS · Terraform · AWS CDK · AWS CloudFormation · Lambda · ECS · S3 · Step Functions · SageMaker · Glue · DynamoDB · IAM · ECR · CloudWatch · EMR · SQS · SNS · EventBridge · RDS'.split(' · '),
+    skills: 'AWS · Terraform · AWS CDK · CloudFormation'.split(' · '),
     proficiency: 5,
   },
   {
     category: 'CI/CD & DevOps',
-    skills: 'GitHub Actions · GitLab CI · Bitbucket Pipelines · Docker · Git · Secrets Manager · Parameter Store'.split(' · '),
+    skills: 'GitHub Actions · GitLab CI · Docker · Git'.split(' · '),
     proficiency: 5,
   },
   {
-    category: 'Data & Processing',
-    skills: 'Athena · QuickSight · Databricks · Trino · Data Lake · Batch Processing · SQL · ETL · PySpark · SSIS · Pentaho Data Integration'.split(' · '),
+    category: 'Data Engineering',
+    skills: 'ETL Pipelines · SQL · PySpark · Databricks · Trino'.split(' · '),
     proficiency: 4,
   },
   {
-    category: 'Python Libraries',
-    skills: 'Pandas · NumPy · Boto3 · Requests · OCI'.split(' · '),
+    category: 'Python',
+    skills: 'Python · Pandas · NumPy · Boto3 · FastAPI'.split(' · '),
     proficiency: 4,
   },
   {
     category: 'Databases',
-    skills: 'SQL Server · Oracle · BigQuery · ElasticSearch'.split(' · '),
+    skills: 'SQL Server · Oracle · BigQuery · Elasticsearch'.split(' · '),
     proficiency: 4,
   },
   {
-    category: 'Data Visualization',
-    skills: 'Power BI · Metabase · Elastic-Kibana'.split(' · '),
-    proficiency: 3,
-  },
-  {
     category: 'Platform Engineering',
-    skills: 'Internal Developer Platforms · FastAPI · React · Cost Observability · Workload Monitoring · Developer Enablement'.split(' · '),
+    skills: 'Internal Developer Platforms · Observability · Cost Management · Developer Enablement'.split(' · '),
     proficiency: 5,
   },
   {
     category: 'AI Tooling',
-    skills: 'AWS Bedrock · MCP · OpenAI APIs · GitHub Copilot · Prompt Engineering'.split(' · '),
+    skills: 'MCP · AWS Bedrock · OpenAI APIs · Prompt Engineering · opencode · Cost Optimization'.split(' · '),
     proficiency: 4,
-  },
-  {
-    category: 'Web Dev',
-    skills: 'Flask · Bootstrap · HTML5'.split(' · '),
-    proficiency: 3,
   },
   {
     category: 'Languages',

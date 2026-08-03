@@ -73,11 +73,9 @@ const skillFiles: Array<{ filename: string; cat: (typeof skillCategories)[0] }> 
   { filename: 'data.md', cat: skillCategories[2] },
   { filename: 'python.md', cat: skillCategories[3] },
   { filename: 'databases.md', cat: skillCategories[4] },
-  { filename: 'visualization.md', cat: skillCategories[5] },
-  { filename: 'platform.md', cat: skillCategories[6] },
-  { filename: 'ai.md', cat: skillCategories[7] },
-  { filename: 'web.md', cat: skillCategories[8] },
-  { filename: 'languages.md', cat: skillCategories[9] },
+  { filename: 'platform.md', cat: skillCategories[5] },
+  { filename: 'ai.md', cat: skillCategories[6] },
+  { filename: 'languages.md', cat: skillCategories[7] },
 ];
 
 // ── Virtual filesystem ──────────────────────────────────────────────────────

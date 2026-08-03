@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ── Fonts (self-hosted via @fontsource-variable) ─────────── */
-/* ponytail: Inter removed — mono-only identity; --font-sans kept for WorkspaceBar compat */
+@import "@fontsource-variable/inter/index.css";
 @import "@fontsource-variable/jetbrains-mono/index.css";
 
 @theme {
@@ -11,8 +11,8 @@
   --color-surface-alt: #1a2230;
   --color-border: #232d3d;
   --color-border-active: #344860;
-  --color-text: #c9d1d9;
-  --color-text-muted: #7d8794; /* WCAG AA (5.3:1) on --color-bg; #6e7681 was 4.2:1 */
+  --color-text: #d7dde5; /* Lightened for prose readability on dark bg; ~12.5:1 on #0a0e14 */
+  --color-text-muted: #7d8794; /* WCAG AA (5.3:1) on --color-bg */
   --color-accent: #f0b429;
   --color-accent-dim: #c4941a;
   --color-success: #3fb950;
@@ -43,7 +43,7 @@
   --text-4xl: 3.5rem;     /* 56px */
 
   /* Fluid display scale — oversized hero heading */
-  --text-display: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+  --text-display: clamp(2.5rem, 6vw + 1rem, 4.5rem);
   --text-display-sm: clamp(1.75rem, 4vw + 0.5rem, 3.5rem);
 
   /* Spacing scale */
@@ -82,9 +82,9 @@
 html {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-mono);
-  font-size: 16px;
-  line-height: 1.6;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.7;
   scroll-behavior: smooth;
   /* Reserve the scrollbar gutter so the boot overlay's scroll lock
      (overflow: hidden) doesn't shift the layout when the bar disappears
@@ -96,6 +96,16 @@ html {
 
 body {
   margin: 0;
+}
+
+/* Headings use mono — the OS chrome voice */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+
+code, kbd, samp, pre {
+  font-family: var(--font-mono);
 }
 
 ::selection {
@@ -644,18 +654,6 @@ body {
 .module-content.is-visible > *:nth-child(7) { transition-delay: 0.35s; }
 .module-content.is-visible > *:nth-child(8) { transition-delay: 0.4s; }
 
-@supports (animation-timeline: view()) {
-  .module-content {
-    transition: none;
-  }
-
-  .module-content {
-    animation: fade-in-up linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .module-content {
     opacity: 1;
@@ -665,14 +663,26 @@ body {
   }
 }
 
+/* No-JS: class-gated reveal can never run without the observer, so show all
+   module content statically (spec: content never hidden by the reveal). */
+@media (scripting: none) {
+  .module-content {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* ── Prose tokens ────────────────────────────────────────────────────── */
 .prose p {
+  font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: 1.7;
   max-width: 65ch;
 }
 
 .prose h1, .prose h2, .prose h3 {
+  font-family: var(--font-mono);
   line-height: 1.2;
 }
 
