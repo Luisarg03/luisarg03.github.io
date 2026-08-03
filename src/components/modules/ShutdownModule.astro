@@ -1,0 +1,85 @@
+---
+/**
+ * ShutdownModule — the "shutdown" / footer section.
+ * Replaces BaseLayout footer on the homepage.
+ */
+---
+
+<section id="contact" class="shutdown-module" aria-label="Footer">
+  <div class="module-divider reveal-on-view" aria-hidden="true">
+    <svg viewBox="0 0 1200 2" preserveAspectRatio="none">
+      <line x1="0" y1="1" x2="1200" y2="1" />
+    </svg>
+  </div>
+
+  <div class="module-content shutdown-content">
+    <p class="shutdown-prompt">$ echo "© 2026"</p>
+
+    <div class="shutdown-body">
+      <span class="shutdown-copyright">© 2026 Luis Meyehen Paz</span>
+
+      <div class="shutdown-links">
+        <a
+          href="https://github.com/luisarg03"
+          target="_blank"
+          rel="noopener"
+          class="shutdown-link"
+        >
+          github ↗
+        </a>
+        <a
+          href="https://linkedin.com/in/luisarg03"
+          target="_blank"
+          rel="noopener"
+          class="shutdown-link"
+        >
+          linkedin ↗
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .shutdown-module {
+    padding: var(--space-8) 0 var(--space-12);
+  }
+
+  .shutdown-content {
+    max-width: 52rem;
+  }
+
+  .shutdown-prompt {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+    opacity: 0.6;
+  }
+
+  .shutdown-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .shutdown-links {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .shutdown-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .shutdown-link:hover {
+    color: var(--color-text);
+  }
+</style>

@@ -2,48 +2,44 @@
 
 ## Purpose
 
-Replaces the current flat tag-grid in `SkillMap.astro` with a richer visualization: a polar/radar chart showing category proficiency, plus a grouped tag list for detail. Designed to communicate "where my strengths cluster" at a glance, with the detail available for the curious.
-
+Replaces the current flat tag-grid in `SkillMap.astro` with a richer visualization: a syntax-highlighted code structure showing category proficiency, plus a grouped tag list for detail. Designed to communicate the structure of my expertise at a glance, with the detail available for the curious.
 ## Requirements
+### Requirement: Code-presented skill categories
+The system SHALL render skill categories as an htop-style process list instead of a syntax-highlighted code structure.
 
-### Requirement: Radar chart of skill categories
-The system SHALL render a polar/radar chart showing relative proficiency per skill category.
+The presentation SHALL:
+- Render one row per category with columns: PID (index), USER (static value), CPU% and MEM% (proficiency-derived bars), and COMMAND (category name)
+- Fill bars from the category proficiency (0-5) scaled to a percentage
+- Add a subtle CSS shimmer to the bar fill (CSS animation only, no JavaScript)
+- Display all categories from `skillCategories` in `cv.ts` with their skills
+- Emphasize the hovered or focused category row with the single accent color
+- Remain readable as text for screen readers (no image-based representation)
+- Not require the syntax highlighter for the skills section
 
-The chart SHALL:
-- Be implemented as inline SVG (no chart library)
-- Display one axis per category from `skillCategories` in `cv.ts`
-- Plot a single polygon connecting proficiency points across axes
-- Use the copper accent color for the polygon fill (low opacity) and stroke
-- Be interactive: hovering an axis highlights that category in the tag list
-- Be accessible: each axis has a `<title>` element and a focusable target
+#### Scenario: Process list renders all categories
+- **WHEN** the skills module is loaded
+- **THEN** a process list shows all categories from `cv.ts`
+- **AND** each row shows its category name and a proficiency bar
 
-The radar column and skill group list column SHALL align their top edges at all breakpoints. The radar SVG SHALL be top-aligned within its grid cell with no extra vertical offset.
+#### Scenario: Code block renders all categories
+- **WHEN** the skills module is loaded
+- **THEN** the htop process list shows all categories from `cv.ts`
+- **AND** each row shows its category name and a proficiency bar
 
-#### Scenario: Radar renders all categories
-- **WHEN** the Skills section is loaded with N skill categories
-- **THEN** the radar displays N axes equally spaced around the center
-- **AND** a polygon connects the proficiency points for each category
+#### Scenario: Hover emphasizes the active category
+- **WHEN** the user hovers or focuses a category row
+- **THEN** that row gains the accent color emphasis
+- **AND** the other rows remain neutral/muted
 
-#### Scenario: Hovering an axis highlights the tag group
-- **WHEN** the user hovers over an axis in the radar
-- **THEN** the corresponding tag group in the adjacent list gains an emphasis style
-- **AND** non-hovered groups reduce to muted style
-
-#### Scenario: Radar is keyboard navigable
-- **WHEN** the user tabs to the radar
-- **THEN** each axis is independently focusable
-- **AND** pressing `Enter` or `Space` on an axis highlights that category
-- **AND** a screen reader announces the category name and proficiency
-
-#### Scenario: Radar and list columns are top-aligned
-- **WHEN** the Skills section is rendered at any breakpoint
-- **THEN** the top edge of the radar SVG aligns with the top edge of the first skill group header
-- **AND** no additional vertical offset is applied to either column
+#### Scenario: Mobile categories stay collapsible
+- **WHEN** viewport width is < 640px
+- **THEN** categories remain collapsible (collapsed by default, expand on tap)
+- **AND** expanded state is indicated by a chevron rotation
 
 ### Requirement: Skill category proficiency data
 The system SHALL represent per-category proficiency as a numeric value in `cv.ts`.
 
-Proficiency SHALL be a number from 0 to 5, additive with the existing `category` and `skills` fields. Categories without a stated proficiency SHALL default to 0 (the radar omits the polygon vertex but still draws the axis).
+Proficiency SHALL be a number from 0 to 5, additive with the existing `category` and `skills` fields. Categories without a stated proficiency SHALL default to 0.
 
 #### Scenario: Proficiency values are present in cv.ts
 - **WHEN** the data file is parsed
@@ -51,38 +47,39 @@ Proficiency SHALL be a number from 0 to 5, additive with the existing `category`
 - **AND** the value is between 0 and 5 inclusive
 
 ### Requirement: Grouped skill tag list
-The system SHALL display skill tags grouped by category, with the group matching the radar's active axis emphasized.
+The grouped structure of the skill list SHALL be preserved within the process-list presentation: each category row SHALL reveal its skill list as indented monospace lines when expanded.
 
-The list SHALL:
-- Group tags under a category header (monospace, muted, with a colored dot matching the radar axis color)
-- Show the count of skills per group
-- Highlight the active group when the radar axis is hovered or focused
-- Be collapsible per group on mobile (collapsed by default; expand on tap)
+The expand/collapse toggle logic SHALL live in the component's `<script>` block, not as an inline event handler attribute.
 
-The expand/collapse toggle logic SHALL remain functional and SHALL be extracted from inline script to the component's `<script>` block.
-
-#### Scenario: Tags render under each category
-- **WHEN** the Skills section is loaded
-- **THEN** each category header is followed by its tag list
-- **AND** tags are rendered as monospace pills with category-tinted borders
-
-#### Scenario: Active group is emphasized
-- **WHEN** the user hovers the "Cloud & IaC" axis in the radar
-- **THEN** the "Cloud & IaC" tag group in the list has a brighter border and full-opacity text
-- **AND** other groups drop to muted opacity
+#### Scenario: Groups render under each category
+- **WHEN** the skills module is loaded
+- **THEN** each category row is followed by its skill list when expanded
+- **AND** skills render in the monospace font
 
 #### Scenario: Mobile groups are collapsible
 - **WHEN** viewport width is < 640px
 - **THEN** each category group is collapsed by default
-- **AND** tapping the header expands the group's tag list
-- **AND** expanded state is indicated by a chevron rotation
+- **AND** tapping the header expands the group's skill list
 
 ### Requirement: Color assignment per category
-The system SHALL assign a distinct accent color per category, consistent with the current `categoryAccents` map in `SkillMap.astro`.
+The system SHALL NOT rely on per-category accent colors as the primary visual encoding. Categories SHALL render in neutral tones with a single accent color (`--color-accent`) used for hover/focus emphasis.
 
-The current color mapping SHALL be preserved; new colors SHALL only be added if a new category appears in the data.
+The existing `categoryAccents` map MAY remain in the codebase for backward compatibility but SHALL NOT drive tag styling.
 
-#### Scenario: Existing color map is preserved
+#### Scenario: Categories render neutral
 - **WHEN** the Skills section renders
-- **THEN** the same color per category as the current `SkillMap.astro` is used
-- **AND** no visual regression occurs for users who have seen the previous version
+- **THEN** category rows and tags use neutral border/muted text tones
+- **AND** no per-category color is applied to tags
+
+#### Scenario: Accent marks the active category
+- **WHEN** a category is hovered or focused
+- **THEN** it renders with the accent color
+- **AND** all other categories remain neutral
+
+### Requirement: Skills section labeling
+The skills section SHALL be titled "Skills" (or "Technical Skills"), accurately covering all displayed categories including languages, libraries, and web development — not only infrastructure.
+
+#### Scenario: Section title matches content
+- **WHEN** the skills section renders
+- **THEN** the visible section heading is "Skills" and does not imply infrastructure-only scope
+

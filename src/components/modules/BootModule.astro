@@ -1,0 +1,173 @@
+---
+/**
+ * BootModule — transient full-viewport boot overlay for the homepage.
+ * Plays on first page entry (full load of `/`), then fades out and is
+ * removed from the DOM. Decorative only; the page content sits behind it
+ * from the start (zero layout shift — `position: fixed` takes no space).
+ * Skipped entirely on: quick mode (sessionStorage), reduced motion, no-JS,
+ * client-side navigation, `back_forward` loads, and direct hash loads.
+ */
+---
+
+<div class="boot-overlay" id="boot-overlay" hidden aria-hidden="true">
+  <div class="boot-terminal" id="boot-terminal">
+    <!-- Static fallback — never displayed (overlay is hidden without JS).
+         Matches the canonical frames so a failed engine still has content. -->
+    <div class="boot-line">[    0.000000] Booting LuisOS v7.0.0 — luis@cloud</div>
+    <div class="boot-line">[    0.154200] CPU: Arch x86_64 (4 cores @ 3.4GHz)</div>
+    <div class="boot-line">[    0.423100] Memory: 64GB RAM detected — swap: 8GB</div>
+    <div class="boot-line">[    0.891300] Kernel: linux-arch 6.6.0 loaded</div>
+    <div class="boot-line">[    1.245000] Starting system services...</div>
+    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Started OpenSSH Daemon</div>
+    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Started Hyprland Compositor</div>
+    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Reached target Multi-User System.</div>
+  </div>
+</div>
+
+<script>
+  // @ts-nocheck
+  import '../../scripts/boot';
+
+  (function () {
+    const overlay = document.getElementById('boot-overlay');
+    const terminal = document.getElementById('boot-terminal');
+    if (!overlay || !terminal) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let quickMode = false;
+    try {
+      quickMode = sessionStorage.getItem('luisos-booted') === '1';
+    } catch (e) { /* ignore storage errors */ }
+
+    // Full page loads only. navigation.type is 'back_forward' on real
+    // document back/forward loads. history.state.index > 0 means the page
+    // was reached via an Astro view transition (ClientRouter bumps the index
+    // on every pushState, and patches the initial state to index 0).
+    const navType = performance.getEntriesByType('navigation')[0]?.type ?? 'navigate';
+    const viaClientNav = !!(history.state && history.state.index > 0);
+
+    const shouldPlay =
+      !prefersReducedMotion &&
+      !quickMode &&
+      navType !== 'back_forward' &&
+      !viaClientNav &&
+      !location.hash &&
+      typeof window.initBootSequence === 'function';
+
+    if (!shouldPlay) return;
+
+    let fading = false;
+    let controller = null;
+
+    function unlockScroll() {
+      document.documentElement.style.overflow = '';
+    }
+
+    function fadeAndRemove() {
+      if (fading) return;
+      fading = true;
+      unlockScroll();
+      overlay.classList.add('boot-overlay-fade');
+      // Fade (≤ 0.5s), then drop the overlay and its listeners entirely.
+      setTimeout(function () {
+        overlay.remove();
+        window.removeEventListener('wheel', skip);
+        window.removeEventListener('scroll', skip);
+      }, 500);
+    }
+
+    function skip() {
+      if (controller && controller.skip) controller.skip();
+    }
+
+    // Skip on scroll attempts too — the engine already handles
+    // click/keydown/touchstart. Scroll-as-skip also releases the scroll lock.
+    window.addEventListener('wheel', skip, { once: true, passive: true });
+    window.addEventListener('scroll', skip, { once: true, passive: true });
+
+    // Reveal + scroll lock. Clear the static fallback FIRST so the typing
+    // engine starts from an empty terminal with no flash of static lines.
+    terminal.innerHTML = '';
+    document.documentElement.style.overflow = 'hidden';
+    overlay.hidden = false;
+
+    // Start the engine after the reveal: it renders the first frame
+    // synchronously, so line 1 is never lost to the clear above.
+    controller = window.initBootSequence(terminal, {
+      frameDelay: 250,
+      onComplete: fadeAndRemove,
+    });
+
+    // Fallback guarantee: even if the typing engine stalls, the overlay
+    // always fades out and unlocks (2.5s typing budget + 0.5s fade + margin).
+    setTimeout(fadeAndRemove, 4000);
+  })();
+</script>
+
+<style>
+  /* ── Overlay ─────────────────────────────────────────────────────────── */
+  .boot-overlay {
+    /* Above the header (z-10) and module content; below the command
+       palette (z-9999). */
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-bg);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  /* The UA [hidden] display:none is overridden by display:flex above —
+     restore the hidden state explicitly (no-JS and all skip paths rely on
+     the overlay never rendering). */
+  .boot-overlay[hidden] {
+    display: none;
+  }
+
+  .boot-overlay.boot-overlay-fade {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .boot-overlay {
+      transition: none;
+    }
+  }
+
+  .boot-terminal {
+    max-width: 52rem;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .boot-line {
+    animation: boot-line-in 0.15s ease-out both;
+  }
+
+  @keyframes boot-line-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  :global(.boot-ok) {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .boot-line {
+      animation: none;
+    }
+  }
+</style>
