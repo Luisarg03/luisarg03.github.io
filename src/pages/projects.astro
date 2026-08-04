@@ -612,30 +612,39 @@ function highlightCode(code: string, lang: string) {
 {/* Filter chips script — task 6.7 */}
 <script>
 // @ts-nocheck
-(function() {
+function setupFilterChips() {
   var grid = document.querySelector('.projects-grid');
   if (!grid) return;
-  var chips = document.querySelectorAll('.filter-chip');
-  chips.forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      var filter = chip.getAttribute('data-filter');
-      chips.forEach(function(c) {
-        c.classList.toggle('filter-chip--active', c === chip);
-      });
-      document.querySelectorAll('.project-card').forEach(function(card) {
-        var tags = (card.getAttribute('data-tags') || '').split(',').map(function(s) { return s.trim(); });
-        var show = filter === 'all' || tags.indexOf(filter) !== -1;
-        card.style.display = show ? '' : 'none';
-      });
-    });
+  // No need to query chips — use event delegation on the grid (or its parent)
+  // The filter-chip click bubbles up; we catch it via closest()
+}
+
+document.addEventListener('click', function(event) {
+  var chip = event.target.closest && event.target.closest('.filter-chip');
+  if (!chip) return;
+  var grid = document.querySelector('.projects-grid');
+  if (!grid) return;
+
+  var filter = chip.getAttribute('data-filter');
+
+  // Update active state on all chips
+  document.querySelectorAll('.filter-chip').forEach(function(c) {
+    c.classList.toggle('filter-chip--active', c === chip);
   });
-})();
+
+  // Show/hide cards based on filter
+  document.querySelectorAll('.project-card').forEach(function(card) {
+    var tags = (card.getAttribute('data-tags') || '').split(',').map(function(s) { return s.trim(); });
+    var show = filter === 'all' || tags.indexOf(filter) !== -1;
+    card.style.display = show ? '' : 'none';
+  });
+});
 </script>
 
 {/* Text scramble intro — task 8.1 */}
 <script>
 // @ts-nocheck
-(function() {
+function setupTextScramble() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var el = document.querySelector('.project-card--featured .project-card__title');
   if (!el || el.getAttribute('data-scrambled') === 'true') return;
@@ -650,5 +659,10 @@ function highlightCode(code: string, lang: string) {
     el.textContent = real.split('').map(function(c, j) { return j <= i ? c : (c === ' ' ? ' ' : randomChar()); }).join('');
     i++;
   }, 50);
-})();
+}
+
+// Run on initial load
+setupTextScramble();
+// Re-run on Astro view transitions (when navigating back to /projects)
+document.addEventListener('astro:page-load', setupTextScramble);
 </script>

@@ -4,6 +4,7 @@
  * Decorative terminal framing + real identity content + contact actions.
  */
 import { siteConfig, experience } from '../../content/cv';
+import Card from '../ui/Card.astro';
 
 const yearsExp = new Date().getFullYear() - 2019;
 const currentRole = experience.find((e) => e.endDate === null);
@@ -120,22 +121,30 @@ const currentRole = experience.find((e) => e.endDate === null);
     <div class="identity-contact">
       <p class="identity-prompt">$ ls /contact/</p>
       <div class="identity-contacts">
-        <a href={`mailto:${siteConfig.email}`} class="identity-contact-link">
-          <span class="identity-contact-file">email.sh</span>
-          <span class="identity-contact-label">Email</span>
-        </a>
-        <a href={siteConfig.github} target="_blank" rel="noopener" class="identity-contact-link">
-          <span class="identity-contact-file">github.sh</span>
-          <span class="identity-contact-label">GitHub ↗</span>
-        </a>
-        <a href={siteConfig.linkedin} target="_blank" rel="noopener" class="identity-contact-link">
-          <span class="identity-contact-file">linkedin.sh</span>
-          <span class="identity-contact-label">LinkedIn ↗</span>
-        </a>
-        <a href="/cv.pdf" download class="identity-contact-link">
-          <span class="identity-contact-file">cv.pdf</span>
-          <span class="identity-contact-label">CV ↓</span>
-        </a>
+        <Card variant="status">
+          <a href={`mailto:${siteConfig.email}`} class="identity-contact-link">
+            <span class="identity-contact-file">email.sh</span>
+            <span class="identity-contact-label">Email</span>
+          </a>
+        </Card>
+        <Card variant="status">
+          <a href={siteConfig.github} target="_blank" rel="noopener" class="identity-contact-link">
+            <span class="identity-contact-file">github.sh</span>
+            <span class="identity-contact-label">GitHub ↗</span>
+          </a>
+        </Card>
+        <Card variant="status">
+          <a href={siteConfig.linkedin} target="_blank" rel="noopener" class="identity-contact-link">
+            <span class="identity-contact-file">linkedin.sh</span>
+            <span class="identity-contact-label">LinkedIn ↗</span>
+          </a>
+        </Card>
+        <Card variant="status">
+          <a href="/cv.pdf" download class="identity-contact-link">
+            <span class="identity-contact-file">cv.pdf</span>
+            <span class="identity-contact-label">CV ↓</span>
+          </a>
+        </Card>
       </div>
     </div>
   </div>
@@ -291,25 +300,18 @@ const currentRole = experience.find((e) => e.endDate === null);
   }
 
   .identity-contact-link {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
     text-decoration: none;
-    transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: color 0.15s;
   }
 
   .identity-contact-link:hover {
     color: var(--color-accent);
-    border-color: var(--color-accent);
-    background: var(--color-surface-alt);
-    box-shadow: 0 0 8px rgba(240, 180, 41, 0.1);
   }
 
   .identity-contact-file {
