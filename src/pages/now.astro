@@ -131,9 +131,11 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
 
   <!-- Main content -->
   <SectionPanel title="/now" class="noise-overlay">
-    <article class="prose-content">
-      <Content />
-    </article>
+    <Card variant="status">
+      <article class="prose-content">
+        <Content />
+      </article>
+    </Card>
   </SectionPanel>
 </BaseLayout>
 
