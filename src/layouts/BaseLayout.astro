@@ -18,6 +18,10 @@ const isNow = Astro.url.pathname === '/now';
 const isProjects = Astro.url.pathname === '/projects' || Astro.url.pathname.startsWith('/projects/');
 const isIndex = !isNow && !isProjects;
 const ogImageURL = `${canonicalURL.origin}/og-default.png`;
+
+const buildCommit = (import.meta.env as any).VITE_BUILD_COMMIT ?? process.env.VITE_BUILD_COMMIT ?? 'unknown';
+const buildDate = (import.meta.env as any).VITE_BUILD_DATE ?? process.env.VITE_BUILD_DATE ?? 'unknown';
+const buildUptime = (import.meta.env as any).VITE_BUILD_UPTIME_DAYS ?? process.env.VITE_BUILD_UPTIME_DAYS ?? '?d';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -172,29 +176,12 @@ const jsonLd = {
 
     <!-- Footer (hidden on homepage where ShutdownModule replaces it) -->
     {!hideFooter && (
-    <footer class="relative z-10 border-t border-[var(--color-border)] mt-6 md:mt-8">
-      <div class="h-px bg-gradient-to-r from-transparent via-[var(--color-border-active)] to-transparent"></div>
-
-      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[var(--text-xs)] font-mono text-[var(--color-text-muted)]">
-        <span>© 2026 Luis Meyehen Paz</span>
-        <div class="flex items-center gap-4">
-          <a
-            href="https://github.com/luisarg03"
-            target="_blank"
-            rel="noopener"
-            class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
-          >
-            github ↗
-          </a>
-          <a
-            href="https://linkedin.com/in/luisarg03"
-            target="_blank"
-            rel="noopener"
-            class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors"
-          >
-            linkedin ↗
-          </a>
-        </div>
+    <footer class="site-terminal-footer">
+      <div class="site-terminal-footer__prompt">
+        ~/luisarg $ git rev-parse --short HEAD
+      </div>
+      <div class="site-terminal-footer__meta">
+        commit {buildCommit} · {buildDate} · uptime {buildUptime}d · ~/luisarg
       </div>
     </footer>
     )}
@@ -211,3 +198,28 @@ const jsonLd = {
     <script defer src="/scripts/copy-code.js"></script>
   </body>
 </html>
+
+<style>
+  /* ── Terminal-style site footer ─────────────────────────────────────────── */
+  .site-terminal-footer {
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-8) auto 0;
+    padding: var(--space-6) var(--space-4) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    max-width: 52rem;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .site-terminal-footer__prompt {
+    color: var(--color-accent);
+    margin-bottom: var(--space-1);
+  }
+
+  .site-terminal-footer__meta {
+    opacity: 0.85;
+  }
+</style>
