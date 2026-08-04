@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/layout/SectionPanel.astro';
 import StatusIndicator from '../components/ui/StatusIndicator.astro';
+import Card from '../components/ui/Card.astro';
 import { getEntry, render, getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 
@@ -41,7 +42,7 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
   <!-- Active projects — dashboard cards -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 stagger">
     <!-- Study progress -->
-    <div class="panel p-4 card-accent-top">
+    <Card variant="status">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           AWS DevOps Cert
@@ -52,10 +53,10 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
         <div class="progress-bar__fill" style="width: 40%"></div>
       </div>
       <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Target: Q4 2026</p>
-    </div>
+    </Card>
 
     <!-- English -->
-    <div class="panel p-4 card-accent-top">
+    <Card variant="status">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           English
@@ -66,10 +67,10 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
         <div class="progress-bar__fill" style="width: 30%"></div>
       </div>
       <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Daily practice</p>
-    </div>
+    </Card>
 
     <!-- Travel log (replaces Japan Trip card) -->
-    <div class="panel p-4 card-accent-top">
+    <Card variant="status">
       <div class="flex items-center justify-between mb-3">
         <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
           Travel log
@@ -125,7 +126,7 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
           })()
         }
       </div>
-    </div>
+    </Card>
   </div>
 
   <!-- Main content -->

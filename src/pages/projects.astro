@@ -1,14 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/layout/SectionPanel.astro';
+import Card from '../components/ui/Card.astro';
 import { getCollection } from 'astro:content';
-
-// Build-time env vars from vite-plugin-buildinfo.js (injected into
-// process.env by the plugin; SSR frontmatter reads them directly — Vite's
-// `define`/`import.meta.env` do not reach .astro frontmatter in dev SSR)
-const commit = process.env.VITE_BUILD_COMMIT ?? 'unknown';
-const buildDate = process.env.VITE_BUILD_DATE ?? 'unknown';
-const uptime = process.env.VITE_BUILD_UPTIME_DAYS ?? '?d';
 
 // Heuristic: prefer projects with explicit impact arrays and larger impact counts.
 function impactScore(a: any) {
@@ -78,13 +72,12 @@ function highlightCode(code: string, lang: string) {
               : data.status === 'online' ? 'ONLINE'
               : '';
             return (
-            <article
-              class={`project-card${isFeatured ? ' project-card--featured' : ''}`}
+            <Card
+              variant="project"
+              class:list={['project-card', { 'project-card--featured': isFeatured }]}
               style={`--i: ${idx}`}
               data-tags={(data.tags || []).join(',')}
             >
-              <div class="project-card__accent" aria-hidden="true"></div>
-
               {isFeatured && hasCodeSnippet ? (
                 /* Featured hero — 2-col grid: text + terminal */
                 <>
@@ -251,18 +244,10 @@ function highlightCode(code: string, lang: string) {
                   </footer>
                 </>
               )}
-            </article>
+            </Card>
             )
           })}
         </div>
-
-        {/* Terminal footer — task 7.1 */}
-        <footer class="projects-terminal-footer">
-          <div class="projects-terminal-footer__prompt">~/luisarg $ git rev-parse --short HEAD</div>
-          <div class="projects-terminal-footer__meta">
-            commit {commit} · {buildDate} · uptime {uptime}d · ~/luisarg
-          </div>
-        </footer>
       </>
     )}
   </SectionPanel>
@@ -273,13 +258,13 @@ function highlightCode(code: string, lang: string) {
   .projects-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: var(--space-6);
   }
 
   @media (min-width: 640px) {
     .projects-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-5);
+      gap: var(--space-8);
     }
     .projects-grid > .project-card:first-child {
       grid-column: 1 / -1;
@@ -300,25 +285,6 @@ function highlightCode(code: string, lang: string) {
     }
   }
 
-  /* ─── Card base (pre-reveal) ─── */
-  .project-card {
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 400ms ease-out,
-                transform 400ms ease-out,
-                border-color 200ms ease-out,
-                box-shadow 200ms ease-out;
-  }
-
   /* ─── Reveal transition ─── */
   .project-card.is-visible {
     opacity: 1;
@@ -326,27 +292,9 @@ function highlightCode(code: string, lang: string) {
     transition-delay: calc(var(--i, 0) * 80ms);
   }
 
-  /* ─── Hover lift ─── */
+  /* ─── Hover lift (border-color only; transform/shadow handled by Card) ─── */
   .project-card:hover {
-    transform: translateY(-2px);
     border-color: var(--color-accent);
-    box-shadow: 0 4px 12px rgba(240, 180, 41, 0.08);
-  }
-
-  /* ─── Top accent bar ─── */
-  .project-card__accent {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--color-accent);
-    opacity: 0;
-    transition: opacity 200ms ease-out;
-  }
-
-  .project-card:hover .project-card__accent {
-    opacity: 1;
   }
 
   /* ─── Card header ─── */
@@ -642,34 +590,12 @@ function highlightCode(code: string, lang: string) {
     color: var(--bg-terminal, #0a0e14);
   }
 
-  /* ─── Terminal footer ─── */
-  .projects-terminal-footer {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    padding: var(--space-6) 0 var(--space-4);
-    margin-top: var(--space-8);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .projects-terminal-footer__prompt {
-    margin-bottom: 0.5rem;
-  }
-
-  .projects-terminal-footer__meta {
-    opacity: 0.7;
-  }
-
   /* ─── Reduced motion ─── */
   @media (prefers-reduced-motion: reduce) {
     .project-card,
     .project-card.is-visible {
       opacity: 1;
       transform: none;
-      transition: none;
-    }
-    .project-card__accent,
-    .project-card:hover .project-card__accent {
       transition: none;
     }
     .project-card__chevron,
