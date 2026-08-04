@@ -1,6 +1,6 @@
 (function () {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const scrollRevealSelectors = '.reveal, .reveal-on-view, .reveal-on-view-delay-1, .reveal-on-view-delay-2, .reveal-on-view-delay-3, .reveal-on-view-delay-4, .draw-on-scroll, .module-divider, .module-content';
+  const scrollRevealSelectors = '.reveal, .reveal-on-view, .reveal-on-view-delay-1, .reveal-on-view-delay-2, .reveal-on-view-delay-3, .reveal-on-view-delay-4, .draw-on-scroll, .module-divider, .module-content, .project-card';
 
   function initReveals() {
     if (reduceMotion || !('IntersectionObserver' in window)) {

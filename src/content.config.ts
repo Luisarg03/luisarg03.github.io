@@ -21,6 +21,7 @@ const projects = defineCollection({
     impact: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
+    status: z.enum(['online', 'wip', 'archived']).optional(),
   }),
 });
 

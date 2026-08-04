@@ -4,6 +4,13 @@ description: "Segundo cerebro personal en formato OKF: un vault de Obsidian que 
 repo: "https://github.com/Luisarg03/obsidian-second-brain"
 tags: ['ia', 'obsidian', 'mcp', 'python']
 order: 1
+status: wip
+problem: "Vendor lock-in para memoria personal: notas atrapadas en servicios cloud (Notion, Evernote, OneNote). RAG y vector DBs agregan complejidad innecesaria para single-user PKM."
+solution: "Vault de Obsidian como single source of truth, formateado como bundle OKF (un archivo de markdown por nota, interlinked). Servidor MCP en Python con SQLite + FTS5 expone el vault a agentes de IA: lecturas opt-in, escrituras casi automáticas. Sin RAG, sin vector DBs."
+impact:
+  - "Single-user PKM sin vendor lock-in: 100% owned by user, vault en disco local"
+  - "Stack simple: Obsidian + Python MCP + SQLite FTS5, zero infra externa corriendo"
+  - "Reads opt-in y writes casi automáticas: los agentes consultan sin romper el flujo de notas manuales"
 ---
 
 Memoria a largo plazo gestionada por mí, no por un vendor. El vault ES el bundle OKF: yo lo navego en Obsidian, los agentes lo consultan por un servidor MCP en Python. Sin RAG ni bases vectoriales — lo simple es lo mejor.
