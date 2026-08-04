@@ -22,6 +22,12 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
     status: z.enum(['online', 'wip', 'archived']).optional(),
+    year: z.number().int().min(2000).max(2100).optional(),
+    role: z.string().optional(),
+    type: z.enum(['personal', 'client', 'oss']).optional(),
+    stack: z.array(z.string()).default([]).optional(),
+    codeSnippet: z.object({ lang: z.string(), code: z.string() }).optional(),
+    links: z.object({ demo: z.string().url().optional(), docs: z.string().url().optional() }).optional(),
   }),
 });
 

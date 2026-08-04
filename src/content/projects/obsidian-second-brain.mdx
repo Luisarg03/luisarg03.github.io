@@ -5,6 +5,20 @@ repo: "https://github.com/Luisarg03/obsidian-second-brain"
 tags: ['ia', 'obsidian', 'mcp', 'python']
 order: 1
 status: wip
+year: 2025
+role: platform engineer
+type: personal
+stack: [python, obsidian, mcp, sqlite]
+codeSnippet:
+  lang: python
+  code: |
+    from mcp_obsidian import server
+
+    server.serve(
+        vault=os.path.expanduser("~/Documents/brain"),
+        readonly=False,
+        fts=sqlite_fts5,
+    )
 problem: "Vendor lock-in para memoria personal: notas atrapadas en servicios cloud (Notion, Evernote, OneNote). RAG y vector DBs agregan complejidad innecesaria para single-user PKM."
 solution: "Vault de Obsidian como single source of truth, formateado como bundle OKF (un archivo de markdown por nota, interlinked). Servidor MCP en Python con SQLite + FTS5 expone el vault a agentes de IA: lecturas opt-in, escrituras casi automáticas. Sin RAG, sin vector DBs."
 impact:
