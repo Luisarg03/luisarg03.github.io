@@ -22,6 +22,8 @@
 
   /* Extended palette */
   --color-accent-glow: rgba(240, 180, 41, 0.12);
+  --color-accent-identity: #2AD4C9;
+  --color-accent-identity-glow: rgba(42,212,201,0.12);
   --color-success-glow: rgba(63, 185, 80, 0.12);
   --color-surface-glow: rgba(240, 180, 41, 0.04);
 
@@ -135,9 +137,19 @@ code, kbd, samp, pre {
   display: inline-block;
   width: 3px;
   height: 0.75em;
-  background: var(--color-accent);
+  background: var(--color-accent-identity);
   border-radius: 1px;
   flex-shrink: 0;
+}
+
+/* Nav active indicator using aria-current="page" on nav links */
+[aria-current="page"].px-3::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: var(--color-accent-identity);
+  margin-top: 4px;
+  border-radius: 2px;
 }
 
 /* ── Surface / Panel ─────────────────────────────────────────────────── */
