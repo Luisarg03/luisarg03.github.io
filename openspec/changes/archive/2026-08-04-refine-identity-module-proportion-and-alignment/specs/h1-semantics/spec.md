@@ -1,11 +1,4 @@
-# h1-semantics Specification
-
-## Purpose
-
-Define semantic H1 requirements for the homepage to improve SEO ranking for the
-user's full name ("Luis Meyehen Paz") in search engines.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Homepage has semantic H1 with full name
 The homepage SHALL contain a visible `<h1>` element whose text content includes

@@ -45,10 +45,13 @@ const currentRole = experience.find((e) => e.endDate === null);
 
       <!-- Name and details (right on desktop, bottom on mobile) -->
       <div class="identity-info">
-        <h1 class="identity-name">{siteConfig.name}</h1>
-
         <!-- Key details -->
         <div class="identity-details">
+          <h1 class="identity-detail-row">
+            <span class="identity-detail-key">Name</span>
+            <span class="identity-detail-sep">:</span>
+            <span class="identity-detail-val">{siteConfig.name}</span>
+          </h1>
           <div class="identity-detail-row">
             <span class="identity-detail-key">Role</span>
             <span class="identity-detail-sep">:</span>
@@ -70,35 +73,36 @@ const currentRole = experience.find((e) => e.endDate === null);
             <span class="identity-detail-val">{siteConfig.location}</span>
           </div>
         </div>
+
+        <!-- Decorative separator -->
+        <p class="identity-prompt">$ cat /etc/motd</p>
+
+        <!-- Summary -->
+        <p class="identity-summary">{siteConfig.summary}</p>
+
+        <!-- Contact actions -->
+        <p class="identity-prompt">$ ls /contact/</p>
+
+        <div class="identity-contacts">
+          <a href={`mailto:${siteConfig.email}`} class="identity-contact-link">
+            <span class="identity-contact-file">email.sh</span>
+            <span class="identity-contact-label">Email</span>
+          </a>
+          <a href={siteConfig.github} target="_blank" rel="noopener" class="identity-contact-link">
+            <span class="identity-contact-file">github.sh</span>
+            <span class="identity-contact-label">GitHub ↗</span>
+          </a>
+          <a href={siteConfig.linkedin} target="_blank" rel="noopener" class="identity-contact-link">
+            <span class="identity-contact-file">linkedin.sh</span>
+            <span class="identity-contact-label">LinkedIn ↗</span>
+          </a>
+          <a href="/cv.pdf" download class="identity-contact-link">
+            <span class="identity-contact-file">cv.pdf</span>
+            <span class="identity-contact-label">CV ↓</span>
+          </a>
+        </div>
       </div>
-    </div>
 
-    <!-- Decorative separator -->
-    <p class="identity-prompt">$ cat /etc/motd</p>
-
-    <!-- Summary -->
-    <p class="identity-summary">{siteConfig.summary}</p>
-
-    <!-- Contact actions -->
-    <p class="identity-prompt">$ ls /contact/</p>
-
-    <div class="identity-contacts">
-      <a href={`mailto:${siteConfig.email}`} class="identity-contact-link">
-        <span class="identity-contact-file">email.sh</span>
-        <span class="identity-contact-label">Email</span>
-      </a>
-      <a href={siteConfig.github} target="_blank" rel="noopener" class="identity-contact-link">
-        <span class="identity-contact-file">github.sh</span>
-        <span class="identity-contact-label">GitHub ↗</span>
-      </a>
-      <a href={siteConfig.linkedin} target="_blank" rel="noopener" class="identity-contact-link">
-        <span class="identity-contact-file">linkedin.sh</span>
-        <span class="identity-contact-label">LinkedIn ↗</span>
-      </a>
-      <a href="/cv.pdf" download class="identity-contact-link">
-        <span class="identity-contact-file">cv.pdf</span>
-        <span class="identity-contact-label">CV ↓</span>
-      </a>
     </div>
   </div>
 </section>
@@ -161,25 +165,6 @@ const currentRole = experience.find((e) => e.endDate === null);
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     margin: 0 0 var(--space-4);
-  }
-
-  /* ── Name ────────────────────────────────────────────────────────────── */
-  .identity-name {
-    font-family: var(--font-mono);
-    font-size: var(--text-display-sm);
-    font-weight: 700;
-    color: var(--color-accent-identity);
-    line-height: 1.1;
-    margin: 0 0 var(--space-5);
-    text-shadow: 0 0 40px var(--color-accent-identity-glow);
-  }
-
-  /* Single line only at very wide desktop (>=1200px where there's ample space);
-     allow wrapping at medium widths. */
-  @media (min-width: 1200px) {
-    .identity-name {
-      white-space: nowrap;
-    }
   }
 
   /* ── Details ─────────────────────────────────────────────────────────── */
