@@ -1,0 +1,14 @@
+---
+title: "NexoCode"
+description: "Independent fork of opencode (AI coding agent CLI) with XDG compliance, hardened plugin isolation, and CLI-only monorepo structure."
+repo: "https://github.com/Luisarg03/NexoCode"
+problem: "opencode is a powerful AI coding agent CLI but has architectural constraints: XDG non-compliance, monolithic plugin system, enterprise package bloat for a CLI-focused tool."
+solution: "Independent fork enforcing Linux/Unix standards (XDG Base Directory), hardened plugin isolation with capability manifests and error sandboxing, CLI-only monorepo with 13 packages (Bun runtime, TypeScript, SolidJS TUI, Effect typed effects, SQLite via Drizzle, MCP/LSP/ACP protocols)."
+impact:
+  - "Demonstrates fork maintenance discipline: code review, security hardening, architectural refactoring at scale"
+  - "XDG Base Directory compliance improves multi-user and containerized deployment scenarios"
+  - "Plugin security model (capability manifests + error isolation) reduces blast radius of third-party plugin failures"
+  - "Monorepo restructuring (13 packages, Bun workspace) proof-of-concept for CLI-first open-source tool architecture"
+tags: ['bun', 'typescript', 'ai-agent', 'llm', 'monorepo', 'plugin-system', 'xdg', 'docker']
+order: 1
+---

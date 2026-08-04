@@ -10,6 +10,7 @@ export interface Experience {
   startDate: string;
   endDate: string | null; // null = current position
   responsibilities: string[];
+  impact?: string[];
 }
 
 export interface SkillCategory {

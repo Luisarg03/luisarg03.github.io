@@ -78,6 +78,8 @@ On mobile:
 ### Requirement: Progressive disclosure of experience
 The experience timeline SHALL render the 3-4 most recent roles expanded by default and collapse earlier roles behind a user-activated disclosure control (native `<details>` or equivalent).
 
+Within each entry's expanded detail block, the system SHALL render quantified impact lines BEFORE responsibility bullets so hiring-relevant impact is surfaced first.
+
 #### Scenario: Default view emphasizes recent roles
 - **WHEN** a visitor loads the homepage
 - **THEN** the 3-4 most recent roles are immediately visible and earlier roles are collapsed
@@ -86,6 +88,11 @@ The experience timeline SHALL render the 3-4 most recent roles expanded by defau
 - **WHEN** the visitor activates the disclosure control
 - **THEN** all earlier roles render without a page reload
 
+#### Scenario: Impact lines render before responsibilities
+- **WHEN** an experience entry is expanded
+- **THEN** any quantified impact lines render at the top of the details block
+- **AND** responsibility bullets render after the impact lines
+
 ### Requirement: Journalctl-style experience log
 The system SHALL render experience entries as a journalctl-style timestamped log instead of a drawn timeline spine. This supersedes the former "Scroll-driven timeline spine" requirement; module divider drawing is covered by the `boot-into-content` spec.
 
@@ -93,6 +100,8 @@ The log SHALL:
 - Render one entry per role as a line like `[started]` with month/year, role, and company
 - Render the current role with an `ACTIVE` status and a pulsing green indicator
 - Use entries from `experience[]` in `cv.ts`, sorted by start date descending
+- Render a quantified impact line beneath an entry's responsibilities when that entry defines an optional `impact` field (array of strings), visually distinguished (e.g. copper-accented) from ordinary responsibility bullets
+- Omit the impact line entirely for entries that do not define `impact`, without leaving an empty placeholder
 
 #### Scenario: Log renders all entries
 - **WHEN** the experience module is loaded
@@ -105,6 +114,14 @@ The log SHALL:
 #### Scenario: Content visible without scroll interaction
 - **WHEN** the module renders in a browser without `animation-timeline` support
 - **THEN** all log entries are visible statically on first paint
+
+#### Scenario: Entry with impact metrics shows a distinct impact line
+- **WHEN** an experience entry defines a non-empty `impact` array
+- **THEN** the entry renders an additional impact line, visually distinguished from the responsibilities list
+
+#### Scenario: Entry without impact metrics renders unchanged
+- **WHEN** an experience entry does not define an `impact` field
+- **THEN** the entry renders exactly as before, with no empty impact section
 
 ### Requirement: Job detail toggle survives navigation
 

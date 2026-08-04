@@ -16,9 +16,23 @@ const projects = defineCollection({
     title: z.string(),
     description: z.string(),
     repo: z.string().url(),
+    problem: z.string().optional(),
+    solution: z.string().optional(),
+    impact: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
   }),
 });
 
-export const collections = { now, projects };
+const travel = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/travel' }),
+  schema: ({ image }) =>
+    z.object({
+      date: z.date(),
+      location: z.string(),
+      caption: z.string(),
+      photos: z.array(image()),
+    }),
+});
+
+export const collections = { now, projects, travel };

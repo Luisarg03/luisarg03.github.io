@@ -45,6 +45,16 @@ import WorkspaceBar from '../workspace/WorkspaceBar.astro';
   import { fileSystem, resolvePath, isDirectory } from './FileSystem';
   import type { ParseResult } from './CommandParser';
 
+  const OUTPUT_TYPE_MAP: Record<string, string> = {
+    error: 'error',
+    success: 'success',
+    warning: 'warning',
+    info: 'info',
+    html: 'html',
+    pre: 'pre',
+    text: 'text',
+  };
+
   // ── Workspace config ──
   interface WorkspaceConfig {
     cwd: string;
@@ -85,10 +95,7 @@ import WorkspaceBar from '../workspace/WorkspaceBar.astro';
       const result = parser.parse(config.autoRun, cwd);
       if (result.type === 'output' && result.content) {
         const outputType = result.outputType || 'text';
-        const typeMap: Record<string, string> = {
-          error: 'error', success: 'success', warning: 'warning', info: 'info', html: 'html', pre: 'pre', text: 'text',
-        };
-        appendOutput(typeMap[outputType] || 'text', result.content);
+        appendOutput(OUTPUT_TYPE_MAP[outputType] || 'text', result.content);
       }
     }
   }
@@ -231,16 +238,7 @@ import WorkspaceBar from '../workspace/WorkspaceBar.astro';
     if (result.type === 'output') {
       const outputType = result.outputType || 'text';
       if (result.content) {
-        const typeMap: Record<string, string> = {
-          error: 'error',
-          success: 'success',
-          warning: 'warning',
-          info: 'info',
-          html: 'html',
-          pre: 'pre',
-          text: 'text',
-        };
-        appendOutput(typeMap[outputType] || 'text', result.content);
+        appendOutput(OUTPUT_TYPE_MAP[outputType] || 'text', result.content);
       }
     }
   }

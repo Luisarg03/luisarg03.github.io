@@ -160,7 +160,7 @@ export const fileSystem: FsNode = {
 // ── Helper functions ────────────────────────────────────────────────────────
 
 /** Normalize a path string: resolve `.` and `..`, produce absolute form. */
-function normalizePathString(cwd: string, target: string): string[] {
+export function normalizePathString(cwd: string, target: string): string[] {
   let path = target;
   if (path.startsWith('~')) path = path.replace('~', HOME_PATH);
 
