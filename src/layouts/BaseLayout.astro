@@ -177,12 +177,36 @@ const jsonLd = {
     <!-- Footer (hidden on homepage where ShutdownModule replaces it) -->
     {!hideFooter && (
     <footer class="site-terminal-footer">
-      <div class="site-terminal-footer__prompt">
-        ~/luisarg $ git rev-parse --short HEAD
-      </div>
-      <div class="site-terminal-footer__meta">
-        commit {buildCommit} · {buildDate} · uptime {buildUptime}d · ~/luisarg
-      </div>
+      <hr class="site-terminal-footer__divider" aria-hidden="true" />
+
+      <p class="site-terminal-footer__prompt">$ luisarg@cloud:~$ ▮</p>
+
+      <hr class="site-terminal-footer__divider" aria-hidden="true" />
+
+      <p class="site-terminal-footer__links">
+        <a href="/" class="site-terminal-footer__link">home</a>
+        <span class="site-terminal-footer__sep" aria-hidden="true">·</span>
+        <a href="/projects" class="site-terminal-footer__link">projects</a>
+        <span class="site-terminal-footer__sep" aria-hidden="true">·</span>
+        <a href="/now" class="site-terminal-footer__link">now</a>
+        <span class="site-terminal-footer__sep" aria-hidden="true">·</span>
+        <a href="https://github.com/luisarg03" target="_blank" rel="noopener" class="site-terminal-footer__link">github</a>
+        <span class="site-terminal-footer__sep" aria-hidden="true">·</span>
+        <a href="https://linkedin.com/in/luisarg03" target="_blank" rel="noopener" class="site-terminal-footer__link">linkedin</a>
+        <span class="site-terminal-footer__sep" aria-hidden="true">·</span>
+        <a href="mailto:luis.m.paz.03@gmail.com" class="site-terminal-footer__link">email</a>
+      </p>
+
+      <hr class="site-terminal-footer__divider" aria-hidden="true" />
+
+      <p class="site-terminal-footer__build">
+        commit <span class="site-terminal-footer__build-val">{buildCommit}</span> · uptime {buildUptime}d · {buildDate}
+      </p>
+
+      <p class="site-terminal-footer__copy">
+        <span class="site-terminal-footer__status-dot" aria-hidden="true"></span>
+        <span>© 2026 Luis Meyehen Paz</span>
+      </p>
     </footer>
     )}
 
@@ -200,13 +224,13 @@ const jsonLd = {
 </html>
 
 <style>
-  /* ── Terminal-style site footer ─────────────────────────────────────────── */
+  /* ── Terminal-style site footer (minimal horizontal) ──────────────────── */
   .site-terminal-footer {
     border-top: 1px solid var(--color-border);
-    margin: var(--space-8) auto 0;
-    padding: var(--space-6) var(--space-4) var(--space-4);
+    margin: var(--space-12) auto 0;
+    padding: var(--space-6) var(--space-4) var(--space-8);
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     color: var(--color-text-muted);
     max-width: 52rem;
     overflow-x: hidden;
@@ -214,12 +238,65 @@ const jsonLd = {
     text-align: center;
   }
 
-  .site-terminal-footer__prompt {
-    color: var(--color-accent);
-    margin-bottom: var(--space-1);
+  .site-terminal-footer__divider {
+    border: 0;
+    border-top: 1px dashed var(--color-border);
+    margin: var(--space-3) auto;
+    max-width: 60%;
+    opacity: 0.4;
   }
 
-  .site-terminal-footer__meta {
-    opacity: 0.85;
+  .site-terminal-footer__prompt {
+    color: var(--color-text-muted);
+    margin: var(--space-2) 0 var(--space-3);
+    opacity: 0.8;
+  }
+
+  .site-terminal-footer__links {
+    margin: var(--space-3) 0;
+    line-height: 1.6;
+  }
+
+  .site-terminal-footer__sep {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    user-select: none;
+  }
+
+  .site-terminal-footer__link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .site-terminal-footer__link:hover {
+    color: var(--color-accent);
+  }
+
+  .site-terminal-footer__build {
+    margin: var(--space-2) 0;
+    opacity: 0.7;
+  }
+
+  .site-terminal-footer__build-val {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .site-terminal-footer__copy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 0;
+    opacity: 0.8;
+  }
+
+  .site-terminal-footer__status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent-identity);
   }
 </style>

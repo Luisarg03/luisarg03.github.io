@@ -11,6 +11,13 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
 ---
 
 <div class="boot-overlay" id="boot-overlay" hidden aria-hidden="true">
+  <!-- OS brand prelude — fixed string, rendered synchronously (CLS anchor) -->
+  <pre class="boot-prelude"> _     _   __   __   ____   ___
+| |   | |  \ \ / /  / __ \ / _ \
+| |   | |   \ V /  | |  | || | | |
+| |___| |    | |   | |__| || |_| |
+|_____|_|    |_|    \____/ \___/</pre>
+
   <div class="boot-terminal" id="boot-terminal">
     <!-- Static fallback — never displayed (overlay is hidden without JS).
          Maps canonical frames so a failed engine still has content. -->
@@ -110,12 +117,11 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
     inset: 0;
     z-index: 40;
     display: flex;
-    /* Top-anchored terminal: typed lines append downward so existing
-       content never moves (centered growth shifts every line and counts
-       toward CLS). */
-    align-items: flex-start;
+    /* Vertically centered: the pre-line prelude renders synchronously and
+       anchors the layout; typed frames grow downward from it with no CLS. */
+    align-items: center;
     justify-content: center;
-    padding: var(--space-8) var(--space-6);
+    padding: var(--space-12) var(--space-6);
     background: var(--color-bg);
     opacity: 1;
     transition: opacity 0.5s ease;
@@ -131,6 +137,44 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
   .boot-overlay.boot-overlay-fade {
     opacity: 0;
     pointer-events: none;
+  }
+
+  /* ── OS prelude (pre-line) ──────────────────────────────────────────── */
+  .boot-prelude {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.1;
+    color: var(--color-accent);
+    text-align: center;
+    margin: 0 0 var(--space-6);
+    white-space: pre;
+    position: relative;
+    z-index: 2;  /* above the scan lines */
+    animation: boot-prelude-glitch 0.5s ease-out 1 both;
+  }
+
+  @keyframes boot-prelude-glitch {
+    0%   { text-shadow:  2px 0 var(--color-accent-identity), -2px 0 var(--color-accent); }
+    20%  { text-shadow: -2px 1px var(--color-accent-identity),  2px -1px var(--color-accent); }
+    40%  { text-shadow:  1px -1px var(--color-accent-identity), -1px 1px var(--color-accent); }
+    60%  { text-shadow:  0 0 transparent, 0 0 transparent; }
+    100% { text-shadow: none; }
+  }
+
+  /* CRT scan lines over the whole overlay (below the text, above the bg) */
+  .boot-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255, 255, 255, 0.025) 2px,
+      rgba(255, 255, 255, 0.025) 3px
+    );
+    z-index: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -166,6 +210,10 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
 
   @media (prefers-reduced-motion: reduce) {
     .boot-line {
+      animation: none;
+    }
+
+    .boot-prelude {
       animation: none;
     }
   }
