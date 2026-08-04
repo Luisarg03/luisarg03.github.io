@@ -5,15 +5,13 @@ import BootModule from '../components/modules/BootModule.astro';
 import IdentityModule from '../components/modules/IdentityModule.astro';
 import SkillsModule from '../components/modules/SkillsModule.astro';
 import ExperienceModule from '../components/modules/ExperienceModule.astro';
-import ShutdownModule from '../components/modules/ShutdownModule.astro';
 ---
 
-<BaseLayout title="Luis Meyehen Paz — Cloud Engineer" hideFooter showBootChip>
+<BaseLayout title="Luis Meyehen Paz — Cloud Engineer" showBootChip>
   <!-- BootModule: fixed overlay (out of flow) — IdentityModule below is the
        first actual content in the viewport. -->
   <BootModule />
   <IdentityModule />
   <SkillsModule />
   <ExperienceModule />
-  <ShutdownModule />
 </BaseLayout>
