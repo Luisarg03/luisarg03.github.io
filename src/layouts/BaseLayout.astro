@@ -83,7 +83,7 @@ const jsonLd = {
 
       <nav class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors group">
+          <a href="/" class="flex items-center gap-2 font-mono text-sm tracking-wider text-[var(--color-accent-identity)] hover:text-[var(--color-text)] transition-colors group">
             <span class="w-2 h-2 rounded-full bg-[var(--color-success)] group-hover:shadow-[0_0_8px_var(--color-success-glow)] transition-shadow" aria-hidden="true"></span>
             <span>~/luisarg</span>
           </a>
@@ -167,7 +167,6 @@ const jsonLd = {
     </header>
 
     <main class="relative z-10 max-w-6xl mx-auto px-6 py-6 md:py-8 lg:py-10" transition:name="main">
-      <!-- TODO(lane 3): add transition:name="hero-block" to the hero <section> in Hero.astro -->
       <slot />
     </main>
 
@@ -207,9 +206,6 @@ const jsonLd = {
 
     <!-- Scroll reveal: IntersectionObserver for .reveal / .reveal-on-view* / .draw-on-scroll -->
     <script defer src="/scripts/scroll-observer.js"></script>
-
-    <!-- Scroll velocity tracker: sets --scroll-velocity for blueprint background -->
-    <script defer src="/scripts/velocity-tracker.js"></script>
 
     <!-- Code copy: per-code-block copy button for prose content -->
     <script defer src="/scripts/copy-code.js"></script>
