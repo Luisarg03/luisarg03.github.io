@@ -4,11 +4,12 @@ import { transformerNotationHighlight } from '@shikijs/transformers';
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import buildinfo from './vite-plugin-buildinfo.js';
 
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), buildinfo()],
   },
   integrations: [mdx(), sitemap()],
   devToolbar: { enabled: false },

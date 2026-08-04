@@ -7,4 +7,23 @@ solution: "GitHub Actions: lint (ruff), build de 3 imágenes Docker (preprocessi
 tags: ['aws', 'sagemaker', 'github-actions', 'docker', 'python']
 order: 0
 status: archived
+year: 2024
+role: ml ops engineer
+type: client
+stack: [aws, sagemaker, github-actions, docker, python]
+codeSnippet:
+  lang: yaml
+  code: |
+    name: sagemaker-cicd
+    on:
+      push:
+        branches: [model/*]
+    jobs:
+      build:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - run: docker build -t $IMAGE .
+links:
+  docs: https://github.com/Luisarg03/sagemaker-cicd-poc/blob/main/docs/design.md
 ---
