@@ -3,8 +3,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/layout/SectionPanel.astro';
 import { getCollection } from 'astro:content';
 
+// Heuristic: prefer projects with explicit impact arrays and larger impact counts.
+// Fallback: extract first number from first impact line if present, otherwise fallback to `order`.
+function impactScore(a: any) {
+  const data = a.data || {};
+  if (data.impact && data.impact.length) return data.impact.length * 100;
+  if (data.impact && data.impact[0]) {
+    const m = data.impact[0].match(/(\d+(?:\.\d+)?)/);
+    if (m) return parseFloat(m[1]) * 10;
+  }
+  return data.order || 0;
+}
+
 const projects = (await getCollection('projects'))
-  .sort((a, b) => a.data.order - b.data.order);
+  .sort((a, b) => impactScore(b) - impactScore(a) || (a.data.order - b.data.order));
 ---
 
 <BaseLayout
@@ -16,35 +28,59 @@ const projects = (await getCollection('projects'))
       <p class="font-mono text-[var(--text-sm)] text-[var(--color-text-muted)]">No projects yet.</p>
     ) : (
       <ul class="divide-y divide-[var(--color-border)]">
-        {projects.map((project) => (
+        {projects.map((project) => {
+          const data = project.data as any;
+          return (
           <li class="py-4">
-            <h2 class="font-mono text-[var(--text-sm)] text-[var(--color-accent)]">
-              {project.data.title}
-            </h2>
-            <p class="mt-1 text-[var(--text-sm)] text-[var(--color-text-muted)]">
-              {project.data.description}
-            </p>
-            <div class="mt-2 flex flex-wrap items-center gap-3 font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
-              <a
-                href={project.data.repo}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors"
-              >
-                github ↗
-              </a>
-              {project.data.tags.length > 0 && (
-                <span class="flex items-center gap-1.5">
-                  {project.data.tags.map((tag) => (
-                    <span class="rounded border border-[var(--color-border)] px-1.5 py-0.5">
-                      {tag}
-                    </span>
-                  ))}
-                </span>
+            <div class="project-card font-mono text-[var(--text-sm)] max-w-full break-words" style="background: var(--bg-terminal, #0a0e14);">
+              <h2 class="text-[var(--text-sm)] text-[var(--color-accent)]">
+                {data.title}
+              </h2>
+              <p class="mt-1 text-[var(--text-sm)] text-[var(--color-text-muted)]">
+                {data.description}
+              </p>
+
+              {data.problem && (
+                <pre class="mt-3 text-[var(--text-sm)] text-[var(--color-text-muted)] comment-line whitespace-pre-wrap break-words">// {data.problem}</pre>
               )}
+              {data.solution && (
+                <pre class="mt-1 text-[var(--text-sm)] text-[var(--color-text-muted)] comment-line whitespace-pre-wrap break-words">// {data.solution}</pre>
+              )}
+
+              {data.impact && data.impact.length > 0 && (
+                <div class="mt-3 flex flex-col gap-1 impact-list">
+                  {data.impact.map((imp: string) => (
+                    <div class="impact-line text-[var(--text-sm)]">
+                      <span class="impact-marker">→</span>
+                      <span class="ml-2 text-[var(--color-accent)]">{imp}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div class="mt-3 flex flex-wrap items-center gap-3 text-[var(--text-xs)] text-[var(--color-text-muted)]">
+                <a
+                  href={data.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-[var(--color-accent)] hover:text-[var(--color-text)] transition-colors"
+                >
+                  github ↗
+                </a>
+                {data.tags.length > 0 && (
+                  <span class="flex flex-wrap items-center gap-1.5">
+                    {data.tags.map((tag: string) => (
+                      <span class="rounded border border-[var(--color-border)] px-1.5 py-0.5">
+                        {tag}
+                      </span>
+                    ))}
+                  </span>
+                )}
+              </div>
             </div>
           </li>
-        ))}
+          )
+        })}
       </ul>
     )}
   </SectionPanel>

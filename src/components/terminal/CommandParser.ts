@@ -1,5 +1,5 @@
 import type { FsNode } from './FileSystem';
-import { resolvePath, listDir, isDirectory, HOME_PATH } from './FileSystem';
+import { resolvePath, listDir, isDirectory, HOME_PATH, normalizePathString } from './FileSystem';
 
 // ── Result types ────────────────────────────────────────────────────────────
 
@@ -147,7 +147,6 @@ export class CommandParser {
 
     this.register('cd', (args, cwd) => {
       const rawTarget = args[0] || '~';
-      const normalized = this.normalizePath(cwd, rawTarget);
       const node = resolvePath(fs, cwd, rawTarget);
       if (!node) {
         return { type: 'output', content: `[ERROR] ${rawTarget}: No such file or directory`, outputType: 'error' };
@@ -155,7 +154,8 @@ export class CommandParser {
       if (!isDirectory(node)) {
         return { type: 'output', content: `[ERROR] ${rawTarget}: Not a directory`, outputType: 'error' };
       }
-      return { type: 'cd', path: normalized };
+      const segments = normalizePathString(cwd, rawTarget);
+      return { type: 'cd', path: '/' + segments.join('/') };
     }, 'Change directory (default: ~)');
 
     this.register('cat', (args, cwd) => {
@@ -291,25 +291,4 @@ export class CommandParser {
     }, 'Disconnect from the session');
   }
 
-  /** Normalize a path string: resolve `.`/`..`, return canonical absolute path. */
-  private normalizePath(cwd: string, target: string): string {
-    let resolved = target;
-    if (resolved.startsWith('~')) resolved = resolved.replace('~', HOME_PATH);
-
-    const segments = resolved.startsWith('/')
-      ? resolved.split('/').filter(Boolean)
-      : [...cwd.split('/').filter(Boolean), ...resolved.split('/').filter(Boolean)];
-
-    const result: string[] = [];
-    for (const seg of segments) {
-      if (seg === '.' || seg === '') continue;
-      if (seg === '..') {
-        if (result.length > 0) result.pop();
-        continue;
-      }
-      result.push(seg);
-    }
-
-    return '/' + result.join('/');
-  }
 }

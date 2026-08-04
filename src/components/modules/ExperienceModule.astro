@@ -56,7 +56,7 @@ const EXPANDED_COUNT = 3;
               ─── {year} ───
             </div>
 
-            {roles.map((exp, ri) => {
+            {roles.map((exp: any, ri) => {
               const start = parseDate(exp.startDate);
               const isActive = exp.endDate === null;
               const showExpanded = (globalIdx + ri) < EXPANDED_COUNT;
@@ -90,7 +90,15 @@ const EXPANDED_COUNT = 3;
                         hidden={!showExpanded}
                       >
                         <div class="experience-detail-inner">
-                          {exp.responsibilities.map((r) => (
+                          {exp.impact && exp.impact.length > 0 && (
+                            <div class="experience-impact">
+                              {exp.impact.map((im: string) => (
+                                <div class="experience-impact-line">→ {im}</div>
+                              ))}
+                            </div>
+                          )}
+
+                          {exp.responsibilities.map((r: string) => (
                             <div class="experience-resp">· {r}</div>
                           ))}
                         </div>
@@ -246,6 +254,21 @@ const EXPANDED_COUNT = 3;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  /* Impact lines: visually distinct, copper accent */
+  .experience-impact {
+    margin-top: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .experience-impact-line {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-accent);
     line-height: 1.6;
   }
 
