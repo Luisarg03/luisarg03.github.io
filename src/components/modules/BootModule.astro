@@ -7,20 +7,16 @@
  * Skipped entirely on: quick mode (sessionStorage), reduced motion, no-JS,
  * client-side navigation, `back_forward` loads, and direct hash loads.
  */
+import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
 ---
 
 <div class="boot-overlay" id="boot-overlay" hidden aria-hidden="true">
   <div class="boot-terminal" id="boot-terminal">
     <!-- Static fallback — never displayed (overlay is hidden without JS).
-         Matches the canonical frames so a failed engine still has content. -->
-    <div class="boot-line">[    0.000000] Booting LuisOS v7.0.0 — luis@cloud</div>
-    <div class="boot-line">[    0.154200] CPU: Arch x86_64 (4 cores @ 3.4GHz)</div>
-    <div class="boot-line">[    0.423100] Memory: 64GB RAM detected — swap: 8GB</div>
-    <div class="boot-line">[    0.891300] Kernel: linux-arch 6.6.0 loaded</div>
-    <div class="boot-line">[    1.245000] Starting system services...</div>
-    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Started OpenSSH Daemon</div>
-    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Started Hyprland Compositor</div>
-    <div class="boot-line"><span class="boot-ok">[     OK     ]</span> Reached target Multi-User System.</div>
+         Maps canonical frames so a failed engine still has content. -->
+    {LUIS_BOOT_FRAMES.map((frame) => (
+      <div class="boot-line" set:html={frame} />
+    ))}
   </div>
 </div>
 
