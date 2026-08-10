@@ -1,0 +1,23 @@
+---
+title: "OpenDashboard"
+description: "Visualizador de solo lectura para la CLI de agentes OpenCode: costos, cadenas de delegación y uso de tokens que la terminal no muestra."
+repo: "https://github.com/Luisarg03/OpenDashboard"
+problem: "En flujos de trabajo multi-agente, la CLI de OpenCode no expone costos por sesión, cadenas de delegación ni uso de tokens. Solo muestra la salida directa del agente — la superficie operacional completa queda invisible."
+solution: "Dashboard web que abre la base SQLite de OpenCode con PRAGMA query_only = 1 (nunca escribe). Backend FastAPI con JSON API y SSE para cola en vivo. Frontend React 19 + Vite, React Flow para grafos de delegación, TanStack Query para datos. KPI tiles, gráfico de costos, tabla ordenable de sesiones, vista de traza con grafos, timeline con playback, modo foco y drawer de detalle. Cero configuración, puerto 8420."
+impact:
+  - "Observabilidad sobre una superficie que la CLI no expone: delegaciones encadenadas, costos por sesión, tokens consumidos"
+  - "Lectura-only por construcción: PRAGMA query_only = 1 garantiza que el dashboard nunca modifica la base de OpenCode"
+  - "Operación cero-configuración: solo requiere que OpenCode haya corrido una vez, puerto fijo 8420"
+  - "Plugin opcional de OpenCode lo auto-inicia como singleton machine-wide"
+tags: ['python', 'fastapi', 'react', 'sqlite', 'observability', 'llm-agents']
+order: 0
+status: wip
+year: 2026
+role: platform engineer
+type: oss
+cover: ../../assets/projects/opendashboard.png
+coverAlt: "Dashboard de OpenCode mostrando KPI tiles de costos, gráfico de evolución de gasto y tabla de sesiones con cadenas de delegación de agentes"
+stack: [python, fastapi, react, sqlite, sse]
+links:
+  docs: https://github.com/Luisarg03/OpenDashboard/tree/main/docs
+---

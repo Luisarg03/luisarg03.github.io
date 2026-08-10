@@ -32,22 +32,34 @@ The project card layout SHALL stack into a single column without horizontal over
 - **THEN** project cards render in a single column
 - **AND** no content is clipped or overflows horizontally
 
-## ADDED Requirements
-
 ### Requirement: Project grid with featured project
 
 The `/projects` page SHALL render projects in a CSS Grid
 layout. On desktop viewports (>= 640px), the first project
-(ordered by impact score) SHALL span the full grid width
-("featured"), and the remaining projects SHALL render in a
-2-column grid. On mobile viewports (< 640px), all projects
-SHALL stack in a single column.
+(ordered by ascending `order` frontmatter value) SHALL span
+the full grid width ("featured"), and the remaining projects
+SHALL render in a 2-column grid. On mobile viewports
+(< 640px), all projects SHALL stack in a single column.
+
+Project sequence SHALL be determined solely by the `order`
+field. No computed ranking heuristic SHALL influence the
+displayed order.
 
 #### Scenario: Featured project spans full width on desktop
 - **WHEN** a visitor opens `/projects` at viewport >= 640px
 - **THEN** the first project card occupies the full grid width
 - **AND** the remaining project cards render in a 2-column
   grid below the featured card
+
+#### Scenario: Featured project is the lowest order value
+- **WHEN** the projects collection contains entries with
+  `order` values 0, 1, 2, and 3
+- **THEN** the entry with `order: 0` renders as the featured
+  card
+- **AND** the remaining entries render in ascending `order`
+  sequence
+- **AND** the number of `impact` entries on any project does
+  not affect its position
 
 #### Scenario: All projects stack on mobile
 - **WHEN** a visitor opens `/projects` at viewport < 640px
@@ -183,8 +195,6 @@ prefers reduced motion.
 - **AND** the page is fully readable and navigable in its
   static state
 
-## ADDED Requirements
-
 ### Requirement: Project meta fields
 
 The `projects` content collection SHALL support optional
@@ -260,25 +270,43 @@ label is rendered.
 
 ### Requirement: Project featured hero with terminal window
 
-The featured project (first card by impact score) SHALL
+The featured project (first card by ascending `order`) SHALL
 render a 2-column layout on desktop viewports (>= 1024px):
 a text column on the left (title, status dot, meta row,
 description, case study, links) and a terminal window on the
-right (a stylized code block with shiki-rendered syntax
-highlighting). The terminal window SHALL include a title bar
-with the project title and a code area. On tablet
-(640-1023px) and mobile (< 640px) viewports, the terminal
-window stacks below the text column. When the featured
-project has no `codeSnippet` field, the terminal window is
-hidden entirely.
+right. The terminal window SHALL include a title bar with the
+project title and a content area.
+
+The content area SHALL render the project's `cover` image when
+that field is present. When `cover` is absent and
+`codeSnippet` is present, the content area SHALL render the
+code block with shiki syntax highlighting instead. When
+neither field is present, the terminal window SHALL be hidden
+entirely.
+
+On tablet (640-1023px) and mobile (< 640px) viewports, the
+terminal window stacks below the text column.
 
 #### Scenario: Featured project shows terminal window on desktop
 - **WHEN** a visitor opens `/projects` at viewport >= 1024px
 - **THEN** the featured project card renders a 2-column
   layout
 - **AND** the right column shows a terminal window with a
-  title bar and a code area
-- **AND** the code area renders the project's
+  title bar and a content area
+
+#### Scenario: Featured project with a cover renders the image
+- **WHEN** the featured project entry defines `cover`
+- **THEN** the terminal window content area renders the cover
+  image
+- **AND** the image uses the `coverAlt` value as its alt text
+- **AND** the terminal title bar renders unchanged
+- **AND** the `codeSnippet` field, if present, is not
+  rendered
+
+#### Scenario: Featured project without a cover renders the code snippet
+- **WHEN** the featured project entry has no `cover` field
+  but defines `codeSnippet`
+- **THEN** the code area renders the project's
   `codeSnippet.code` with shiki syntax highlighting for the
   language declared in `codeSnippet.lang`
 
@@ -290,9 +318,9 @@ hidden entirely.
 - **AND** the terminal window is horizontally scrollable if
   the code is wider than the viewport
 
-#### Scenario: Featured project without codeSnippet omits the terminal window
-- **WHEN** the featured project entry has no `codeSnippet`
-  field
+#### Scenario: Featured project without cover or codeSnippet omits the terminal window
+- **WHEN** the featured project entry has neither a `cover`
+  nor a `codeSnippet` field
 - **THEN** the card renders as a single column (text only)
 - **AND** no empty terminal window placeholder is visible
 - **AND** no layout shift occurs (the card height is stable)
@@ -302,7 +330,7 @@ hidden entirely.
 - **THEN** it includes a title bar with the project title in
   monospace
 - **AND** the title bar uses the surface color background
-- **AND** the title bar is visually distinct from the code
+- **AND** the title bar is visually distinct from the content
   area
 
 ### Requirement: Project multi-link presentation
@@ -333,44 +361,6 @@ link row SHALL appear in the card footer alongside the tags.
 - **WHEN** a project entry has no `links` field
 - **THEN** the card footer renders only `github ↗`
 - **AND** the link points to `data.repo`
-
-### Requirement: Project tag filter chips
-
-The `/projects` page SHALL render a row of tag filter chips
-above the project grid. The chips SHALL include an `[all]`
-chip plus one chip per unique tag across all projects.
-Clicking a chip filters the grid to show only projects that
-include the chip's tag. Clicking `[all]` shows all projects.
-The active chip SHALL be visually distinct (copper background,
-copper text). Filter state SHALL be local to the page (no
-URL persistence required for this change).
-
-#### Scenario: Filter chip row renders above the grid
-- **WHEN** a visitor opens `/projects`
-- **THEN** a row of filter chips renders above the
-  `.projects-grid`
-- **AND** the first chip is `[all]`
-- **AND** the remaining chips are one per unique tag across
-  all projects, sorted alphabetically
-
-#### Scenario: Clicking a tag chip filters the grid
-- **WHEN** a visitor clicks the `[aws]` chip
-- **THEN** the grid shows only projects whose tags include
-  `aws`
-- **AND** the `[aws]` chip is visually active (copper
-  background)
-- **AND** the `[all]` chip is visually inactive
-
-#### Scenario: Clicking all resets the filter
-- **WHEN** a visitor clicks the `[all]` chip
-- **THEN** the grid shows all projects
-- **AND** the `[all]` chip is visually active
-
-#### Scenario: Filter chip keyboard accessibility
-- **WHEN** a visitor tabs to a filter chip and presses Enter
-  or Space
-- **THEN** the chip activates and the grid filters as if
-  clicked
 
 ### Requirement: Terminal-style page footer with build metadata
 
@@ -432,8 +422,6 @@ SHALL only run once per page load (no repeat on re-render).
   scramble
 - **AND** the title remains stable as the real text
 
-## ADDED Requirements
-
 ### Requirement: Project grid has increased card spacing
 
 The `/projects` page SHALL render the project grid with
@@ -450,3 +438,71 @@ Desktop viewports (>= 640px) SHALL use `gap: var(--space-8)`.
 - **WHEN** a visitor views `/projects` at viewport >= 640px
 - **THEN** the gap between project cards resolves to
   `var(--space-8)` (2rem)
+
+### Requirement: Project cover image field
+
+The `projects` content collection SHALL support an optional
+`cover` field, validated with Astro's `image()` helper, and an
+optional `coverAlt` string field. When `cover` is defined,
+`coverAlt` SHALL also be defined. Entries that omit both
+fields SHALL render exactly as before, with no empty image
+placeholder and no layout shift.
+
+Cover images SHALL be sourced from `src/assets/projects/` so
+they pass through Astro's build-time image optimization
+pipeline.
+
+#### Scenario: Entry with a cover image
+- **WHEN** a project entry defines `cover` and `coverAlt`
+- **THEN** the schema validates the entry
+- **AND** the image resolves through Astro's image pipeline
+  with an optimized output asset
+
+#### Scenario: Entry without a cover image
+- **WHEN** a project entry omits `cover` and `coverAlt`
+- **THEN** the schema validates the entry
+- **AND** the card renders with no image and no empty
+  placeholder
+
+#### Scenario: Cover image carries alternative text
+- **WHEN** a cover image is rendered
+- **THEN** its `alt` attribute is the entry's `coverAlt` value
+- **AND** the alt text is not empty
+
+### Requirement: Non-featured project card code snippet
+
+Non-featured project cards SHALL render their `codeSnippet` field
+when present, using the same terminal-window design language as the
+featured hero (a reduced variant of the chrome is permitted, but it
+must be visibly the same treatment, not a second visual language).
+The snippet SHALL remain visually subordinate to the featured hero's
+terminal window. Cards without a `codeSnippet` SHALL render with no
+empty placeholder and no layout shift.
+
+#### Scenario: Non-featured card renders its code snippet
+- **WHEN** a non-featured project entry defines a `codeSnippet`
+  field
+- **THEN** the card renders the snippet's `code` with shiki syntax
+  highlighting for the language declared in `codeSnippet.lang`
+- **AND** the snippet is wrapped in terminal chrome matching the
+  featured hero's visual treatment
+
+#### Scenario: Non-featured card without a code snippet
+- **WHEN** a non-featured project entry has no `codeSnippet` field
+- **THEN** the card renders no terminal window
+- **AND** no empty placeholder is visible
+- **AND** no layout shift occurs (the card height is stable)
+
+#### Scenario: Featured hero remains visually dominant
+- **WHEN** a visitor views the `/projects` page at viewport >= 640px
+- **THEN** the featured hero's terminal window is visually larger
+  or more prominent than any non-featured card snippet
+- **AND** non-featured snippets do not compete with the featured
+  hero for visual attention
+
+#### Scenario: Non-featured cards with snippets stack correctly on mobile
+- **WHEN** a visitor opens `/projects` at viewport < 640px
+- **THEN** non-featured cards containing a snippet render in a
+  single column
+- **AND** no horizontal overflow occurs from the terminal chrome
+  or the highlighted code content
