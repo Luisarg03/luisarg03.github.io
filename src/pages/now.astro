@@ -11,11 +11,11 @@ if (!entry) throw new Error('now/now.md missing');
 
 const { Content } = await render(entry);
 const updated = entry.data.updated;
-const formattedDate = updated.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-});
+// YAML date parses as midnight UTC; format with UTC getters so the intended
+// calendar day is preserved regardless of the server's timezone (toLocaleDateString
+// shifts the day back in negative-offset zones).
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const formattedDate = `${MONTHS[updated.getUTCMonth()]} ${updated.getUTCDate()}, ${updated.getUTCFullYear()}`;
 
 // server-side load travel entries in frontmatter so template can render
 const _travelEntries = (await getCollection('travel')) || [];
@@ -25,6 +25,14 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
   const db = b && b.data && b.data.date ? b.data.date.getTime() : 0;
   return db - da;
 });
+
+// StatusIndicator supports active|in-progress|planned|offline; map focus statuses, fallback to planned
+const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'offline'> = {
+  'in-progress': 'in-progress',
+  planned: 'planned',
+  paused: 'offline',
+  completed: 'active',
+};
 ---
 
 <BaseLayout title="/now — Luis Meyehen Paz">
@@ -39,94 +47,72 @@ const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a,
     </p>
   </div>
 
-  <!-- Active projects — dashboard cards -->
+  <!-- Focus cards — render from frontmatter -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 stagger">
-    <!-- Study progress -->
-    <Card variant="status">
-      <div class="flex items-center justify-between mb-3">
-        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
-          AWS DevOps Cert
-        </span>
-        <StatusIndicator status="in-progress" />
-      </div>
-      <div class="progress-bar mb-2">
-        <div class="progress-bar__fill" style="width: 40%"></div>
-      </div>
-      <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Target: Q4 2026</p>
-    </Card>
+    {entry.data.focus.map((item) => (
+      <Card variant="status">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+            {item.label}
+          </span>
+          <StatusIndicator status={focusStatusMap[item.status] ?? 'planned'} />
+        </div>
+        {item.progress !== undefined && (
+          <div class="progress-bar mb-2">
+            <div class="progress-bar__fill" style={`width: ${item.progress}%`}></div>
+          </div>
+        )}
+        {item.note && (
+          <p class="font-mono text-[10px] text-[var(--color-text-muted)]">{item.note}</p>
+        )}
+      </Card>
+    ))}
 
-    <!-- English -->
-    <Card variant="status">
-      <div class="flex items-center justify-between mb-3">
-        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
-          English
-        </span>
-        <StatusIndicator status="in-progress" />
-      </div>
-      <div class="progress-bar mb-2">
-        <div class="progress-bar__fill" style="width: 30%"></div>
-      </div>
-      <p class="font-mono text-[10px] text-[var(--color-text-muted)]">Daily practice</p>
-    </Card>
+    <!-- Travel log (only when travel collection has entries) -->
+    {travelSorted.length > 0 && (
+      <Card variant="status">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+            Travel log
+          </span>
+          <StatusIndicator status="planned" />
+        </div>
 
-    <!-- Travel log (replaces Japan Trip card) -->
-    <Card variant="status">
-      <div class="flex items-center justify-between mb-3">
-        <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
-          Travel log
-        </span>
-        <StatusIndicator status="planned" />
-      </div>
+        ---
 
-      ---
+        <!-- Travel entries: render as journalctl-style rows, collapsed by default -->
+        <div class="travel-log mt-2">
+          <div class="font-mono text-[var(--text-xs)]">
+            {travelSorted.map((e: any, idx: number) => {
+              const id = `travel-detail-${idx}`;
+              const date = e.data.date.toISOString().slice(0,10);
+              return (
+                <div class="travel-entry" style="border-left:2px solid var(--color-border); padding:0.5rem 0.5rem; margin-left:0.5rem">
+                  <div class="travel-entry-header" style="display:flex;gap:0.5rem;align-items:center;">
+                    <span class="travel-date text-[var(--color-text-muted)]">[{date}]</span>
+                    <span class="travel-location text-[var(--color-accent)]">{(e as any).data.location}</span>
+                    <span class="travel-caption text-[var(--color-text)]">{(e as any).data.caption}</span>
+                    {(e as any).data.photos && (e as any).data.photos.length > 0 && (
+                      <button class="travel-toggle" aria-expanded="false" aria-controls={id} style="margin-left:auto;background:none;border:none;color:var(--color-accent);font-family:var(--font-mono);cursor:pointer;">Show photos</button>
+                    )}
+                  </div>
 
-      <!-- Travel entries: render as journalctl-style rows, collapsed by default -->
-      {
-        // load collection server-side
-      }
-      <div class="travel-log mt-2">
-        {/** server-side: load collection and render */}
-        {
-          (() => {
-            const sorted = travelSorted || [];
-            if (sorted.length === 0) {
-              return (<p class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">No travel entries yet.</p>);
-            }
-
-            return (
-              <div class="font-mono text-[var(--text-xs)]">
-                {sorted.map((e: any, idx: number) => {
-                  const id = `travel-detail-${idx}`;
-                  const date = e.data.date.toISOString().slice(0,10);
-                  return (
-                    <div class="travel-entry" style="border-left:2px solid var(--color-border); padding:0.5rem 0.5rem; margin-left:0.5rem">
-                      <div class="travel-entry-header" style="display:flex;gap:0.5rem;align-items:center;">
-                        <span class="travel-date text-[var(--color-text-muted)]">[{date}]</span>
-                        <span class="travel-location text-[var(--color-accent)]">{(e as any).data.location}</span>
-                        <span class="travel-caption text-[var(--color-text)]">{(e as any).data.caption}</span>
-                        {(e as any).data.photos && (e as any).data.photos.length > 0 && (
-                          <button class="travel-toggle" aria-expanded="false" aria-controls={id} style="margin-left:auto;background:none;border:none;color:var(--color-accent);font-family:var(--font-mono);cursor:pointer;">Show photos</button>
-                        )}
+                  {(e as any).data.photos && (e as any).data.photos.length > 0 && (
+                    <div id={id} class="travel-details" role="region" aria-label={`Photos for ${(e as any).data.location}`} hidden>
+                      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+                        {(e as any).data.photos.map((p: any) => (
+                          <Image src={p} alt={(e as any).data.caption} width={240} height={160} />
+                        ))}
                       </div>
-
-                      {(e as any).data.photos && (e as any).data.photos.length > 0 && (
-                        <div id={id} class="travel-details" role="region" aria-label={`Photos for ${(e as any).data.location}`} hidden>
-                          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
-                            {(e as any).data.photos.map((p: any) => (
-                              <Image src={p} alt={(e as any).data.caption} width={240} height={160} />
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
-                  );
-                })}
-              </div>
-            );
-          })()
-        }
-      </div>
-    </Card>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </Card>
+    )}
   </div>
 
   <!-- Main content -->
