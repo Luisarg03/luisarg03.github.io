@@ -3,25 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/layout/SectionPanel.astro';
 import Card from '../components/ui/Card.astro';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
-// Heuristic: prefer projects with explicit impact arrays and larger impact counts.
-function impactScore(a: any) {
-  const data = a.data || {};
-  if (data.impact && data.impact.length) return data.impact.length * 100;
-  if (data.impact && data.impact[0]) {
-    const m = data.impact[0].match(/(\d+(?:\.\d+)?)/);
-    if (m) return parseFloat(m[1]) * 10;
-  }
-  return data.order || 0;
-}
-
-const projects = (await getCollection('projects'))
-  .sort((a, b) => impactScore(b) - impactScore(a) || (a.data.order - b.data.order));
-
-// Compute unique tags for filter chips (sorted alphabetically)
-const allTags = [...new Set(
-  projects.flatMap(p => ((p.data as any).tags || []) as string[])
-)].sort();
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
 // Shiki highlighter for terminal window (task 3.1)
 import { createHighlighter } from 'shiki';
@@ -43,18 +27,6 @@ function highlightCode(code: string, lang: string) {
       <p class="font-mono text-[var(--text-sm)] text-[var(--color-text-muted)]">No projects yet.</p>
     ) : (
       <>
-        {/* Filter chips — task 6.1 */}
-        <div class="filter-chips">
-          <button type="button" class="filter-chip filter-chip--active" data-filter="all">
-            <span class="filter-chip-label">[all]</span>
-          </button>
-          {allTags.map(tag => (
-            <button type="button" class="filter-chip" data-filter={tag}>
-              <span class="filter-chip-label">{tag}</span>
-            </button>
-          ))}
-        </div>
-
         <div class="projects-grid">
           {projects.map((project, idx) => {
             const data = project.data as any;
@@ -76,9 +48,8 @@ function highlightCode(code: string, lang: string) {
               variant="project"
               class:list={['project-card', { 'project-card--featured': isFeatured }]}
               style={`--i: ${idx}`}
-              data-tags={(data.tags || []).join(',')}
             >
-              {isFeatured && hasCodeSnippet ? (
+              {isFeatured && (data.cover || hasCodeSnippet) ? (
                 /* Featured hero — 2-col grid: text + terminal */
                 <>
                   <div class="project-card__hero-text">
@@ -163,7 +134,13 @@ function highlightCode(code: string, lang: string) {
                       <span class="project-card__terminal-controls" aria-hidden="true">▢ ◯ ●</span>
                       <span class="project-card__terminal-title">{data.title}</span>
                     </div>
-                    <pre class="project-card__terminal-code"><code set:html={highlightCode(data.codeSnippet.code, data.codeSnippet.lang)} /></pre>
+                    {data.cover ? (
+                      <div class="project-card__terminal-cover">
+                        <Image src={data.cover} alt={data.coverAlt} />
+                      </div>
+                    ) : (
+                      <pre class="project-card__terminal-code"><code set:html={highlightCode(data.codeSnippet.code, data.codeSnippet.lang)} /></pre>
+                    )}
                   </aside>
                 </>
               ) : (
@@ -184,6 +161,17 @@ function highlightCode(code: string, lang: string) {
                   )}
 
                   <p class="project-card__description">{data.description}</p>
+
+                  {hasCodeSnippet && (
+                    <details class="project-card__snippet-terminal">
+                      <summary class="project-card__snippet-titlebar">
+                        <span class="project-card__terminal-controls" aria-hidden="true">▢ ◯ ●</span>
+                        <span class="project-card__snippet-label">code</span>
+                        <span class="project-card__snippet-chevron" aria-hidden="true">▸</span>
+                      </summary>
+                      <pre class="project-card__snippet-code"><code set:html={highlightCode(data.codeSnippet.code, data.codeSnippet.lang)} /></pre>
+                    </details>
+                  )}
 
                   {(data.problem || data.solution || (data.impact && data.impact.length > 0)) && (
                     <details class="project-card__case-study">
@@ -282,6 +270,9 @@ function highlightCode(code: string, lang: string) {
     .project-card--featured {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: var(--space-5);
+    }
+    .project-card__hero-terminal {
+      align-self: start;
     }
   }
 
@@ -555,39 +546,94 @@ function highlightCode(code: string, lang: string) {
     font-size: var(--text-xs);
   }
 
-  /* ─── Filter chips ─── */
-  .filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    padding-bottom: var(--space-4);
-  }
-
-  .filter-chip {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
+  /* ─── Compact terminal snippet (non-featured cards, collapsible) ─── */
+  .project-card__snippet-terminal {
+    position: relative;
     border: 1px solid var(--color-border);
-    border-radius: 4px;
-    padding: 0.25rem 0.75rem;
     background: var(--color-surface);
-    color: var(--color-text-muted);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    overflow: hidden;
+    margin-top: var(--space-3);
+  }
+
+  .project-card__snippet-titlebar {
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
-    transition: border-color 150ms ease-out, color 150ms ease-out;
+    user-select: none;
+    list-style: none;
   }
 
-  .filter-chip:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+  .project-card__snippet-titlebar::-webkit-details-marker {
+    display: none;
   }
 
-  .filter-chip--active {
-    background: var(--color-accent);
-    color: var(--bg-terminal, #0a0e14);
-    border-color: var(--color-accent);
+  .project-card__snippet-terminal[open] .project-card__snippet-titlebar {
+    border-bottom-color: var(--color-border);
   }
 
-  .filter-chip--active:hover {
-    color: var(--bg-terminal, #0a0e14);
+  .project-card__snippet-titlebar .project-card__terminal-controls {
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+  }
+
+  .project-card__snippet-label {
+    flex: 1;
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .project-card__snippet-chevron {
+    font-size: 0.55rem;
+    color: var(--color-text-muted);
+    transition: transform 200ms ease-out;
+  }
+
+  .project-card__snippet-terminal[open] .project-card__snippet-chevron {
+    transform: rotate(90deg);
+  }
+
+  .project-card__snippet-code {
+    padding: 0.5rem 0.625rem;
+    font-size: 0.65rem;
+    color: var(--color-text);
+    background: transparent;
+    margin: 0;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .project-card__snippet-code :global(pre) {
+    background: transparent !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .project-card__snippet-code :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+
+  /* ─── Terminal cover image ─── */
+  .project-card__terminal-cover {
+    padding: 0.75rem;
+  }
+
+  .project-card__terminal-cover :global(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 3px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   /* ─── Reduced motion ─── */
@@ -599,7 +645,9 @@ function highlightCode(code: string, lang: string) {
       transition: none;
     }
     .project-card__chevron,
-    .project-card__case-study[open] .project-card__chevron {
+    .project-card__case-study[open] .project-card__chevron,
+    .project-card__snippet-chevron,
+    .project-card__snippet-terminal[open] .project-card__snippet-chevron {
       transition: none;
     }
     .status-dot--online,
@@ -608,38 +656,6 @@ function highlightCode(code: string, lang: string) {
     }
   }
 </style>
-
-{/* Filter chips script — task 6.7 */}
-<script>
-// @ts-nocheck
-function setupFilterChips() {
-  var grid = document.querySelector('.projects-grid');
-  if (!grid) return;
-  // No need to query chips — use event delegation on the grid (or its parent)
-  // The filter-chip click bubbles up; we catch it via closest()
-}
-
-document.addEventListener('click', function(event) {
-  var chip = event.target.closest && event.target.closest('.filter-chip');
-  if (!chip) return;
-  var grid = document.querySelector('.projects-grid');
-  if (!grid) return;
-
-  var filter = chip.getAttribute('data-filter');
-
-  // Update active state on all chips
-  document.querySelectorAll('.filter-chip').forEach(function(c) {
-    c.classList.toggle('filter-chip--active', c === chip);
-  });
-
-  // Show/hide cards based on filter
-  document.querySelectorAll('.project-card').forEach(function(card) {
-    var tags = (card.getAttribute('data-tags') || '').split(',').map(function(s) { return s.trim(); });
-    var show = filter === 'all' || tags.indexOf(filter) !== -1;
-    card.style.display = show ? '' : 'none';
-  });
-});
-</script>
 
 {/* Text scramble intro — task 8.1 */}
 <script>
