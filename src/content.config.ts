@@ -7,6 +7,14 @@ const now = defineCollection({
   schema: z.object({
     title: z.string().optional(),
     updated: z.date(),
+    focus: z.array(
+      z.object({
+        label: z.string(),
+        status: z.enum(['in-progress', 'planned', 'paused', 'completed']),
+        progress: z.number().int().min(0).max(100).optional(),
+        note: z.string().optional(),
+      })
+    ).default([]),
   }),
 });
 
