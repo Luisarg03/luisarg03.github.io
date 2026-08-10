@@ -94,8 +94,6 @@ Each link SHALL show a label and a value. External links SHALL open in new tabs 
 - **THEN** link icons are glyphs or SVGs in the monospace style
 - **AND** no emoji characters are used
 
-## ADDED Requirements
-
 ### Requirement: Identity name renders as a detail row
 
 The whoami module SHALL render the user's name as a `Name: value`
@@ -143,8 +141,6 @@ the info column on mobile.
   render full-width below the detail list
 - **AND** the page reads top-to-bottom in order: Arch art, name +
   details, MOTD prompt, summary, contact prompt, contact row
-
-## ADDED Requirements
 
 ### Requirement: Identity module renders as 3 vertical blocks
 

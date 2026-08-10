@@ -1,4 +1,10 @@
-## ADDED Requirements
+# Site Configuration
+
+## Purpose
+
+Global site configuration: build-time sitemap generation via `@astrojs/sitemap`, a `robots.txt` referencing the sitemap, and theme-color/color-scheme meta tags consistent with the dark terminal aesthetic.
+
+## Requirements
 
 ### Requirement: Auto-generated sitemap.xml at build time
 The site SHALL generate a valid sitemap.xml at build time using the `@astrojs/sitemap`
