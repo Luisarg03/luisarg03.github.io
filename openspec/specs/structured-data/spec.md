@@ -1,4 +1,10 @@
-## ADDED Requirements
+# Structured Data
+
+## Purpose
+
+Provide machine-readable structured data to search engines and social crawlers: a JSON-LD `Person` block and a JSON-LD `WebSite` block on every page, both valid schema.org markup.
+
+## Requirements
 
 ### Requirement: Person schema on every page
 The site SHALL include a JSON-LD `Person` structured data block on every page. The block

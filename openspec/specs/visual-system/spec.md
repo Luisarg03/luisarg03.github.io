@@ -176,8 +176,6 @@ SHALL NOT:
 - **WHEN** the hero renders
 - **THEN** no radial gradient blur layers are present in the hero background
 
-## ADDED Requirements
-
 ### Requirement: Shared Card component primitive
 
 The system SHALL provide a shared `<Card>` component at
@@ -265,8 +263,6 @@ including `/now` and `/projects`.
   top border
 - **AND** the footer is centered within a `max-width: 52rem`
   container
-
-## ADDED Requirements
 
 ### Requirement: Boot loader is centered with pre-line prelude
 

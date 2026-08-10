@@ -1,4 +1,10 @@
-## ADDED Requirements
+# Asset Optimization
+
+## Purpose
+
+Optimize the site's asset delivery and initial paint: font preconnect to Google Fonts CDN, `font-display: swap` on custom fonts, deferred loading of non-critical scripts, a properly-dimensioned OG image, and paint optimization hints for the BlueprintGrid canvas.
+
+## Requirements
 
 ### Requirement: Font preconnect to Google Fonts CDN
 The site SHALL include a `<link rel="preconnect">` to `https://fonts.googleapis.com`
