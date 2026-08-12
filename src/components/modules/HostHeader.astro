@@ -1,0 +1,176 @@
+---
+/**
+ * HostHeader — identity + system line above the htop window.
+ * Identity data: server-rendered (no-JS safe).
+ * System data: JS-detected, '—' without JS.
+ */
+import { siteConfig, experience } from '../../content/cv';
+
+const yearsExp = new Date().getFullYear() - 2019;
+const experienceText = `${Math.floor(yearsExp)}+ years`;
+
+// Current: first experience entry with endDate === null → company
+const activeEntry = experience.find((e) => e.endDate === null);
+const current = activeEntry?.company ?? siteConfig.availability;
+---
+
+<div class="host-header panel" id="identity">
+  <!-- Identity row — server-rendered, no JS needed -->
+  <div class="host-header-identity">
+    <span class="host-header-pair"><span class="host-header-key">Role</span>:&nbsp;<span class="host-header-val">{siteConfig.role}</span></span>
+    <span class="host-header-sep">·</span>
+    <span class="host-header-pair"><span class="host-header-key">Experience</span>:&nbsp;<span class="host-header-val">{experienceText}</span></span>
+    <span class="host-header-sep">·</span>
+    <span class="host-header-pair"><span class="host-header-key">Current</span>:&nbsp;<span class="host-header-val">{current}</span></span>
+    <span class="host-header-sep">·</span>
+    <span class="host-header-pair"><span class="host-header-key">Location</span>:&nbsp;<span class="host-header-val">{siteConfig.location}</span></span>
+  </div>
+
+  <!-- System line — JS-detected, '—' without JS -->
+  <div class="host-header-system">
+    <span class="host-header-sys-pair"><span class="host-header-sys-key">OS</span>: <span class="host-header-sys-val" data-host="os">—</span></span>
+    <span class="host-header-sys-sep">·</span>
+    <span class="host-header-sys-pair"><span class="host-header-sys-key">Browser</span>: <span class="host-header-sys-val" data-host="browser">—</span></span>
+    <span class="host-header-sys-sep">·</span>
+    <span class="host-header-sys-pair"><span class="host-header-sys-key">Display</span>: <span class="host-header-sys-val" data-host="display">—</span></span>
+    <span class="host-header-sys-sep">·</span>
+    <span class="host-header-sys-pair"><span class="host-header-sys-key">CPU</span>: <span class="host-header-sys-val" data-host="cpu">—</span></span>
+    <span class="host-header-sys-sep">·</span>
+    <span class="host-header-sys-pair"><span class="host-header-sys-key">Lang</span>: <span class="host-header-sys-val" data-host="lang">—</span></span>
+  </div>
+</div>
+
+<script>
+  // @ts-nocheck
+  (function () {
+    function detectOS(ua) {
+      if (/Windows NT/.test(ua)) return 'Windows';
+      if (/Mac OS X|macOS/.test(ua)) return 'macOS';
+      if (/Android/.test(ua)) return 'Android';
+      if (/iPhone|iPad|iOS/.test(ua)) return 'iOS';
+      if (/Linux/.test(ua)) return 'Linux';
+      return 'Unknown';
+    }
+
+    function detectBrowser(ua) {
+      if (/Edg\//.test(ua)) return 'Edge ' + ((ua.match(/Edg\/([\d.]+)/) || [])[1] || '');
+      if (/Firefox\//.test(ua)) return 'Firefox ' + ((ua.match(/Firefox\/([\d.]+)/) || [])[1] || '');
+      if (/Chrome\//.test(ua) && !/Chromium\//.test(ua)) return 'Chrome ' + ((ua.match(/Chrome\/([\d.]+)/) || [])[1] || '');
+      if (/Safari\//.test(ua) && /Version\//.test(ua)) return 'Safari ' + ((ua.match(/Version\/([\d.]+)/) || [])[1] || '');
+      return 'Unknown';
+    }
+
+    function set(key, val) {
+      var el = document.querySelector('[data-host="' + key + '"]');
+      if (el) el.textContent = val;
+    }
+
+    function initHostDetails() {
+      if (typeof window === 'undefined' || !window.navigator) return;
+      var ua = navigator.userAgent || '';
+      var dpr = window.devicePixelRatio || 1;
+      var w = window.screen && window.screen.width ? window.screen.width : '?';
+      var h = window.screen && window.screen.height ? window.screen.height : '?';
+      var cores = navigator.hardwareConcurrency || '?';
+      var lang = navigator.language || '?';
+
+      set('os', detectOS(ua));
+      set('browser', detectBrowser(ua));
+      set('display', w + 'x' + h + ' @' + dpr + 'x');
+      set('cpu', cores + (cores === 1 ? ' core' : ' cores'));
+      set('lang', lang);
+    }
+
+    initHostDetails();
+    document.addEventListener('astro:page-load', initHostDetails);
+  })();
+</script>
+
+<style>
+  .host-header {
+    max-width: 72rem;
+    margin: 0 auto var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    position: relative;
+  }
+
+  /* ── Identity row ─────────────────────────────────────────────────── */
+  .host-header-identity {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0;
+  }
+
+  .host-header-pair {
+    white-space: nowrap;
+  }
+
+  .host-header-key {
+    color: var(--color-accent-identity);
+    font-weight: 600;
+  }
+
+  .host-header-val {
+    color: var(--color-text);
+  }
+
+  .host-header-sep {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    margin: 0 0.5em;
+    user-select: none;
+  }
+
+  /* ── System line ──────────────────────────────────────────────────── */
+  .host-header-system {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0;
+    margin-top: var(--space-1);
+  }
+
+  .host-header-sys-pair {
+    white-space: nowrap;
+  }
+
+  .host-header-sys-key {
+    opacity: 0.7;
+  }
+
+  .host-header-sys-val {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .host-header-sys-sep {
+    opacity: 0.4;
+    margin: 0 0.5em;
+    user-select: none;
+  }
+
+  /* ── Mobile: wrapping without breaking pairs ──────────────────────── */
+  @media (max-width: 767px) {
+    .host-header {
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .host-header-identity {
+      font-size: var(--text-xs);
+    }
+
+    .host-header-sep {
+      margin: 0 0.35em;
+    }
+
+    .host-header-sys-sep {
+      margin: 0 0.35em;
+    }
+  }
+</style>

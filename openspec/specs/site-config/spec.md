@@ -3,9 +3,7 @@
 ## Purpose
 
 Global site configuration: build-time sitemap generation via `@astrojs/sitemap`, a `robots.txt` referencing the sitemap, and theme-color/color-scheme meta tags consistent with the dark terminal aesthetic.
-
 ## Requirements
-
 ### Requirement: Auto-generated sitemap.xml at build time
 The site SHALL generate a valid sitemap.xml at build time using the `@astrojs/sitemap`
 integration. The sitemap MUST include `<url>` entries for `/` and `/now` with
@@ -37,7 +35,16 @@ and allows all crawlers.
 The site SHALL include `<meta name="theme-color">` and
 `<meta name="color-scheme" content="dark">` in the `<head>` of every page.
 
+The theme-color value SHALL match the background token
+(`#0a0e14`).
+
 #### Scenario: Dark theme meta present
 - **WHEN** any page renders
-- **THEN** `<meta name="theme-color" content="#0a0a0f">` is present
+- **THEN** `<meta name="theme-color" content="#0a0e14">` is present
 - **AND** `<meta name="color-scheme" content="dark">` is present
+
+#### Scenario: Theme color matches the background token
+- **WHEN** any page renders
+- **THEN** the rendered meta theme-color equals `#0a0e14`
+- **AND** the value matches the page background token
+

@@ -11,19 +11,35 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
 ---
 
 <div class="boot-overlay" id="boot-overlay" hidden aria-hidden="true">
-  <!-- OS brand prelude — fixed string, rendered synchronously (CLS anchor) -->
-  <pre class="boot-prelude"> _     _   __   __   ____   ___
-| |   | |  \ \ / /  / __ \ / _ \
-| |   | |   \ V /  | |  | || | | |
-| |___| |    | |   | |__| || |_| |
-|_____|_|    |_|    \____/ \___/</pre>
+  <div class="boot-content">
+    <!-- OS brand prelude — fixed string, rendered synchronously (CLS anchor) -->
+    <pre class="boot-prelude">-`
+                  .o+`
+                 `ooo/
+                `+oooo:
+               `+oooooo:
+               -+oooooo+:
+             `/:-:++oooo+:
+            `/++++/+++++++:
+           `/++++++++++++++:
+          `/+++ooooooooooooo/`
+         ./ooosssso++osssssso+`
+        .oossssso-````/ossssss+`
+       -osssssso.      :ssssssso.
+      :osssssss/        osssso+++.
+     /ossssssss/        +ssssooo/-
+   `/ossssso+/:-        -:/+osssso+-
+  `+sso+:-`                 `.-/+oso:
+ `++:.                           `-/+/
+ .`                                 `/</pre>
 
-  <div class="boot-terminal" id="boot-terminal">
-    <!-- Static fallback — never displayed (overlay is hidden without JS).
-         Maps canonical frames so a failed engine still has content. -->
-    {LUIS_BOOT_FRAMES.map((frame) => (
-      <div class="boot-line" set:html={frame} />
-    ))}
+    <div class="boot-terminal" id="boot-terminal">
+      <!-- Static fallback — never displayed (overlay is hidden without JS).
+           Maps canonical frames so a failed engine still has content. -->
+      {LUIS_BOOT_FRAMES.map((frame) => (
+        <div class="boot-line" set:html={frame} />
+      ))}
+    </div>
   </div>
 </div>
 
@@ -72,11 +88,13 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
       fading = true;
       unlockScroll();
       overlay.classList.add('boot-overlay-fade');
-      // Fade (≤ 0.5s), then drop the overlay and its listeners entirely.
+      // Fade (≤ 0.5s), then drop the overlay and trigger htop bar cascade.
       setTimeout(function () {
         overlay.remove();
         window.removeEventListener('wheel', skip);
         window.removeEventListener('scroll', skip);
+        // Signal htop window to start bar fill cascade
+        document.dispatchEvent(new CustomEvent('boot-overlay-hidden'));
       }, 500);
     }
 
@@ -117,8 +135,7 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
     inset: 0;
     z-index: 40;
     display: flex;
-    /* Vertically centered: the pre-line prelude renders synchronously and
-       anchors the layout; typed frames grow downward from it with no CLS. */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: var(--space-12) var(--space-6);
@@ -139,14 +156,29 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
     pointer-events: none;
   }
 
+  /* ── Content wrapper (neofetch layout) ──────────────────────────────── */
+  .boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  @media (min-width: 640px) {
+    .boot-content {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 3ch;
+    }
+  }
+
   /* ── OS prelude (pre-line) ──────────────────────────────────────────── */
   .boot-prelude {
-    font-family: var(--font-mono);
+    font-family: 'JetBrains Mono Variable', monospace;
     font-size: 14px;
     line-height: 1.1;
     color: var(--color-accent);
-    text-align: center;
-    margin: 0 0 var(--space-6);
+    margin: 0;
     white-space: pre;
     position: relative;
     z-index: 2;  /* above the scan lines */
@@ -184,8 +216,8 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
   }
 
   .boot-terminal {
-    max-width: 52rem;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     line-height: 1.8;
@@ -215,6 +247,19 @@ import { LUIS_BOOT_FRAMES } from '../../scripts/boot-frames.js';
 
     .boot-prelude {
       animation: none;
+    }
+  }
+
+  /* ── Responsive — mobile 390px ─────────────────────────────────────── */
+  @media (max-width: 639px) {
+    .boot-prelude {
+      font-size: 10px;
+      margin-bottom: var(--space-4);
+    }
+
+    .boot-terminal {
+      font-size: var(--text-xs);
+      line-height: 1.6;
     }
   }
 </style>

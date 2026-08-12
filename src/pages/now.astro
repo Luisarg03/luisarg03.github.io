@@ -42,7 +42,7 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
       <StatusIndicator status="active" label="operational" />
       <span class="h-px flex-1 bg-[var(--color-border)]"></span>
     </div>
-    <p class="font-mono text-[var(--text-xs)] text-[var(--color-text-muted)]">
+    <p class="font-mono text-xs text-[var(--color-text-muted)]">
       Last updated: {formattedDate}
     </p>
   </div>
@@ -52,7 +52,7 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
     {entry.data.focus.map((item) => (
       <Card variant="status">
         <div class="flex items-center justify-between mb-3">
-          <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+          <span class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
             {item.label}
           </span>
           <StatusIndicator status={focusStatusMap[item.status] ?? 'planned'} />
@@ -63,7 +63,7 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
           </div>
         )}
         {item.note && (
-          <p class="font-mono text-[10px] text-[var(--color-text-muted)]">{item.note}</p>
+          <p class="font-mono text-xs text-[var(--color-text-muted)]" style="line-height: 1.6">{item.note}</p>
         )}
       </Card>
     ))}
@@ -72,7 +72,7 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
     {travelSorted.length > 0 && (
       <Card variant="status">
         <div class="flex items-center justify-between mb-3">
-          <span class="font-mono text-[var(--text-xs)] uppercase tracking-wider text-[var(--color-text-muted)]">
+          <span class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
             Travel log
           </span>
           <StatusIndicator status="planned" />
@@ -81,25 +81,25 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
         ---
 
         <!-- Travel entries: render as journalctl-style rows, collapsed by default -->
-        <div class="travel-log mt-2">
-          <div class="font-mono text-[var(--text-xs)]">
+        <div class="travel-log">
+          <div class="travel-log-list">
             {travelSorted.map((e: any, idx: number) => {
               const id = `travel-detail-${idx}`;
               const date = e.data.date.toISOString().slice(0,10);
               return (
-                <div class="travel-entry" style="border-left:2px solid var(--color-border); padding:0.5rem 0.5rem; margin-left:0.5rem">
-                  <div class="travel-entry-header" style="display:flex;gap:0.5rem;align-items:center;">
-                    <span class="travel-date text-[var(--color-text-muted)]">[{date}]</span>
-                    <span class="travel-location text-[var(--color-accent)]">{(e as any).data.location}</span>
-                    <span class="travel-caption text-[var(--color-text)]">{(e as any).data.caption}</span>
+                <div class="travel-entry">
+                  <div class="travel-entry-header">
+                    <span class="travel-date">[{date}]</span>
+                    <span class="travel-location">{(e as any).data.location}</span>
+                    <span class="travel-caption">{(e as any).data.caption}</span>
                     {(e as any).data.photos && (e as any).data.photos.length > 0 && (
-                      <button class="travel-toggle" aria-expanded="false" aria-controls={id} style="margin-left:auto;background:none;border:none;color:var(--color-accent);font-family:var(--font-mono);cursor:pointer;">Show photos</button>
+                      <button class="travel-toggle" aria-expanded="false" aria-controls={id}>Show photos</button>
                     )}
                   </div>
 
                   {(e as any).data.photos && (e as any).data.photos.length > 0 && (
                     <div id={id} class="travel-details" role="region" aria-label={`Photos for ${(e as any).data.location}`} hidden>
-                      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+                      <div class="travel-photos">
                         {(e as any).data.photos.map((p: any) => (
                           <Image src={p} alt={(e as any).data.caption} width={240} height={160} />
                         ))}
@@ -126,6 +126,72 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
 </BaseLayout>
 
 <style>
+  /* ── Travel log styles ─────────────────────────────────────────────── */
+  .travel-log {
+    margin-top: var(--space-2);
+  }
+
+  .travel-log-list {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  .travel-entry {
+    border-left: 2px solid var(--color-border);
+    padding: var(--space-2) var(--space-2);
+    margin-left: var(--space-2);
+  }
+
+  .travel-entry-header {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .travel-date {
+    color: var(--color-text-muted);
+  }
+
+  .travel-location {
+    color: var(--color-accent);
+  }
+
+  .travel-caption {
+    color: var(--color-text);
+  }
+
+  .travel-toggle {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: color 150ms ease-out;
+  }
+
+  .travel-toggle:hover {
+    color: var(--color-text);
+  }
+
+  .travel-toggle:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .travel-details {
+    margin-top: var(--space-2);
+  }
+
+  .travel-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  /* ── Prose content styles ──────────────────────────────────────────── */
   .prose-content :global(h2) {
     font-family: var(--font-mono);
     font-size: var(--text-xs);

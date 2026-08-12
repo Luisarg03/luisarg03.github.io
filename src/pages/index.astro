@@ -2,16 +2,16 @@
 import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BootModule from '../components/modules/BootModule.astro';
-import IdentityModule from '../components/modules/IdentityModule.astro';
-import SkillsModule from '../components/modules/SkillsModule.astro';
+import HostHeader from '../components/modules/HostHeader.astro';
+import HtopWindow from '../components/modules/HtopWindow.astro';
 import ExperienceModule from '../components/modules/ExperienceModule.astro';
 ---
 
 <BaseLayout title="Luis Meyehen Paz — Cloud Engineer" showBootChip>
-  <!-- BootModule: fixed overlay (out of flow) — IdentityModule below is the
-       first actual content in the viewport. -->
+  <!-- BootModule: fixed overlay (out of flow) — HostHeader + HtopWindow
+       below are the first actual content in the viewport. -->
   <BootModule />
-  <IdentityModule />
-  <SkillsModule />
+  <HostHeader />
+  <HtopWindow />
   <ExperienceModule />
 </BaseLayout>
