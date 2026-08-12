@@ -1,0 +1,554 @@
+---
+/**
+ * HtopWindow — the hero section replacing IdentityModule + SkillsModule.
+ * A real htop window with identity as PID 000 and skill categories as rows.
+ * SEO/ATS: Row 000 is the single H1 (mono styling, not display-scale).
+ */
+import { siteConfig, skillCategories } from '../../content/cv';
+
+const yearsExp = new Date().getFullYear() - 2019;
+const monthsExp = new Date().getMonth();
+
+// CPU% = proficiency / 5 * 100; identity always 100
+function cpuPercent(proficiency: number): number {
+  return Math.round((proficiency / 5) * 100);
+}
+
+// MEM% = CPU * 0.8 + jitter, clamped 0-100
+const JITTER = [0, 0, 0, -5, -5, -10, 0, -5, -10];
+function memPercent(cpu: number, idx: number): number {
+  const raw = Math.round(cpu * 0.8 + (JITTER[idx] ?? 0));
+  return Math.max(0, Math.min(100, raw));
+}
+
+// Diff prefix: ~ if proficiency >= 4, = if < 4
+function diffPrefix(proficiency: number): { glyph: string; diff: string } {
+  return proficiency >= 4
+    ? { glyph: '~', diff: 'change' }
+    : { glyph: '=', diff: 'unchanged' };
+}
+
+// Uptime string
+const uptime = `${yearsExp}yr ${monthsExp}mo`;
+
+// Total tasks = 1 identity + 8 categories = 9
+const totalTasks = 1 + skillCategories.length;
+const runningTasks = totalTasks - 1; // all except identity "running"
+---
+
+<div class="htop-window panel" id="htop">
+  <!-- Title bar -->
+  <div class="htop-titlebar">
+    <span class="htop-titlebar-text">luisarg@cloud:~$ htop — {siteConfig.name}, {siteConfig.role} @ {skillCategories[0] ? 'Interbank' : ''}</span>
+  </div>
+
+  <!-- Column header -->
+  <div class="htop-header">
+    <span class="htop-col htop-col-pid">PID</span>
+    <span class="htop-col htop-col-user">USER</span>
+    <span class="htop-col htop-col-cpu">CPU%</span>
+    <span class="htop-col htop-col-mem">MEM%</span>
+    <span class="htop-col htop-col-cmd">COMMAND</span>
+  </div>
+
+  <!-- Rows -->
+  <div class="htop-body">
+    <!-- Row 000: identity -->
+    <div class="htop-row htop-row--identity">
+      <span class="htop-col htop-col-pid">000</span>
+      <span class="htop-col htop-col-user">root</span>
+      <span class="htop-col htop-col-cpu">
+        <span class="htop-bar-wrap">
+          <span class="htop-bar htop-bar--cpu" style="width: 100%"></span>
+        </span>
+        <span class="htop-pct">100</span>
+      </span>
+      <span class="htop-col htop-col-mem">
+        <span class="htop-bar-wrap">
+          <span class="htop-bar htop-bar--mem" style="width: 100%"></span>
+        </span>
+        <span class="htop-pct">100</span>
+      </span>
+      <span class="htop-col htop-col-cmd">
+        <span class="tf-diff-prefix" data-diff="add" aria-hidden="true">+</span>
+        <h1 class="htop-identity-name">{siteConfig.name} — {siteConfig.role} @ Interbank</h1>
+      </span>
+    </div>
+
+    <!-- Rows 001-008: skill categories -->
+    {skillCategories.map((cat, i) => {
+      const pid = String(i + 1).padStart(3, '0');
+      const cpu = cpuPercent(cat.proficiency);
+      const mem = memPercent(cpu, i + 1); // +1 because JITTER[0] is for identity
+      const prefix = diffPrefix(cat.proficiency);
+      return (
+        <div class="htop-row htop-row--expandable" role="button" tabindex="0" aria-expanded="false" data-skill-index={i}>
+          <span class="htop-col htop-col-pid">{pid}</span>
+          <span class="htop-col htop-col-user">luis</span>
+          <span class="htop-col htop-col-cpu">
+            <span class="htop-bar-wrap">
+              <span class="htop-bar htop-bar--cpu" style={`width: ${cpu}%`}></span>
+            </span>
+            <span class="htop-pct">{cpu}</span>
+          </span>
+          <span class="htop-col htop-col-mem">
+            <span class="htop-bar-wrap">
+              <span class="htop-bar htop-bar--mem" style={`width: ${mem}%`}></span>
+            </span>
+            <span class="htop-pct">{mem}</span>
+          </span>
+          <span class="htop-col htop-col-cmd">
+            <span class="tf-diff-prefix" data-diff={prefix.diff} aria-hidden="true">{prefix.glyph}</span>
+            <span class="htop-cmd-expandable">
+              <span class="htop-chevron" aria-hidden="true">▸</span>
+              {cat.evidence ? (
+                <span class="htop-cmd-name">
+                  {cat.category}
+                  <span class="htop-evidence">{cat.evidence}</span>
+                </span>
+              ) : (
+                cat.category
+              )}
+            </span>
+          </span>
+          <div class="htop-subrows" hidden>
+            {cat.skills.map((skill) => (
+              <div class="htop-subrow">
+                <span class="htop-subrow-prefix" aria-hidden="true">├─</span>
+                {skill}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <!-- Status bar -->
+  <div class="htop-statusbar">
+    <span class="htop-statusbar-tasks">Tasks: {totalTasks} total, {runningTasks} running</span>
+    <span class="htop-statusbar-mem">
+      <span class="htop-bar-wrap htop-bar-wrap--small">
+        <span class="htop-bar htop-bar--mem" style="width: 78%"></span>
+      </span>
+      Mem
+    </span>
+    <span class="htop-statusbar-uptime">up {uptime}</span>
+  </div>
+</div>
+
+<!-- No-JS: bars render at target width, no animation -->
+<noscript>
+  <style>
+    .htop-bar { transition: none !important; }
+    .htop-statusbar { opacity: 1 !important; }
+  </style>
+</noscript>
+
+<script>
+  // @ts-nocheck
+  (function () {
+    // ── Bar cascade animation ──────────────────────────────────────────
+    function fillBars() {
+      var bars = document.querySelectorAll('.htop-body .htop-bar');
+      var statusbar = document.querySelector('.htop-statusbar');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion) {
+        // Already at target width via inline styles; just show status bar
+        if (statusbar) statusbar.classList.add('is-visible');
+        return;
+      }
+
+      // Reset all bars to 0%
+      bars.forEach(function (bar) {
+        var target = bar.style.width;
+        bar.setAttribute('data-target', target);
+        bar.style.width = '0%';
+      });
+
+      // Cascade fill: bar i starts at i*100ms, 0.3s transition each
+      bars.forEach(function (bar, i) {
+        setTimeout(function () {
+          var target = bar.getAttribute('data-target') || '0%';
+          bar.style.width = target;
+        }, i * 100);
+      });
+
+      // Status bar fades in at end
+      var totalDelay = bars.length * 100 + 300;
+      setTimeout(function () {
+        if (statusbar) statusbar.classList.add('is-visible');
+      }, totalDelay);
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────
+    // Listen for boot overlay hidden event to start bar cascade
+    document.addEventListener('boot-overlay-hidden', fillBars);
+
+    // ── Skill row expand/collapse (delegated, survives view transitions) ──
+    function handleSkillToggle(event) {
+      var row = event.target.closest ? event.target.closest('[data-skill-index]') : null;
+      if (!row) return;
+      // Identity row (no data-skill-index) is excluded by the closest check
+
+      var expanded = row.getAttribute('aria-expanded') === 'true';
+      var subrows = row.querySelector('.htop-subrows');
+      var chevron = row.querySelector('.htop-chevron');
+
+      row.setAttribute('aria-expanded', String(!expanded));
+      if (subrows) subrows.hidden = expanded;
+      if (chevron) chevron.textContent = expanded ? '▸' : '▾';
+    }
+
+    document.addEventListener('click', handleSkillToggle);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        var row = e.target.closest ? e.target.closest('[data-skill-index]') : null;
+        if (!row) return;
+        e.preventDefault();
+        handleSkillToggle(e);
+      }
+    });
+
+    // If boot was skipped (quick mode / reduced motion / no-JS fallback),
+    // bars should already be at target width. Just show status bar.
+    // The boot-overlay-hidden event won't fire in those cases, so check
+    // if the overlay is already gone.
+    setTimeout(function () {
+      var overlay = document.getElementById('boot-overlay');
+      var statusbar = document.querySelector('.htop-statusbar');
+      // Hidden overlay = skipped boot (quick mode, reduced motion, etc.):
+      // it stays in the DOM with `hidden`, so treat it as absent.
+      if ((!overlay || overlay.hidden) && statusbar && !statusbar.classList.contains('is-visible')) {
+        // Boot was skipped or already removed — show status bar
+        statusbar.classList.add('is-visible');
+      }
+    }, 100);
+  })();
+</script>
+
+<style>
+  /* ── Window frame ─────────────────────────────────────────────────── */
+  .htop-window {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--panel-radius);
+    box-shadow: var(--panel-shadow);
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  /* ── Title bar ────────────────────────────────────────────────────── */
+  .htop-titlebar {
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .htop-titlebar-text {
+    opacity: 0.8;
+  }
+
+  /* ── Column header ────────────────────────────────────────────────── */
+  .htop-header {
+    display: grid;
+    grid-template-columns: 3.5rem 4rem 1fr 1fr 2fr;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--color-border);
+    opacity: 0.6;
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 2;
+  }
+
+  /* ── Body rows ────────────────────────────────────────────────────── */
+  .htop-body {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .htop-row {
+    display: grid;
+    grid-template-columns: 3.5rem 4rem 1fr 1fr 2fr;
+    gap: var(--space-2);
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    transition: background 0.15s;
+  }
+
+  .htop-row:hover {
+    background: var(--color-surface-alt);
+  }
+
+  /* ── Identity row (teal highlight) ────────────────────────────────── */
+  .htop-row--identity {
+    background: rgba(42, 212, 201, 0.06);
+    border-left: 3px solid var(--color-accent-identity);
+  }
+
+  .htop-row--identity:hover {
+    background: rgba(42, 212, 201, 0.1);
+  }
+
+  .htop-identity-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-accent-identity);
+    margin: 0;
+    line-height: 1.2;
+    /* H1 for SEO/ATS — deliberately NOT display-scale */
+  }
+
+  /* ── Column styles ────────────────────────────────────────────────── */
+  .htop-col-pid {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .htop-col-user {
+    color: var(--color-text-muted);
+  }
+
+  .htop-col-cpu,
+  .htop-col-mem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .htop-col-cmd {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text);
+    font-weight: 500;
+    min-width: 0;
+  }
+
+  /* ── Expandable skill rows ──────────────────────────────────────── */
+  .htop-row--expandable {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .htop-row--expandable:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    border-radius: 2px;
+  }
+
+  .htop-cmd-expandable {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .htop-chevron {
+    font-size: 0.7em;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+    width: 1ch;
+    text-align: center;
+  }
+
+  /* ── Sub-rows (skills list) ────────────────────────────────────── */
+  .htop-subrows {
+    grid-column: 1 / -1;
+    padding: 0 0 0 7.5rem; /* align with COMMAND text (PID + USER + indent) */
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .htop-subrow {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    padding: 0.15rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.6;
+  }
+
+  .htop-subrow-prefix {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  /* ── Evidence sub-line (COMMAND cell, when SkillCategory.evidence exists) ── */
+  .htop-cmd-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .htop-evidence {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.6;
+    padding-left: 2ch; /* 2-space indent in mono */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .htop-pct {
+    min-width: 2.5rem;
+    text-align: right;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Bar visualization ────────────────────────────────────────────── */
+  .htop-bar-wrap {
+    flex: 1;
+    height: 6px;
+    background: var(--color-surface-alt);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 3rem;
+  }
+
+  .htop-bar {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%; /* Start at 0 for cascade animation */
+  }
+
+  .htop-bar--cpu {
+    background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent));
+  }
+
+  .htop-bar--mem {
+    background: linear-gradient(90deg, rgba(42, 212, 201, 0.6), var(--color-accent-identity));
+  }
+
+  /* ── Status bar ───────────────────────────────────────────────────── */
+  .htop-statusbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface-alt);
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .htop-statusbar.is-visible {
+    opacity: 1;
+  }
+
+  .htop-statusbar-tasks {
+    white-space: nowrap;
+  }
+
+  .htop-statusbar-mem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    white-space: nowrap;
+  }
+
+  .htop-bar-wrap--small {
+    width: 4rem;
+    min-width: unset;
+  }
+
+  .htop-statusbar-uptime {
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ── Responsive: <768px — condensed ───────────────────────────────── */
+  @media (max-width: 767px) {
+    .htop-header {
+      grid-template-columns: 2.5rem 1fr;
+    }
+
+    .htop-col-user,
+    .htop-col-mem {
+      display: none;
+    }
+
+    .htop-row {
+      grid-template-columns: 2.5rem 1fr;
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .htop-col-cmd {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .htop-col-cpu {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin-top: var(--space-1);
+    }
+
+    .htop-statusbar {
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .htop-subrows {
+      padding-left: 0;
+    }
+
+    .htop-titlebar {
+      padding: var(--space-2) var(--space-3);
+      font-size: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+
+  /* ── Reduced motion: bars at final width, no transitions ──────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .htop-bar {
+      transition: none;
+    }
+
+    .htop-statusbar {
+      transition: none;
+    }
+  }
+
+  /* ── Cascade animation (filled by JS) ─────────────────────────────── */
+  .htop-bar[data-filled] {
+    transition: width 0.3s ease;
+  }
+</style>

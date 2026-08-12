@@ -2,16 +2,44 @@
 // Blueprint grid background — procedural canvas island.
 // Enhanced: varied grid densities, color zones, infrastructure diagram feel.
 // Honours prefers-reduced-motion: falls back to a single static frame.
+// Directional light: radial-gradient overlay with top-left copper source.
 ---
 
-<div style="content-visibility: auto; contain: paint;" aria-hidden="true">
+<div class="blueprint-grid-wrapper parallax-layer" style="content-visibility: auto; contain: paint;" aria-hidden="true">
   <canvas
     id="blueprint-grid"
     class="fixed inset-0 w-full h-full pointer-events-none z-0"
     style="will-change: transform;"
     aria-hidden="true"
   ></canvas>
+  <div class="blueprint-grid-light-overlay" aria-hidden="true"></div>
 </div>
+
+<style>
+  .blueprint-grid-wrapper {
+    position: relative;
+  }
+
+  .blueprint-grid-light-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(
+      ellipse at 15% 15%,
+      rgba(240, 180, 41, 0.03) 0%,
+      rgba(240, 180, 41, 0.01) 30%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blueprint-grid-light-overlay {
+      opacity: 0.5;
+    }
+  }
+</style>
 
 <script>
   const canvas = document.getElementById('blueprint-grid') as HTMLCanvasElement | null;

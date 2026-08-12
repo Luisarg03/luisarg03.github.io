@@ -17,6 +17,8 @@ export interface SkillCategory {
   category: string;
   skills: string[];
   proficiency: number;
+  // Quantified proof, rendered as an htop row sub-line. Absent = today's row.
+  evidence?: string;
 }
 
 export interface Education {
@@ -164,7 +166,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     category: 'AI Tooling',
-    skills: 'MCP · AWS Bedrock · OpenAI APIs · Prompt Engineering · opencode · Cost Optimization'.split(' · '),
+    skills: 'MCP · Agent Orchestration · Multi-agent Workflows · Agentic Coding Tools · opencode · OpenAI APIs · AWS Bedrock'.split(' · '),
     proficiency: 4,
   },
   {
@@ -205,5 +207,5 @@ export const siteConfig: SiteConfig = {
   github: 'https://github.com/luisarg03',
   availability: 'Currently at Interbank',
   summary:
-    'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms. Experience spanning cloud infrastructure, internal developer platforms, cost and workload observability, and AI-assisted developer workflows. Track record enabling Data Science and engineering teams through reusable infrastructure, self-service tooling, and platform engineering.',
+    'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms. Experience spanning cloud infrastructure, internal developer platforms, cost and workload observability, and agentic developer workflows (multi-agent orchestration, MCP tooling). Track record enabling Data Science and engineering teams through reusable infrastructure, self-service tooling, and platform engineering.',
 };

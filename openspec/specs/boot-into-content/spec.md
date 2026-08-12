@@ -10,6 +10,7 @@ The homepage SHALL play a full-viewport terminal boot as a transient overlay on 
 The boot overlay SHALL:
 - Render `position: fixed` covering the viewport (z-index above the header, below the command palette), with an opaque page background
 - Auto-play typed boot lines (reusing the existing LuisOS framing) completing within 2.5 seconds, then fade out within 0.5 seconds and be removed from the DOM
+- Reveal module-loading lines sequentially, one line at a time, with the existing typed-frame timing (fixed line order, no interleaving or random delays)
 - Play only on full page loads of `/` (not client-side navigation, not `back_forward` navigation), first visit per session, tracked via sessionStorage
 - Skip to completion on the first interaction (click, key, touch, wheel, or scroll)
 - Not render at all when `prefers-reduced-motion: reduce`, when JavaScript is disabled, when the sessionStorage quick-mode key is set, or when the URL carries a module hash
@@ -20,6 +21,11 @@ The boot overlay SHALL:
 - **WHEN** a visitor opens `/` for the first time in a session via a full page load
 - **THEN** the boot overlay types the lines in sequence within 2.5 seconds
 - **AND** the overlay fades out within 0.5 seconds revealing the page
+
+#### Scenario: Boot lines load sequentially
+- **WHEN** the boot overlay plays
+- **THEN** module-loading lines appear one by one, in order, each with the existing typed-frame timing
+- **AND** no line renders before its turn in the sequence
 
 #### Scenario: Skip on interaction
 - **WHEN** the user clicks, presses a key, touches, or scrolls during the boot overlay

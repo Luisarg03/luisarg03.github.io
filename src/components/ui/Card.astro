@@ -30,7 +30,7 @@ const classes = baseClasses.join(' ');
 </div>
 
 <style>
-  /* ── Project variant: hover lift + shadow + top accent on hover ─────── */
+  /* ── Project variant: hover lift + shadow ─────────────────────────────── */
   .card--project {
     position: relative;
     overflow: hidden;
@@ -41,32 +41,14 @@ const classes = baseClasses.join(' ');
     transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms;
   }
 
-  .card--project::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--color-accent);
-    opacity: 0;
-    transition: opacity 200ms ease-out;
-  }
-
   .card--project:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(240, 180, 41, 0.08);
-  }
-
-  .card--project:hover::before {
-    opacity: 1;
+    box-shadow: 0 4px 12px rgba(240, 180, 41, 0.08), 0 0 20px rgba(240, 180, 41, 0.12);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .card--project,
-    .card--project::before,
-    .card--project:hover,
-    .card--project:hover::before {
+    .card--project:hover {
       transition: none;
       transform: none;
     }
@@ -79,16 +61,5 @@ const classes = baseClasses.join(' ');
     display: flex;
     flex-direction: column;
     padding: var(--space-4);
-  }
-
-  .card--status::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--color-accent);
-    opacity: 1;
   }
 </style>

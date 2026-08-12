@@ -61,6 +61,7 @@ function profToPercent(p: number): number {
               </span>
               <span class="skills-col-cmd">
                 <span class="skills-chevron" aria-hidden="true">▸</span>
+                <span class="tf-diff-prefix" data-diff={cat.proficiency >= 4 ? 'change' : 'unchanged'} aria-hidden="true">{cat.proficiency >= 4 ? '~' : '='}</span>
                 {cat.category}
               </span>
             </button>
@@ -114,7 +115,7 @@ function profToPercent(p: number): number {
 
 <style>
   .skills-module {
-    padding: var(--space-8) 0;
+    padding: var(--section-gap-md) 0;
   }
 
   .skills-content {
@@ -123,10 +124,11 @@ function profToPercent(p: number): number {
 
   .skills-prompt {
     font-family: var(--font-mono);
-    font-size: var(--text-sm);
+    font-size: var(--text-display-sm);
     color: var(--color-text-muted);
     margin: 0 0 var(--space-4);
     opacity: 0.6;
+    line-height: 1.2;
   }
 
   /* ── Table header ────────────────────────────────────────────────────── */
