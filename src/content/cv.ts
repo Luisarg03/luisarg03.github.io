@@ -40,6 +40,12 @@ export interface SiteConfig {
   github: string;
   availability: string;
   summary: string;
+  positioning: string;
+  about: {
+    philosophy: string;
+    stack: string;
+    focus: string;
+  };
 }
 
 // ── Experience ──────────────────────────────────────────────────────────────
@@ -208,4 +214,10 @@ export const siteConfig: SiteConfig = {
   availability: 'Currently at Interbank',
   summary:
     'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms. Experience spanning cloud infrastructure, internal developer platforms, cost and workload observability, and agentic developer workflows (multi-agent orchestration, MCP tooling). Track record enabling Data Science and engineering teams through reusable infrastructure, self-service tooling, and platform engineering.',
+  positioning: 'I make data teams ship faster by treating infrastructure as a product.',
+  about: {
+    philosophy: 'If a human is doing something twice, a script should be doing it once.',
+    stack: 'Arch + Hyprland · terminal-first · when docs fail, I read the source code',
+    focus: 'Platform engineering × data platforms × AI-assisted workflows',
+  },
 };

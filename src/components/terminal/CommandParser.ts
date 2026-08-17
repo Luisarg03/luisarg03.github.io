@@ -162,6 +162,11 @@ export class CommandParser {
       if (args.length === 0) {
         return { type: 'output', content: '[ERROR] Usage: cat <file> [file...]', outputType: 'error' };
       }
+      // Special case: cv.pdf triggers download
+      if (args[0] === 'cv.pdf') {
+        window.location.href = '/cv.pdf';
+        return { type: 'output', content: 'Downloading CV...', outputType: 'success' };
+      }
       const contents: string[] = [];
       for (const file of args) {
         const node = resolvePath(fs, cwd, file);
@@ -176,7 +181,7 @@ export class CommandParser {
         contents.push(node.content ? node.content() : '');
       }
       return { type: 'output', content: contents.join('\n') };
-    }, 'Show file contents');
+    }, 'Show file contents (or download cv.pdf)');
 
     this.register('pwd', (_args, cwd) => {
       return { type: 'output', content: cwd };
@@ -285,6 +290,21 @@ export class CommandParser {
         outputType: 'info',
       };
     }, 'Reveal the truth');
+
+    this.register('home', (_args, _cwd) => {
+      window.location.href = '/';
+      return { type: 'output', content: 'Navigating to home...' };
+    }, 'Go to homepage');
+
+    this.register('projects', (_args, _cwd) => {
+      window.location.href = '/projects';
+      return { type: 'output', content: 'Navigating to /projects...' };
+    }, 'Go to projects page');
+
+    this.register('now', (_args, _cwd) => {
+      window.location.href = '/now';
+      return { type: 'output', content: 'Navigating to /now...' };
+    }, 'Go to /now page');
 
     this.register('exit', (_args, _cwd) => {
       return { type: 'reboot' };

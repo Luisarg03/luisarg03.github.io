@@ -3,30 +3,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionPanel from '../components/layout/SectionPanel.astro';
 import StatusIndicator from '../components/ui/StatusIndicator.astro';
 import Card from '../components/ui/Card.astro';
-import { getEntry, render, getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getEntry, render } from 'astro:content';
 
 const entry = await getEntry('now', 'now');
 if (!entry) throw new Error('now/now.md missing');
 
 const { Content } = await render(entry);
 const updated = entry.data.updated;
-// YAML date parses as midnight UTC; format with UTC getters so the intended
-// calendar day is preserved regardless of the server's timezone (toLocaleDateString
-// shifts the day back in negative-offset zones).
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const formattedDate = `${MONTHS[updated.getUTCMonth()]} ${updated.getUTCDate()}, ${updated.getUTCFullYear()}`;
 
-// server-side load travel entries in frontmatter so template can render
-const _travelEntries = (await getCollection('travel')) || [];
-// cast to Array<any> to avoid narrow generated types when collection empty
-const travelSorted = /** @type {Array<any>} */ (_travelEntries).slice().sort((a, b) => {
-  const da = a && a.data && a.data.date ? a.data.date.getTime() : 0;
-  const db = b && b.data && b.data.date ? b.data.date.getTime() : 0;
-  return db - da;
-});
-
-// StatusIndicator supports active|in-progress|planned|offline; map focus statuses, fallback to planned
 const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'offline'> = {
   'in-progress': 'in-progress',
   planned: 'planned',
@@ -36,7 +22,6 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
 ---
 
 <BaseLayout title="/now — Luis Meyehen Paz">
-  <!-- System status header -->
   <div class="mb-4">
     <div class="flex items-center gap-3 mb-2">
       <StatusIndicator status="active" label="operational" />
@@ -47,7 +32,6 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
     </p>
   </div>
 
-  <!-- Focus cards — render from frontmatter -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 stagger">
     {entry.data.focus.map((item) => (
       <Card variant="status">
@@ -67,55 +51,8 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
         )}
       </Card>
     ))}
-
-    <!-- Travel log (only when travel collection has entries) -->
-    {travelSorted.length > 0 && (
-      <Card variant="status">
-        <div class="flex items-center justify-between mb-3">
-          <span class="font-mono text-xs uppercase tracking-wider text-[var(--color-text-muted)]">
-            Travel log
-          </span>
-          <StatusIndicator status="planned" />
-        </div>
-
-        ---
-
-        <!-- Travel entries: render as journalctl-style rows, collapsed by default -->
-        <div class="travel-log">
-          <div class="travel-log-list">
-            {travelSorted.map((e: any, idx: number) => {
-              const id = `travel-detail-${idx}`;
-              const date = e.data.date.toISOString().slice(0,10);
-              return (
-                <div class="travel-entry">
-                  <div class="travel-entry-header">
-                    <span class="travel-date">[{date}]</span>
-                    <span class="travel-location">{(e as any).data.location}</span>
-                    <span class="travel-caption">{(e as any).data.caption}</span>
-                    {(e as any).data.photos && (e as any).data.photos.length > 0 && (
-                      <button class="travel-toggle" aria-expanded="false" aria-controls={id}>Show photos</button>
-                    )}
-                  </div>
-
-                  {(e as any).data.photos && (e as any).data.photos.length > 0 && (
-                    <div id={id} class="travel-details" role="region" aria-label={`Photos for ${(e as any).data.location}`} hidden>
-                      <div class="travel-photos">
-                        {(e as any).data.photos.map((p: any) => (
-                          <Image src={p} alt={(e as any).data.caption} width={240} height={160} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </Card>
-    )}
   </div>
 
-  <!-- Main content -->
   <SectionPanel title="/now" class="noise-overlay">
     <Card variant="status">
       <article class="prose-content">
@@ -126,71 +63,6 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
 </BaseLayout>
 
 <style>
-  /* ── Travel log styles ─────────────────────────────────────────────── */
-  .travel-log {
-    margin-top: var(--space-2);
-  }
-
-  .travel-log-list {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-  }
-
-  .travel-entry {
-    border-left: 2px solid var(--color-border);
-    padding: var(--space-2) var(--space-2);
-    margin-left: var(--space-2);
-  }
-
-  .travel-entry-header {
-    display: flex;
-    gap: var(--space-2);
-    align-items: center;
-    flex-wrap: wrap;
-  }
-
-  .travel-date {
-    color: var(--color-text-muted);
-  }
-
-  .travel-location {
-    color: var(--color-accent);
-  }
-
-  .travel-caption {
-    color: var(--color-text);
-  }
-
-  .travel-toggle {
-    margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    cursor: pointer;
-    transition: color 150ms ease-out;
-  }
-
-  .travel-toggle:hover {
-    color: var(--color-text);
-  }
-
-  .travel-toggle:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  .travel-details {
-    margin-top: var(--space-2);
-  }
-
-  .travel-photos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-2);
-  }
-
   /* ── Prose content styles ──────────────────────────────────────────── */
   .prose-content :global(h2) {
     font-family: var(--font-mono);
@@ -256,29 +128,3 @@ const focusStatusMap: Record<string, 'active' | 'in-progress' | 'planned' | 'off
     border-bottom-color: var(--color-accent);
   }
 </style>
-
-<script>
-  // @ts-nocheck
-  (function () {
-    document.addEventListener('click', function (event) {
-      var btn = event.target.closest ? event.target.closest('.travel-toggle') : null;
-      if (!btn) return;
-
-      var expanded = btn.getAttribute('aria-expanded') === 'true';
-      var id = btn.getAttribute('aria-controls');
-      var panel = id ? document.getElementById(id) : null;
-      if (!panel) return;
-
-      btn.setAttribute('aria-expanded', String(!expanded));
-      panel.hidden = expanded;
-
-      var label = btn.querySelector('.travel-toggle-label');
-      if (label) {
-        label.textContent = expanded ? 'Show photos' : 'Hide photos';
-      } else {
-        // toggle simple text when no inner label
-        btn.textContent = expanded ? 'Show photos' : 'Hide photos';
-      }
-    });
-  })();
-</script>

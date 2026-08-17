@@ -9,7 +9,7 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
 (function () {
   'use strict';
 
-  var FRAME_DELAY = 250;
+  var FRAME_DELAY = 150;
   var QUICK_MODE_KEY = 'luisos-booted';
   var SKIP_EVENTS = ['keydown', 'click', 'touchstart'];
 
@@ -62,6 +62,15 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
       }
     }
 
+    // Handoff burst: flash the noise layer when the final frame renders.
+    // The noise element lives in the host overlay (BootModule); it may be
+    // absent (terminal page, overlay already removed) — no-op then.
+    function triggerBurst() {
+      var overlay = containerEl.closest && containerEl.closest('#boot-overlay');
+      var noise = overlay && overlay.querySelector('.boot-noise');
+      if (noise) noise.classList.add('is-burst');
+    }
+
     function finish() {
       if (completed) return;
       completed = true;
@@ -79,6 +88,7 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
         return;
       }
       renderLine(frames[frameIndex]);
+      if (frameIndex === frames.length - 1) triggerBurst();
       frameIndex++;
       timer = setTimeout(showNextFrame, frameDelay);
     }
@@ -92,6 +102,8 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
         renderLine(frames[frameIndex]);
         frameIndex++;
       }
+      // The last rendered frame is the final one — fire the burst too.
+      triggerBurst();
       finish();
     }
 
