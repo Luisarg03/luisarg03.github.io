@@ -49,15 +49,4 @@ const projects = defineCollection({
     }),
 });
 
-const travel = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/travel' }),
-  schema: ({ image }) =>
-    z.object({
-      date: z.date(),
-      location: z.string(),
-      caption: z.string(),
-      photos: z.array(image()),
-    }),
-});
-
-export const collections = { now, projects, travel };
+export const collections = { now, projects };

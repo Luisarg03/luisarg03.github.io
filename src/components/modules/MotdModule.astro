@@ -1,0 +1,167 @@
+---
+/**
+ * MotdModule — "message of the day" section.
+ * Terminal-style config dump that introduces Luis as a person.
+ */
+import { siteConfig } from '../../content/cv';
+
+const about = siteConfig.about;
+---
+
+<section id="about" class="motd-module" aria-label="About me">
+  <div class="module-divider reveal-on-view" aria-hidden="true">
+    <svg viewBox="0 0 1200 2" preserveAspectRatio="none">
+      <line x1="0" y1="1" x2="1200" y2="1" />
+    </svg>
+  </div>
+
+  <div class="module-content motd-content">
+    <p class="motd-prompt">$ cat /etc/motd</p>
+
+    <div class="motd-terminal panel">
+      <div class="motd-terminal-bar">
+        <span class="motd-terminal-dot" aria-hidden="true"></span>
+        <span class="motd-terminal-dot" aria-hidden="true"></span>
+        <span class="motd-terminal-dot" aria-hidden="true"></span>
+        <span class="motd-terminal-title">motd — luis@arch</span>
+      </div>
+
+      <div class="motd-body">
+        <div class="motd-row">
+          <span class="motd-key">philosophy</span>
+          <span class="motd-sep">=</span>
+          <span class="motd-val motd-val--accent">{about.philosophy}</span>
+        </div>
+
+        <div class="motd-row">
+          <span class="motd-key">stack</span>
+          <span class="motd-sep">=</span>
+          <span class="motd-val">{about.stack}</span>
+        </div>
+
+        <div class="motd-row">
+          <span class="motd-key">focus</span>
+          <span class="motd-sep">=</span>
+          <span class="motd-val">{about.focus}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .motd-module {
+    padding: var(--section-gap-md) 0;
+  }
+
+  .motd-content {
+    max-width: 52rem;
+  }
+
+  .motd-prompt {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-4);
+    opacity: 0.6;
+  }
+
+  .motd-terminal {
+    overflow: hidden;
+  }
+
+  .motd-terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+
+  .motd-terminal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border-active);
+  }
+
+  .motd-terminal-dot:first-child {
+    background: var(--color-danger);
+  }
+
+  .motd-terminal-dot:nth-child(2) {
+    background: var(--color-warning);
+  }
+
+  .motd-terminal-dot:nth-child(3) {
+    background: var(--color-success);
+  }
+
+  .motd-terminal-title {
+    color: var(--color-text-muted);
+    margin-left: var(--space-2);
+  }
+
+  .motd-body {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .motd-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  .motd-key {
+    color: var(--color-accent-identity);
+    font-weight: 600;
+    min-width: 10ch;
+    flex-shrink: 0;
+  }
+
+  .motd-sep {
+    color: var(--color-text-muted);
+    opacity: 0.4;
+  }
+
+  .motd-val {
+    color: var(--color-text);
+  }
+
+  .motd-val--accent {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 639px) {
+    .motd-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .motd-key {
+      min-width: unset;
+    }
+
+    .motd-sep {
+      display: none;
+    }
+
+    .motd-val {
+      padding-left: var(--space-4);
+      color: var(--color-text-muted);
+    }
+
+    .motd-val--accent {
+      color: var(--color-accent);
+    }
+  }
+</style>

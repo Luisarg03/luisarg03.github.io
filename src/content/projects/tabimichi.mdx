@@ -1,0 +1,32 @@
+---
+title: "Tabimichi 旅道"
+description: "Local discovery app: tell it where you are and how much time you have, it recommends nearby places ranked by weather, distance, time budget and mood (Japan-focused)."
+repo: "https://github.com/Luisarg03/tabimichi"
+problem: "Planning daily activities while traveling is fragmented across multiple apps — weather in one, maps in another, recommendations in a third. No tool combines location, time budget, weather conditions, and personal mood into a single suggestion."
+solution: "Next.js 16 app with a scoring engine that ranks nearby places by weather (Open-Meteo), distance (Leaflet), time budget, and mood. Uses Overpass + Google Places for discovery, DeepSeek for narrative generation, and SQLite for local persistence. No account required, works fully offline with cached data."
+impact:
+  - "M3 complete: discovery + weather scoring + interactive map + LLM narrative"
+  - "Zero-config startup: works without API keys using public Overpass + local cache"
+  - "Built for Japan travel 2027 — designed for slow, local exploration"
+tags: ['next.js', 'typescript', 'react', 'tailwind', 'leaflet', 'sqlite', 'llm']
+order: 0
+status: online
+year: 2026
+role: fullstack developer
+type: personal
+stack: [next.js, typescript, react, tailwind, leaflet, sqlite, deepseek]
+codeSnippet:
+  lang: typescript
+  code: |
+    // Scoring engine: rank places by weather × distance × time × mood
+    const score = (
+      weather: number,   // 0-1: ideal conditions
+      distance: number,  // 0-1: closer is better
+      timeFit: number,   // 0-1: fits time budget
+      mood: number       // 0-1: matches user preference
+    ) => weather * 0.35 + distance * 0.25 + timeFit * 0.25 + mood * 0.15;
+cover: ../../assets/projects/tabimichi/results.png
+coverAlt: "Tabimichi recommendation results showing nearby places ranked by weather, distance and mood with interactive map"
+links:
+  demo: https://tabimichi.vercel.app
+---

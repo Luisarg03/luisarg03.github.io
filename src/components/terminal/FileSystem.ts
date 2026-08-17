@@ -26,6 +26,10 @@ const aboutContent = () =>
     '  .oooooooooooooooo.        GitHub: ' + siteConfig.github,
     '    .+ooooooooooo+.         Contact: ' + siteConfig.email,
     '        ........',
+    '',
+    'philosophy = ' + siteConfig.about.philosophy,
+    'stack      = ' + siteConfig.about.stack,
+    'focus      = ' + siteConfig.about.focus,
   ].join('\n');
 
 const contactContent = () =>
