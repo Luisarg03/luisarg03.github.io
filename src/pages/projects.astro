@@ -1,801 +1,106 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionPanel from '../components/layout/SectionPanel.astro';
-import Card from '../components/ui/Card.astro';
+import TermWindow from '../components/terminal/TermWindow.astro';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
+import mobileShot from '../assets/projects/tabimichi/mobile.png';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
-// Shiki highlighter for terminal window (task 3.1)
-import { createHighlighter } from 'shiki';
-const highlighter = await createHighlighter({
-  themes: ['github-dark'],
-  langs: ['bash', 'python', 'yaml', 'typescript', 'tsx', 'javascript', 'json'],
-});
-function highlightCode(code: string, lang: string) {
-  return highlighter.codeToHtml(code, { lang, theme: 'github-dark' });
-}
+const [featured, ...rest] = projects;
+const f = featured?.data as any;
 
-// Diff prefix: maps project status to tf-plan glyph
-function diffPrefix(status?: string, idx?: number): { glyph: string; diff: string } {
-  if (idx === 0) return { glyph: '+', diff: 'add' };        // featured = new
-  if (status === 'archived') return { glyph: '-', diff: 'remove' };
-  if (status === 'wip') return { glyph: '~', diff: 'change' };
-  return { glyph: '~', diff: 'change' };                     // default = evolving
+// Terminal title bar slug: "OpenDashboard" → "opendashboard"
+function slugify(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 ---
 
 <BaseLayout
-  title="/projects — Luis Meyehen Paz"
+  title="Projects — Luis Meyehen Paz"
   description="Selected projects — knowledge systems, infrastructure, and tooling."
+  session="projects"
+  footPrompt="$ ls ~/projects ▮"
 >
-  <SectionPanel title="/projects" class="noise-overlay">
-    {projects.length === 0 ? (
-      <p class="font-mono text-[var(--text-sm)] text-[var(--color-text-muted)]">No projects yet.</p>
-    ) : (
-      <>
-        <div class="projects-grid">
-          {projects.map((project, idx) => {
-            const data = project.data as any;
-            const hasCodeSnippet = !!data.codeSnippet;
-            const isFeatured = idx === 0;
-            const metaParts = [
-              data.year != null ? `year: ${data.year}` : '',
-              data.role ? `role: ${data.role}` : '',
-              data.type ? `type: ${data.type}` : '',
-              data.stack && data.stack.length ? `stack: ${data.stack.join(', ')}` : '',
-              data.scaleMetric ? data.scaleMetric : '',
-            ].filter(Boolean);
-            const hasMeta = metaParts.length > 0;
-            const statusLabel = data.status === 'wip' ? 'WIP'
-              : data.status === 'archived' ? 'ARCHIVED'
-              : data.status === 'online' ? 'ONLINE'
-              : '';
-            return (
-            <Card
-              variant="project"
-              class:list={['project-card', { 'project-card--featured': isFeatured }]}
-              style={`--i: ${idx}`}
-            >
-              {isFeatured && (data.cover || hasCodeSnippet) ? (
-                /* Featured hero — 2-col grid: text + terminal */
-                <>
-                  <div class="project-card__hero-text">
-                    <header class="project-card__header">
-                      <span class="tf-diff-prefix" data-diff={diffPrefix(data.status, idx).diff} aria-hidden="true">{diffPrefix(data.status, idx).glyph}</span>
-                      <h2 class="project-card__title">{data.title}</h2>
-                      {data.status && (
-                        <span class={`status-dot status-dot--${data.status}`}>●</span>
-                        <span class="status-dot-label">{statusLabel}</span>
-                      )}
-                    </header>
+  <main class="screen sess-main">
+    <div class="container screen-inner">
+      <div class="screen-head">
+        <p class="eyebrow">showcase · selected work</p>
+        <h2>Proof you can open.</h2>
+        <p>Each project in its native window — a real screenshot for the apps, a terminal for the CLI. Nothing staged.</p>
+      </div>
 
-                    {hasMeta && (
-                      <div class="project-card__meta">
-                        {'// '}{metaParts.join(' · ')}
-                      </div>
-                    )}
+      <!-- Featured: Tabimichi -->
+      {featured && (
+        <article class="showcase-featured">
+          <div class="showcase-copy">
+            <span class="pill">featured</span>
+            <h3>{f.title}</h3>
+            <p class="project-desc">{f.description}</p>
+            {f.impact && f.impact.length > 0 && (
+              <p class="project-impact">→ {f.impact.slice(0, 2).join('; ')}</p>
+            )}
+            <div class="project-tags">
+              {f.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+            </div>
+            <a class="project-link" href={f.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+          </div>
 
-                    <p class="project-card__description">{data.description}</p>
+          <div class="showcase-visual">
+            <figure class="shot-frame">
+              <div class="shot-bar">
+                <span class="term-dot" aria-hidden="true"></span>
+                <span class="term-dot" aria-hidden="true"></span>
+                <span class="term-dot" aria-hidden="true"></span>
+                <span class="term-title">tabimichi.vercel.app</span>
+              </div>
+              {f.cover && <Image class="shot-img" src={f.cover} alt={f.coverAlt ?? f.title} />}
+            </figure>
+            <figure class="shot-frame shot-frame--phone" aria-hidden="true">
+              <Image class="shot-img" src={mobileShot} alt="" />
+            </figure>
+          </div>
+        </article>
+      )}
 
-                    {data.planSummary && (
-                      <p class="project-card__plan-summary">
-                        <span class="project-card__plan-label">plan:</span>{' '}
-                        {data.planSummary.add != null && <><span class="tf-diff-prefix" data-diff="add" aria-hidden="true">+</span><span class="plan-val plan-val--add">{data.planSummary.add}</span></>}
-                        {data.planSummary.change != null && <><span class="tf-diff-prefix" data-diff="change" aria-hidden="true">~</span><span class="plan-val plan-val--change">{data.planSummary.change}</span></>}
-                        {data.planSummary.remove != null && <><span class="tf-diff-prefix" data-diff="remove" aria-hidden="true">-</span><span class="plan-val plan-val--remove">{data.planSummary.remove}</span></>}
-                        {data.planSummary.unchanged != null && <><span class="tf-diff-prefix" data-diff="unchanged" aria-hidden="true">=</span><span class="plan-val plan-val--unchanged">{data.planSummary.unchanged}</span></>}
-                      </p>
-                    )}
-
-                    {(data.problem || data.solution || (data.impact && data.impact.length > 0)) && (
-                      <details class="project-card__case-study">
-                        <summary class="project-card__case-study-summary">
-                          <span class="project-card__chevron" aria-hidden="true">▸</span>
-                          read case study
-                        </summary>
-                        <div class="project-card__case-study-body">
-                          {data.problem && (
-                            <pre class="project-card__case-study-line">// {data.problem}</pre>
-                          )}
-                          {data.solution && (
-                            <pre class="project-card__case-study-line">// {data.solution}</pre>
-                          )}
-                          {data.impact && data.impact.length > 0 && (
-                            <div class="project-card__impact">
-                              {data.impact.map((imp: string) => (
-                                <div class="project-card__impact-line">
-                                  <span class="project-card__impact-marker">→</span>
-                                  <span class="project-card__impact-text">{imp}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </details>
-                    )}
-
-                    <footer class="project-card__footer">
-                      {data.tags.length > 0 && (
-                        <div class="project-card__tags">
-                          {data.tags.map((tag: string) => (
-                            <span class="project-card__tag">{tag}</span>
-                          ))}
-                        </div>
-                      )}
-                      <div class="project-card__links">
-                        <a href={data.repo} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                          github ↗
-                        </a>
-                        {data.links?.demo && (
-                          <>
-                            <span class="project-card__link-sep">·</span>
-                            <a href={data.links.demo} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                              demo ↗
-                            </a>
-                          </>
-                        )}
-                        {data.links?.docs && (
-                          <>
-                            <span class="project-card__link-sep">·</span>
-                            <a href={data.links.docs} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                              docs ↗
-                            </a>
-                          </>
-                        )}
-                      </div>
-                    </footer>
+      <div class="grid-2">
+        {rest.map((project) => {
+          const d = project.data as any;
+          const hasCover = !!d.cover;
+          const snippet = d.codeSnippet ? d.codeSnippet.code.split('\n').slice(0, 4).join('\n') : null;
+          const barTitle = hasCover ? slugify(d.title) : `${slugify(d.title)} — ${d.codeSnippet?.lang ?? 'shell'}`;
+          return (
+            <article class="card project-card">
+              {hasCover ? (
+                <figure class="shot-frame">
+                  <div class="shot-bar">
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-title">{barTitle}</span>
                   </div>
-
-                  {/* Terminal window */}
-                  <aside class="project-card__hero-terminal" aria-hidden="false">
-                    <div class="project-card__terminal-titlebar">
-                      <span class="project-card__terminal-controls" aria-hidden="true">▢ ◯ ●</span>
-                      <span class="project-card__terminal-title">{data.title}</span>
-                    </div>
-                    {data.cover ? (
-                      <div class="project-card__terminal-cover">
-                        <Image src={data.cover} alt={data.coverAlt} />
-                      </div>
-                    ) : (
-                      <pre class="project-card__terminal-code"><code set:html={highlightCode(data.codeSnippet.code, data.codeSnippet.lang)} /></pre>
-                    )}
-                  </aside>
-                </>
+                  <Image class="shot-img" src={d.cover} alt={d.coverAlt ?? d.title} />
+                </figure>
               ) : (
-                /* Normal card (non-featured, or featured without codeSnippet) */
-                <>
-                  <header class="project-card__header">
-                    <span class="tf-diff-prefix" data-diff={diffPrefix(data.status, idx).diff} aria-hidden="true">{diffPrefix(data.status, idx).glyph}</span>
-                    <h2 class="project-card__title">{data.title}</h2>
-                    {data.status && (
-                      <span class={`status-dot status-dot--${data.status}`}>●</span>
-                      <span class="status-dot-label">{statusLabel}</span>
-                    )}
-                  </header>
-
-                  {hasMeta && (
-                    <div class="project-card__meta">
-                      {'// '}{metaParts.join(' · ')}
-                    </div>
-                  )}
-
-                  <p class="project-card__description">{data.description}</p>
-
-                  {data.planSummary && (
-                    <p class="project-card__plan-summary">
-                      <span class="project-card__plan-label">plan:</span>{' '}
-                      {data.planSummary.add != null && <><span class="tf-diff-prefix" data-diff="add" aria-hidden="true">+</span><span class="plan-val plan-val--add">{data.planSummary.add}</span></>}
-                      {data.planSummary.change != null && <><span class="tf-diff-prefix" data-diff="change" aria-hidden="true">~</span><span class="plan-val plan-val--change">{data.planSummary.change}</span></>}
-                      {data.planSummary.remove != null && <><span class="tf-diff-prefix" data-diff="remove" aria-hidden="true">-</span><span class="plan-val plan-val--remove">{data.planSummary.remove}</span></>}
-                      {data.planSummary.unchanged != null && <><span class="tf-diff-prefix" data-diff="unchanged" aria-hidden="true">=</span><span class="plan-val plan-val--unchanged">{data.planSummary.unchanged}</span></>}
-                    </p>
-                  )}
-
-                  {hasCodeSnippet && (
-                    <details class="project-card__snippet-terminal">
-                      <summary class="project-card__snippet-titlebar">
-                        <span class="project-card__terminal-controls" aria-hidden="true">▢ ◯ ●</span>
-                        <span class="project-card__snippet-label">code</span>
-                        <span class="project-card__snippet-chevron" aria-hidden="true">▸</span>
-                      </summary>
-                      <pre class="project-card__snippet-code"><code set:html={highlightCode(data.codeSnippet.code, data.codeSnippet.lang)} /></pre>
-                    </details>
-                  )}
-
-                  {(data.problem || data.solution || (data.impact && data.impact.length > 0)) && (
-                    <details class="project-card__case-study">
-                      <summary class="project-card__case-study-summary">
-                        <span class="project-card__chevron" aria-hidden="true">▸</span>
-                        read case study
-                      </summary>
-                      <div class="project-card__case-study-body">
-                        {data.problem && (
-                          <pre class="project-card__case-study-line">// {data.problem}</pre>
-                        )}
-                        {data.solution && (
-                          <pre class="project-card__case-study-line">// {data.solution}</pre>
-                        )}
-                        {data.impact && data.impact.length > 0 && (
-                          <div class="project-card__impact">
-                            {data.impact.map((imp: string) => (
-                              <div class="project-card__impact-line">
-                                <span class="project-card__impact-marker">→</span>
-                                <span class="project-card__impact-text">{imp}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </details>
-                  )}
-
-                  <footer class="project-card__footer">
-                    {data.tags.length > 0 && (
-                      <div class="project-card__tags">
-                        {data.tags.map((tag: string) => (
-                          <span class="project-card__tag">{tag}</span>
-                        ))}
-                      </div>
-                    )}
-                    <div class="project-card__links">
-                      <a href={data.repo} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                        github ↗
-                      </a>
-                      {data.links?.demo && (
-                        <>
-                          <span class="project-card__link-sep">·</span>
-                          <a href={data.links.demo} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                            demo ↗
-                          </a>
-                        </>
-                      )}
-                      {data.links?.docs && (
-                        <>
-                          <span class="project-card__link-sep">·</span>
-                          <a href={data.links.docs} target="_blank" rel="noopener noreferrer" class="project-card__repo">
-                            docs ↗
-                          </a>
-                        </>
-                      )}
-                    </div>
-                  </footer>
-                </>
+                snippet && (
+                  <TermWindow title={barTitle}>
+                    <code style="color: var(--fg);">{snippet}</code>
+                  </TermWindow>
+                )
               )}
-            </Card>
-            )
-          })}
-        </div>
-      </>
-    )}
-  </SectionPanel>
+              <h3>{d.title}</h3>
+              <p class="project-desc">{d.description}</p>
+              {d.impact && d.impact.length > 0 && (
+                <p class="project-impact">→ {d.impact[0]}</p>
+              )}
+              <div class="project-tags">
+                {d.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+              </div>
+              <a class="project-link" href={d.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </main>
 </BaseLayout>
-
-<style>
-  /* ─── Grid layout ─── */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
-  }
-
-  @media (min-width: 640px) {
-    .projects-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-8);
-    }
-    .projects-grid > .project-card:first-child {
-      grid-column: 1 / -1;
-    }
-  }
-
-  /* ─── Featured card 2-col grid ─── */
-  .project-card--featured {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-
-  @media (min-width: 1024px) {
-    .project-card--featured {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: var(--space-5);
-    }
-    .project-card__hero-terminal {
-      align-self: start;
-    }
-  }
-
-  /* ─── Reveal transition ─── */
-  .project-card.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: calc(var(--i, 0) * 80ms);
-  }
-
-  /* ─── Hover lift (border-color only; transform/shadow handled by Card) ─── */
-  .project-card:hover {
-    border-color: var(--color-accent);
-  }
-
-  /* ─── Scroll-driven parallax-lite (progressive enhancement) ─── */
-  @supports (animation-timeline: view()) {
-    .project-card {
-      animation: card-parallax linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 100%;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .project-card {
-        animation: none;
-      }
-    }
-  }
-
-  /* ─── Card header ─── */
-  .project-card__header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-  }
-
-  .project-card__title {
-    font-family: var(--font-mono);
-    font-size: var(--text-base);
-    color: var(--color-accent);
-    font-weight: 600;
-  }
-
-  /* Featured project card title uses display font */
-  .project-card--featured .project-card__title {
-    font-family: var(--font-display);
-    font-size: var(--text-display-sm);
-    font-weight: 600;
-    line-height: 1.1;
-  }
-
-  /* ─── Status dot ─── */
-  .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    vertical-align: middle;
-    margin-right: 0.4em;
-    position: relative;
-    font-size: 0;
-    line-height: 0;
-  }
-
-  .status-dot--online {
-    color: var(--color-accent-identity);
-    background: var(--color-accent-identity);
-    animation: pulse 2s infinite ease-in-out;
-  }
-
-  .status-dot--wip {
-    color: var(--color-accent);
-    background: var(--color-accent);
-  }
-
-  .status-dot--archived {
-    color: var(--color-text-muted);
-    background: var(--color-text-muted);
-  }
-
-  .status-dot--online::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    opacity: 0.4;
-    background: var(--color-accent-identity);
-    animation: pulse 2s infinite ease-in-out 0.3s;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-  }
-
-  .status-dot-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    vertical-align: middle;
-  }
-
-  /* ─── Meta row ─── */
-  .project-card__meta {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    margin: 0 0 var(--space-3);
-    line-height: 1.6;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ─── Card description ─── */
-  .project-card__description {
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    line-height: 1.6;
-  }
-
-  /* ─── Plan summary line ─── */
-  .project-card__plan-summary {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .project-card__plan-label {
-    color: var(--color-text-muted);
-    opacity: 0.6;
-  }
-
-  .plan-val {
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-  }
-  .plan-val--add      { color: var(--color-tf-add); }
-  .plan-val--change   { color: var(--color-tf-change); }
-  .plan-val--remove   { color: var(--color-tf-remove); }
-  .plan-val--unchanged { color: var(--color-tf-unchanged); }
-
-  /* ─── Case study details ─── */
-  .project-card__case-study {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .project-card__case-study-summary {
-    cursor: pointer;
-    color: var(--color-text-muted);
-    user-select: none;
-    list-style: none;
-  }
-
-  .project-card__case-study-summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .project-card__chevron {
-    display: inline-block;
-    margin-right: 0.375rem;
-    transition: transform 200ms ease-out;
-  }
-
-  .project-card__case-study[open] .project-card__chevron {
-    transform: rotate(90deg);
-  }
-
-  .project-card__case-study-body {
-    margin-top: var(--space-2);
-    padding-left: var(--space-3);
-    border-left: 2px solid var(--color-border);
-  }
-
-  .project-card__case-study-line {
-    color: var(--color-text-muted);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  /* ─── Impact list ─── */
-  .project-card__impact {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-top: var(--space-2);
-  }
-
-  .project-card__impact-line {
-    display: flex;
-    align-items: baseline;
-  }
-
-  .project-card__impact-marker {
-    color: var(--color-accent);
-    margin-right: 0.5rem;
-  }
-
-  .project-card__impact-text {
-    color: var(--color-accent);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  /* ─── Card footer ─── */
-  .project-card__footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    margin-top: auto;
-  }
-
-  .project-card__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.375rem;
-  }
-
-  .project-card__tag {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    border: 1px solid var(--color-border);
-    border-radius: 9999px;
-    padding: 0.25rem 0.75rem;
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, font-variation-settings 150ms ease-out;
-  }
-
-  .project-card__tag:hover {
-    transform: scale(1.03);
-    box-shadow: 0 2px 8px rgba(240, 180, 41, 0.15);
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-    font-variation-settings: 'wght' 500;
-  }
-
-  .project-card__tag:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .project-card__tag {
-      transition: none;
-    }
-    .project-card__tag:hover {
-      transform: none;
-    }
-  }
-
-  /* ─── Multi-link row ─── */
-  .project-card__links {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .project-card__link-sep {
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-  }
-
-  .project-card__repo {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-accent);
-    text-decoration: none;
-    transition: color 150ms ease-out;
-  }
-
-  .project-card__repo:hover {
-    color: var(--color-text);
-  }
-
-  .project-card__repo:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .project-card__repo {
-      transition: none;
-    }
-  }
-
-  /* ─── Terminal window (featured hero) ─── */
-  .project-card__hero-terminal {
-    position: relative;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    padding: 1rem;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    overflow-x: auto;
-    min-height: 12rem;
-  }
-
-  .project-card__terminal-titlebar {
-    background: rgba(0, 0, 0, 0.15);
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--color-border);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: -1rem -1rem 0.75rem;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .project-card__terminal-controls {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    opacity: 0.5;
-  }
-
-  .project-card__terminal-title {
-    flex: 1;
-    text-align: center;
-    font-weight: 600;
-  }
-
-  .project-card__terminal-code {
-    padding: 0.75rem;
-    font-size: var(--text-xs);
-    color: var(--color-text);
-    background: transparent;
-    margin: 0;
-    line-height: 1.5;
-    overflow-x: auto;
-  }
-
-  /* Shiki overrides to blend with project palette */
-  .project-card__terminal-code :global(pre) {
-    background: transparent !important;
-    margin: 0;
-    padding: 0;
-  }
-
-  .project-card__terminal-code :global(code) {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-  }
-
-  /* ─── Compact terminal snippet (non-featured cards, collapsible) ─── */
-  .project-card__snippet-terminal {
-    position: relative;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    border-radius: 4px;
-    font-family: var(--font-mono);
-    overflow: hidden;
-    margin-top: var(--space-3);
-  }
-
-  .project-card__snippet-titlebar {
-    background: rgba(0, 0, 0, 0.15);
-    padding: 0.3rem 0.5rem;
-    border-bottom: 1px solid transparent;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    user-select: none;
-    list-style: none;
-  }
-
-  .project-card__snippet-titlebar::-webkit-details-marker {
-    display: none;
-  }
-
-  .project-card__snippet-terminal[open] .project-card__snippet-titlebar {
-    border-bottom-color: var(--color-border);
-  }
-
-  .project-card__snippet-titlebar .project-card__terminal-controls {
-    font-size: 0.5rem;
-    letter-spacing: 0.1em;
-    opacity: 0.4;
-  }
-
-  .project-card__snippet-label {
-    flex: 1;
-    font-size: 0.6rem;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .project-card__snippet-chevron {
-    font-size: 0.55rem;
-    color: var(--color-text-muted);
-    transition: transform 200ms ease-out;
-  }
-
-  .project-card__snippet-terminal[open] .project-card__snippet-chevron {
-    transform: rotate(90deg);
-  }
-
-  .project-card__snippet-code {
-    padding: 0.5rem 0.625rem;
-    font-size: 0.65rem;
-    color: var(--color-text);
-    background: transparent;
-    margin: 0;
-    line-height: 1.5;
-    overflow-x: auto;
-  }
-
-  .project-card__snippet-code :global(pre) {
-    background: transparent !important;
-    margin: 0;
-    padding: 0;
-  }
-
-  .project-card__snippet-code :global(code) {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-  }
-
-  /* ─── Terminal cover image ─── */
-  .project-card__terminal-cover {
-    padding: 0.75rem;
-  }
-
-  .project-card__terminal-cover :global(img) {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 3px;
-    border: 1px solid var(--color-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  /* ─── Reduced motion ─── */
-  @media (prefers-reduced-motion: reduce) {
-    .project-card,
-    .project-card.is-visible {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
-    .project-card__chevron,
-    .project-card__case-study[open] .project-card__chevron,
-    .project-card__snippet-chevron,
-    .project-card__snippet-terminal[open] .project-card__snippet-chevron {
-      transition: none;
-    }
-    .status-dot--online,
-    .status-dot--online::after {
-      animation: none;
-    }
-  }
-</style>
-
-{/* Text scramble intro — task 8.1 */}
-<script>
-// @ts-nocheck
-function setupTextScramble() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var el = document.querySelector('.project-card--featured .project-card__title');
-  if (!el || el.getAttribute('data-scrambled') === 'true') return;
-  el.setAttribute('data-scrambled', 'true');
-  var real = el.textContent || '';
-  var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  function randomChar() { return chars[Math.floor(Math.random() * chars.length)]; }
-  el.textContent = real.split('').map(function(c) { return c === ' ' ? ' ' : randomChar(); }).join('');
-  var i = 0;
-  var interval = setInterval(function() {
-    if (i >= real.length) { clearInterval(interval); el.textContent = real; return; }
-    el.textContent = real.split('').map(function(c, j) { return j <= i ? c : (c === ' ' ? ' ' : randomChar()); }).join('');
-    i++;
-  }, 50);
-}
-
-// Run on initial load
-setupTextScramble();
-// Re-run on Astro view transitions (when navigating back to /projects)
-document.addEventListener('astro:page-load', setupTextScramble);
-</script>

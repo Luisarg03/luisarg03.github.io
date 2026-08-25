@@ -1,0 +1,15 @@
+---
+// Closing footer — one terminal prompt per session + copyright.
+export interface Props {
+  prompt?: string;
+}
+
+const { prompt = '$ luis@cloud:~$ ▮' } = Astro.props;
+---
+
+<footer class="pagefoot">
+  <div class="container row-between">
+    <span class="foot-prompt">{prompt}</span>
+    <span class="meta">© 2026 Luis Meyehen Paz · Buenos Aires</span>
+  </div>
+</footer>

@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Experience — Luis Meyehen Paz"
+  description="Cloud and data platform engineering — impact-first experience log."
+  session="journalctl"
+  footPrompt="$ journalctl -u luis@cloud --no-pager ▮"
+>
+  <main class="screen sess-main">
+    <div class="container screen-inner">
+      <div class="screen-head">
+        <p class="eyebrow">journalctl · experience</p>
+        <h2>Seven years, three platform generations.</h2>
+        <p>Impact first, responsibilities second — the strongest signal of each role leads.</p>
+      </div>
+
+      <div class="exp-list">
+        <article class="exp-row">
+          <span class="meta">10/2023 — now</span>
+          <div>
+            <h3>Interbank <span class="exp-role">· Cloud Platform Engineer</span></h3>
+            <p class="exp-impact">→ Built a self-service variable catalog (FastAPI + React) and reusable pipeline templates so Data Science teams ship ML pilots without waiting on infra.</p>
+            <p class="exp-detail">CI/CD in GitHub Actions &amp; Bitbucket · CDK and CloudFormation · SageMaker ECR images · MCP tooling and agent workflows · monitoring via Step Functions, Glue, Athena, QuickSight.</p>
+          </div>
+        </article>
+
+        <article class="exp-row">
+          <span class="meta">08/2022 — 10/2023</span>
+          <div>
+            <h3>Prisma Medios de Pago <span class="exp-role">· AWS Data Platform Engineer</span></h3>
+            <p class="exp-impact">→ Migrated platform IaC from CDK to Terraform and built event-driven ingestion (SQS · SNS · EventBridge) with automated data-quality checks.</p>
+            <p class="exp-detail">Large-scale ingestion into the enterprise Data Lake on S3 · Salesforce API integration · Python, Step Functions, Lambda, Glue, EMR, Athena.</p>
+          </div>
+        </article>
+
+        <article class="exp-row">
+          <span class="meta">10/2021 — 08/2022</span>
+          <div>
+            <h3>Tiendanube <span class="exp-role">· Data Platform Engineer</span></h3>
+            <p class="exp-impact">→ Designed Lakehouse ETL with Glue and Databricks, opening SQL-based access across teams through Trino.</p>
+            <p class="exp-detail">ETL pipeline ownership · Lakehouse architecture · Databricks and Trino ingestion for the company platform.</p>
+          </div>
+        </article>
+
+        <p class="meta" style="margin-top: 20px;">Earlier roles: Walmart Argentina · Tsoft · Monsun · Dthink — full detail in the CV.</p>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
