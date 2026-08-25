@@ -38,6 +38,7 @@ const projects = defineCollection({
       cover: image().optional(),
       coverAlt: z.string().optional(),
       stack: z.array(z.string()).default([]).optional(),
+      termTitle: z.string().optional(),
       codeSnippet: z.object({ lang: z.string(), code: z.string() }).optional(),
       links: z.object({ demo: z.string().url().optional(), docs: z.string().url().optional() }).optional(),
       planSummary: z.object({

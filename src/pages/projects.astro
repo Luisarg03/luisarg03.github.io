@@ -68,7 +68,7 @@ function slugify(title: string): string {
           const d = project.data as any;
           const hasCover = !!d.cover;
           const snippet = d.codeSnippet ? d.codeSnippet.code.split('\n').slice(0, 4).join('\n') : null;
-          const barTitle = hasCover ? slugify(d.title) : `${slugify(d.title)} — ${d.codeSnippet?.lang ?? 'shell'}`;
+          const barTitle = d.termTitle ?? (hasCover ? slugify(d.title) : `${slugify(d.title)} — ${d.codeSnippet?.lang ?? 'shell'}`);
           return (
             <article class="card project-card">
               {hasCover ? (
