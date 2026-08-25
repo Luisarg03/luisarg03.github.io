@@ -1,0 +1,33 @@
+---
+// Session chrome — the OS-style top bar shared by all five portfolio screens.
+// Mirrors prototype/session-bar: logo, session tabs, live status.
+export interface Props {
+  session: 'identity' | 'journalctl' | 'htop' | 'projects' | 'shutdown';
+}
+
+const { session } = Astro.props;
+
+const tabs = [
+  { id: 'identity', href: '/', label: 'identity' },
+  { id: 'journalctl', href: '/experience', label: 'journalctl' },
+  { id: 'htop', href: '/skills', label: 'htop' },
+  { id: 'projects', href: '/projects', label: 'projects' },
+  { id: 'shutdown', href: '/contact', label: 'shutdown' },
+] as const;
+---
+
+<header class="sess">
+  <div class="container sess-inner">
+    <a class="logo" href="/"><span class="logo-dot" aria-hidden="true"></span>~/luisarg</a>
+    <nav class="sess-tabs" aria-label="Sessions">
+      {
+        tabs.map((tab) => (
+          <a href={tab.href} aria-current={session === tab.id ? 'page' : undefined}>
+            {tab.label}
+          </a>
+        ))
+      }
+    </nav>
+    <span class="sess-status"><span class="dot" aria-hidden="true"></span><span>session: {session}</span></span>
+  </div>
+</header>

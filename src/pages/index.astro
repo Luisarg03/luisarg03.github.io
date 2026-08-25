@@ -1,19 +1,58 @@
 ---
-import '../styles/global.css';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BootModule from '../components/modules/BootModule.astro';
-import HostHeader from '../components/modules/HostHeader.astro';
-import MotdModule from '../components/modules/MotdModule.astro';
-import HtopWindow from '../components/modules/HtopWindow.astro';
-import ExperienceModule from '../components/modules/ExperienceModule.astro';
+import TermWindow from '../components/terminal/TermWindow.astro';
 ---
 
-<BaseLayout title="Luis Meyehen Paz — Cloud Engineer" showBootChip>
-  <!-- BootModule: fixed overlay (out of flow) — HostHeader + HtopWindow
-       below are the first actual content in the viewport. -->
-  <BootModule />
-  <HostHeader />
-  <MotdModule />
-  <HtopWindow />
-  <ExperienceModule />
+<BaseLayout
+  title="Luis Meyehen Paz — Cloud Engineer"
+  description="Cloud Engineer building platforms, pipelines and infrastructure that last. 7+ years on AWS — Terraform, CDK, GitHub Actions and agentic developer workflows."
+  session="identity"
+  footPrompt="$ luis@cloud:~$ ▮"
+>
+  <main class="screen sess-main">
+    <div class="container screen-inner">
+      <div class="hero-split">
+        <div>
+          <p class="eyebrow">~/luisarg · cloud engineer</p>
+          <h1>I make data teams ship faster by treating infrastructure as a product.</h1>
+          <p class="lead" style="margin-top: 22px;">Luis Meyehen Paz — 7+ years building cloud infrastructure, CI/CD pipelines and data platforms on AWS, from Terraform and CDK to agentic developer workflows.</p>
+          <div class="hero-cta" style="margin-top: 30px;">
+            <a class="btn btn-primary" href="/projects">View projects</a>
+            <a class="btn btn-secondary" href="mailto:luis.m.paz.03@gmail.com">Email me</a>
+          </div>
+        </div>
+
+        <TermWindow title="luis@cloud — neofetch">
+          <div class="term-row"><span class="term-key">name</span><span class="term-val term-val--brand">Luis Meyehen Paz</span></div>
+          <div class="term-row"><span class="term-key">os</span><span class="term-val">Cloud Platform Engineer</span></div>
+          <div class="term-row"><span class="term-key">host</span><span class="term-val">Interbank · Peru (remote)</span></div>
+          <div class="term-row"><span class="term-key">kernel</span><span class="term-val">AWS · Terraform · CDK · GitHub Actions</span></div>
+          <div class="term-row"><span class="term-key">uptime</span><span class="term-val">7+ years in data &amp; cloud</span></div>
+          <div class="term-row"><span class="term-key">shell</span><span class="term-val">Python · Bash · SQL</span></div>
+          <div class="term-row"><span class="term-key">location</span><span class="term-val">Buenos Aires, Argentina</span></div>
+          <div class="term-status">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="typed-status">open to senior cloud / platform roles</span><span class="cursor">▮</span>
+          </div>
+        </TermWindow>
+      </div>
+    </div>
+  </main>
 </BaseLayout>
+
+<script>
+  (function () {
+    var el = document.getElementById('typed-status');
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var text = el.textContent;
+    el.textContent = '';
+    var i = 0;
+    (function tick() {
+      if (i <= text.length) {
+        el.textContent = text.slice(0, i);
+        i += 1;
+        setTimeout(tick, 26);
+      }
+    })();
+  })();
+</script>

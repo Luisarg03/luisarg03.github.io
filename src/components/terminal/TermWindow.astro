@@ -1,0 +1,20 @@
+---
+// Terminal window chrome (traffic dots + title) with a body slot.
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<div class="terminal">
+  <div class="term-bar">
+    <span class="term-dot" aria-hidden="true"></span>
+    <span class="term-dot" aria-hidden="true"></span>
+    <span class="term-dot" aria-hidden="true"></span>
+    <span class="term-title">{title}</span>
+  </div>
+  <div class="term-body">
+    <slot />
+  </div>
+</div>
