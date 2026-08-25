@@ -1,5 +1,70 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Curated set — the stack Luis runs every day, rendered as htop processes.
+// `desc` and the meta readouts are page copy (htop chrome), not CV data.
+const skills = [
+  {
+    pid: '01',
+    name: 'Cloud & IaC',
+    stack: 'AWS · Terraform · AWS CDK · CloudFormation',
+    desc: 'Infrastructure as reviewable, versioned code — Terraform and CDK running production workloads for 5+ years.',
+    mem: '1.2G',
+    cpu: '2.4%',
+    uptime: '5+ yrs',
+    path: '~/.luis/cloud-iac',
+  },
+  {
+    pid: '02',
+    name: 'CI/CD & DevOps',
+    stack: 'GitHub Actions · GitLab CI · Docker · Git',
+    desc: 'Pipelines that treat every environment as cattle: repeatable, observable, and fast enough that teams actually use them.',
+    mem: '640M',
+    cpu: '1.8%',
+    uptime: '6+ yrs',
+    path: '~/.luis/ci-cd',
+  },
+  {
+    pid: '03',
+    name: 'Platform Engineering',
+    stack: 'Internal Developer Platforms · Observability · Cost Management · Developer Enablement',
+    desc: "Self-service platforms that turn 'waiting on infra' into a solved problem — catalogs, templates, paved roads.",
+    mem: '1.5G',
+    cpu: '3.1%',
+    uptime: '4+ yrs',
+    path: '~/.luis/platform',
+  },
+  {
+    pid: '04',
+    name: 'Data Engineering',
+    stack: 'ETL Pipelines · SQL · PySpark · Databricks · Trino',
+    desc: 'Event-driven ingestion and lakehouse architectures that keep analysts querying instead of begging for exports.',
+    mem: '2.1G',
+    cpu: '4.2%',
+    uptime: '5+ yrs',
+    path: '~/.luis/data-eng',
+  },
+  {
+    pid: '05',
+    name: 'AI Tooling',
+    stack: 'MCP · Agent Orchestration · Multi-agent Workflows · AWS Bedrock',
+    desc: 'Agentic workflows and MCP tooling that make AI agents useful inside real developer environments.',
+    mem: '890M',
+    cpu: '2.9%',
+    uptime: '2+ yrs',
+    path: '~/.luis/ai-tooling',
+  },
+  {
+    pid: '06',
+    name: 'Python',
+    stack: 'Python · Pandas · NumPy · Boto3 · FastAPI',
+    desc: 'The glue that holds it together — FastAPI services, Boto3 automation, and data pipelines.',
+    mem: '512M',
+    cpu: '1.2%',
+    uptime: '8+ yrs',
+    path: '~/.luis/python',
+  },
+];
 ---
 
 <BaseLayout
@@ -16,7 +81,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <p>The stack I run every day, as a process view — no self-assigned scores, just what's loaded.</p>
       </div>
 
-      <div class="terminal htop">
+      <div class="terminal htop" data-htop>
         <div class="term-bar">
           <span class="term-dot" aria-hidden="true"></span>
           <span class="term-dot" aria-hidden="true"></span>
@@ -25,55 +90,177 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
 
         <div class="htop-summary">
-          <span><span class="val">6</span> skills loaded</span>
+          <span><span class="val">{skills.length}</span> skills loaded</span>
           <span>cloud → platform → data → ai</span>
+          <span class="htop-clock" id="htop-clock">--:--:--</span>
+          <label class="htop-filter">
+            <input id="htop-filter" type="search" placeholder="filter…" aria-label="Filter skills" autocomplete="off" spellcheck="false" />
+          </label>
         </div>
 
-        <div class="htop-head" aria-hidden="true">
-          <span>pid</span><span>skill</span><span>stack</span>
-        </div>
+        <div class="htop-body">
+          <div class="htop-table" role="listbox" aria-label="Skills">
+            <div class="htop-head" aria-hidden="true"><span>pid</span><span>skill</span></div>
 
-        <div class="htop-row">
-          <span class="htop-pid">01</span>
-          <span class="htop-skill">Cloud &amp; IaC</span>
-          <span class="htop-stack">AWS · Terraform · AWS CDK · CloudFormation</span>
-        </div>
+            {
+              skills.map((s, i) => (
+                <div
+                  class:list={['htop-row', { 'is-selected': i === 0 }]}
+                  role="option"
+                  aria-selected={i === 0}
+                  tabindex={i === 0 ? 0 : -1}
+                  data-skill={s.pid}
+                >
+                  <span class="htop-pid">{s.pid}</span>
+                  <span class="htop-skill">
+                    <span class="htop-skill-name">{s.name}</span>
+                    <span class="htop-stack">{s.stack}</span>
+                  </span>
+                </div>
+              ))
+            }
 
-        <div class="htop-row">
-          <span class="htop-pid">02</span>
-          <span class="htop-skill">CI/CD &amp; DevOps</span>
-          <span class="htop-stack">GitHub Actions · GitLab CI · Docker · Git</span>
-        </div>
+            <div class="htop-empty" id="htop-empty" hidden>no matching skills</div>
+          </div>
 
-        <div class="htop-row">
-          <span class="htop-pid">03</span>
-          <span class="htop-skill">Platform Engineering</span>
-          <span class="htop-stack">Internal Developer Platforms · Observability · Cost Management · Developer Enablement</span>
-        </div>
-
-        <div class="htop-row">
-          <span class="htop-pid">04</span>
-          <span class="htop-skill">Data Engineering</span>
-          <span class="htop-stack">ETL Pipelines · SQL · PySpark · Databricks · Trino</span>
-        </div>
-
-        <div class="htop-row">
-          <span class="htop-pid">05</span>
-          <span class="htop-skill">AI Tooling</span>
-          <span class="htop-stack">MCP · Agent Orchestration · Multi-agent Workflows · AWS Bedrock</span>
-        </div>
-
-        <div class="htop-row">
-          <span class="htop-pid">06</span>
-          <span class="htop-skill">Python</span>
-          <span class="htop-stack">Python · Pandas · NumPy · Boto3 · FastAPI</span>
+          <div class="htop-inspector">
+            {
+              skills.map((s, i) => (
+                <section class:list={['insp-panel', { 'is-active': i === 0 }]} id={`insp-${s.pid}`} aria-label={s.name}>
+                  <div class="insp-head">
+                    <span class="insp-status"><span class="dot" aria-hidden="true"></span>running</span>
+                    <span>pid {s.pid}</span>
+                  </div>
+                  <h3 class="insp-name">{s.name}</h3>
+                  <p class="insp-desc">{s.desc}</p>
+                  <dl class="insp-meta">
+                    <div><dt>stack</dt><dd>{s.stack}</dd></div>
+                    <div><dt>mem</dt><dd>{s.mem}</dd></div>
+                    <div><dt>cpu</dt><dd>{s.cpu}</dd></div>
+                    <div><dt>uptime</dt><dd>{s.uptime}</dd></div>
+                    <div><dt>path</dt><dd>{s.path}</dd></div>
+                  </dl>
+                </section>
+              ))
+            }
+          </div>
         </div>
 
         <div class="htop-foot">
-          <span>[ 1–6 of 6 ]</span>
-          <span>htop 3.3.0 · luis@cloud</span>
+          <span id="htop-count">[ 1–{skills.length} of {skills.length} ]</span>
+          <span aria-hidden="true"><kbd>↑</kbd> <kbd>↓</kbd> navigate · <kbd>enter</kbd> select · <kbd>/</kbd> filter</span>
         </div>
       </div>
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  // htop behavior — selection, filter, keyboard nav, live clock.
+  // Re-inits on astro:page-load so state is fresh after view transitions.
+  (function () {
+    function initHtop() {
+      const root = document.querySelector<HTMLElement>('[data-htop]');
+      if (!root || root.dataset.htopReady === '1') return;
+      root.dataset.htopReady = '1';
+
+      const rows = Array.from(root.querySelectorAll<HTMLElement>('.htop-row'));
+      const panels = Array.from(root.querySelectorAll<HTMLElement>('.insp-panel'));
+      const filter = document.getElementById('htop-filter') as HTMLInputElement | null;
+      const countEl = document.getElementById('htop-count') as HTMLElement | null;
+      const emptyEl = document.getElementById('htop-empty') as HTMLElement | null;
+      const clockEl = document.getElementById('htop-clock') as HTMLElement | null;
+      if (!filter || !countEl || !emptyEl || !clockEl) return;
+
+      // Non-null aliases so closures don't lose narrowing.
+      const $filter: HTMLInputElement = filter;
+      const $count: HTMLElement = countEl;
+      const $empty: HTMLElement = emptyEl;
+      const $clock: HTMLElement = clockEl;
+
+      const visibleRows = (): HTMLElement[] => rows.filter((r) => !r.classList.contains('is-hidden'));
+
+      function select(row: HTMLElement, focus: boolean) {
+        rows.forEach((r) => {
+          const on = r === row;
+          r.classList.toggle('is-selected', on);
+          r.setAttribute('aria-selected', on ? 'true' : 'false');
+          r.tabIndex = on ? 0 : -1;
+        });
+        panels.forEach((p) => {
+          p.classList.toggle('is-active', p.id === `insp-${row.dataset.skill}`);
+        });
+        if (focus) row.focus();
+      }
+
+      function updateCount() {
+        const vis = visibleRows();
+        const total = rows.length;
+        if (vis.length === 0) {
+          $count.textContent = '[ no matches ]';
+        } else if (vis.length === 1) {
+          $count.textContent = `[ ${vis[0].dataset.skill} of ${total} ]`;
+        } else {
+          $count.textContent = `[ ${vis[0].dataset.skill}–${vis[vis.length - 1].dataset.skill} of ${total} ]`;
+        }
+        $empty.hidden = vis.length !== 0;
+      }
+
+      function applyFilter() {
+        const q = $filter.value.trim().toLowerCase();
+        let firstVisible: HTMLElement | null = null;
+        rows.forEach((r) => {
+          const text = (r.textContent || '').toLowerCase();
+          const hidden = q !== '' && text.indexOf(q) === -1;
+          r.classList.toggle('is-hidden', hidden);
+          if (!hidden && !firstVisible) firstVisible = r;
+        });
+        const selected = rows.find((r) => r.classList.contains('is-selected') && !r.classList.contains('is-hidden'));
+        if (!selected && firstVisible) select(firstVisible, false);
+        updateCount();
+      }
+
+      rows.forEach((row) => {
+        row.addEventListener('click', () => select(row, true));
+        row.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+            select(row, true);
+            e.preventDefault();
+          } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            const vis = visibleRows();
+            const idx = vis.indexOf(row);
+            const next = e.key === 'ArrowDown' ? vis[idx + 1] : vis[idx - 1];
+            if (next) select(next, true);
+            e.preventDefault();
+          }
+        });
+      });
+
+      $filter.addEventListener('input', applyFilter);
+      $filter.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          $filter.value = '';
+          applyFilter();
+          e.preventDefault();
+        }
+      });
+
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === '/' && document.activeElement !== $filter) {
+          e.preventDefault();
+          $filter.focus();
+        }
+      });
+
+      const pad = (n: number) => (n < 10 ? '0' : '') + n;
+      function tick() {
+        const d = new Date();
+        $clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    document.addEventListener('astro:page-load', initHtop);
+  })();
+</script>

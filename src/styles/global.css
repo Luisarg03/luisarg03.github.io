@@ -917,38 +917,6 @@ code, kbd, samp, pre {
 }
 
 /* ── View transition: terminal wipe crossfade ────────────────────────── */
-@keyframes terminal-wipe-in {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@keyframes terminal-wipe-out {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 100%);
-  }
-}
-
-::view-transition-old(main) {
-  animation: terminal-wipe-out 0.25s cubic-bezier(0.76, 0, 0.24, 1) both;
-}
-
-::view-transition-new(main) {
-  animation: terminal-wipe-in 0.25s cubic-bezier(0.76, 0, 0.24, 1) 0.05s both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(main),
-  ::view-transition-new(main) {
-    animation: none;
-  }
-}
 
 /* ═══════════════════════════════════════════════════════════════════════
    PROTOTYPE v2 — "portfolio as OS · sessions"  (ported from prototype/)
@@ -1094,6 +1062,16 @@ body:has(.sess) :focus-visible { outline: 2px solid var(--accent); outline-offse
 .btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
 .btn-secondary:hover { border-color: var(--fg); background: var(--fg-soft); }
 
+/* mono download link (cv) */
+.cv-dl {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--accent);
+  padding: 6px 2px; transition: color .15s ease;
+}
+.cv-dl:hover { color: var(--fg); }
+.cv-dl .arr { transition: transform .15s ease; }
+.cv-dl:hover .arr { transform: translateY(2px); }
+
 /* ─── terminal window ──────────────────────────────────────────────── */
 .terminal {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -1131,44 +1109,106 @@ body:has(.sess) :focus-visible { outline: 2px solid var(--accent); outline-offse
 .exp-detail { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; max-width: 62ch; }
 @media (max-width: 920px) { .exp-row { grid-template-columns: 1fr; gap: 6px; } }
 
-/* ─── skills (htop process table) ──────────────────────────────────── */
-.htop { max-width: 900px; }
+/* ─── skills (htop process inspector) ──────────────────────────────── */
+.htop { width: 100%; max-width: 1060px; margin-inline: auto; }
+.htop-clock { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
 .htop-summary {
-  display: flex; gap: 22px; flex-wrap: wrap; padding: 12px 16px;
+  display: flex; gap: 18px; flex-wrap: wrap; align-items: center; padding: 12px 18px;
   background: var(--surface-2); border-bottom: 1px solid var(--border);
   font-family: var(--font-mono); font-size: 12px; color: var(--muted);
 }
-.htop-summary .val { color: var(--accent-2); }
+.htop-summary .val { color: var(--accent-2); font-weight: 600; }
+.htop-filter { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+.htop-filter input {
+  font-family: var(--font-mono); font-size: 12px; color: var(--fg);
+  background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  padding: 5px 10px; width: 190px; max-width: 100%;
+}
+.htop-filter input::placeholder { color: var(--muted); }
+.htop-filter input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.htop-body { display: grid; grid-template-columns: minmax(300px, 0.95fr) minmax(320px, 1.05fr); }
+.htop-table { min-width: 0; }
 .htop-head, .htop-row {
   display: grid;
-  grid-template-columns: 44px minmax(160px, 1fr) minmax(240px, 1.9fr);
-  gap: 16px; align-items: center; padding: 13px 16px;
+  grid-template-columns: 46px 1fr;
+  gap: 16px; align-items: center; padding: 12px 18px;
 }
 .htop-head {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2); border-bottom: 1px solid var(--border);
 }
-.htop-row { border-bottom: 1px solid var(--border); font-family: var(--font-mono); transition: background .15s ease; }
+.htop-row {
+  border-bottom: 1px solid var(--border); cursor: pointer; outline: none;
+  transition: background .15s ease, box-shadow .15s ease;
+}
 .htop-row:last-child { border-bottom: 0; }
 .htop-row:hover { background: var(--fg-soft); }
-.htop-pid { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
-.htop-skill { color: var(--fg); font-size: 14px; font-weight: 500; }
+.htop-row:focus-visible { box-shadow: inset 0 0 0 1px var(--accent); }
+.htop-row.is-selected { background: var(--fg-soft); box-shadow: inset 3px 0 0 var(--accent); }
+.htop-row.is-selected:focus-visible { box-shadow: inset 0 0 0 1px var(--accent), inset 3px 0 0 var(--accent); }
+.htop-row.is-selected .htop-skill-name { color: var(--accent); }
+.htop-row.is-hidden { display: none; }
+.htop-pid {
+  font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums;
+  color: var(--muted); text-align: center; justify-self: start;
+  min-width: 36px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface-2);
+}
+.htop-skill { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.htop-skill-name {
+  font-family: var(--font-mono); color: var(--fg); font-size: 14.5px; font-weight: 500;
+  letter-spacing: -0.01em; transition: color .15s ease;
+}
 .htop-stack { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.htop-empty { padding: 20px 18px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+
+/* inspector pane */
+.htop-inspector {
+  min-width: 0; padding: 22px;
+  border-left: 1px solid var(--border);
+  background: color-mix(in oklch, var(--surface-2) 42%, var(--surface));
+}
+.insp-panel { display: none; flex-direction: column; align-items: flex-start; gap: 12px; }
+.insp-panel.is-active { display: flex; }
+.insp-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted);
+}
+.insp-status { display: inline-flex; align-items: center; gap: 7px; color: var(--success); }
+.insp-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); flex: none; }
+.insp-name {
+  font-family: var(--font-display); font-size: clamp(20px, 2.2vw, 24px);
+  font-weight: 600; letter-spacing: -0.01em; line-height: 1.1; color: var(--fg); margin: 0;
+}
+.insp-desc { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.insp-meta {
+  display: flex; flex-direction: column; gap: 12px; margin: 4px 0 0; width: 100%;
+  border-top: 1px solid var(--border); padding-top: 14px;
+}
+.insp-meta > div { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: baseline; }
+.insp-meta dt {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.insp-meta dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--fg); line-height: 1.6; }
+.insp-meta dd a { color: var(--accent-2); border-bottom: 1px solid color-mix(in oklch, var(--accent-2) 45%, transparent); }
+.insp-meta dd a:hover { color: var(--fg); border-color: var(--fg); }
+
 .htop-foot {
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  padding: 10px 16px; background: var(--surface-2); border-top: 1px solid var(--border);
+  padding: 10px 18px; background: var(--surface-2); border-top: 1px solid var(--border);
   font-family: var(--font-mono); font-size: 11.5px; color: var(--muted);
 }
+.htop-foot kbd {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--fg);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+}
 @media (max-width: 860px) {
+  .htop-body { grid-template-columns: 1fr; }
+  .htop-inspector { border-left: 0; border-top: 1px solid var(--border); }
   .htop-head { display: none; }
-  .htop-row {
-    grid-template-columns: 32px 1fr;
-    grid-template-areas: "pid skill" "stack stack";
-    gap: 8px 12px;
-  }
-  .htop-pid { grid-area: pid; }
-  .htop-skill { grid-area: skill; }
-  .htop-stack { grid-area: stack; }
+  .htop-row { grid-template-columns: 40px 1fr; gap: 12px; }
 }
 
 /* ─── project cards ────────────────────────────────────────────────── */
