@@ -43,7 +43,12 @@ function slugify(title: string): string {
             <div class="project-tags">
               {f.tags.map((tag: string) => <span class="tag">{tag}</span>)}
             </div>
-            <a class="project-link" href={f.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+            <div class="project-links">
+              {f.links?.demo && (
+                <a class="project-link" href={f.links.demo} target="_blank" rel="noopener noreferrer">demo ↗</a>
+              )}
+              <a class="project-link" href={f.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+            </div>
           </div>
 
           <div class="showcase-visual">
@@ -52,7 +57,7 @@ function slugify(title: string): string {
                 <span class="term-dot" aria-hidden="true"></span>
                 <span class="term-dot" aria-hidden="true"></span>
                 <span class="term-dot" aria-hidden="true"></span>
-                <span class="term-title">tabimichi.vercel.app</span>
+                <span class="term-title">tabi-cyan.vercel.app</span>
               </div>
               {f.cover && <Image class="shot-img" src={f.cover} alt={f.coverAlt ?? f.title} />}
             </figure>
@@ -96,7 +101,12 @@ function slugify(title: string): string {
               <div class="project-tags">
                 {d.tags.map((tag: string) => <span class="tag">{tag}</span>)}
               </div>
-              <a class="project-link" href={d.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+              <div class="project-links">
+                {d.links?.demo && (
+                  <a class="project-link" href={d.links.demo} target="_blank" rel="noopener noreferrer">demo ↗</a>
+                )}
+                <a class="project-link" href={d.repo} target="_blank" rel="noopener noreferrer">github ↗</a>
+              </div>
             </article>
           );
         })}
