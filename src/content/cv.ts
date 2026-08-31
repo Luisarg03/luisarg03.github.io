@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
-//  CV Data — Luis Meyehen Paz  |  Cloud Engineer
-//  Single source of truth for professional experience, skills, and education.
+//  CV Data — Luis Meyehen Paz  |  Cloud & Data Platform Engineer
+//  Single source of truth. Simple, direct, low-profile. No invented metrics.
 // ═══════════════════════════════════════════════════════════════════════════
 
 export interface Experience {
@@ -17,7 +17,6 @@ export interface SkillCategory {
   category: string;
   skills: string[];
   proficiency: number;
-  // Quantified proof, rendered as an htop row sub-line. Absent = today's row.
   evidence?: string;
 }
 
@@ -53,16 +52,15 @@ export interface SiteConfig {
 export const experience: Experience[] = [
   {
     company: 'Interbank',
-    role: 'Cloud Platform Engineer',
+    role: 'Platform Engineer',
     location: 'Peru · Remote',
     startDate: '10/2023',
     endDate: null,
     responsibilities: [
-      'Built CI/CD pipelines in GitHub Actions and Bitbucket Pipelines, extending a shared template framework with AWS CloudFormation and CDK (Python) to provision and modify cloud infrastructure.',
-      'Build and maintain container images (ECR) for SageMaker training pipelines, handling reusable libraries and complex configurations so Data Science teams can focus on model training.',
-      'Developed Internal Developer Platform (IDP) features — including a self-service variable catalog (FastAPI + React) — to reduce manual toil and align with internal Data Science workflows.',
-      'Enabled AI-assisted development for Data Science teams by delivering reusable MCP integrations, prompt patterns, and local agent workflows; reduced repetitive development effort across the team.',
-      'Set up centralized process and pipeline monitoring: log aggregation, pipeline health tracking, and operational reporting via Step Functions, Glue, Athena and QuickSight.',
+      'Data Science teams ship without waiting on the platform team: self-service pipelines, automated SQL generation, and monitoring they can use on their own.',
+      'Production data stays healthy: quality checks, pipeline monitoring, and drift detection — maintained by me.',
+      'Repetitive work gets automated, including LLM-based workflows with model fallbacks, so teams keep moving when a provider changes.',
+      'I work on AWS (Step Functions, Lambda, Glue, Athena) and maintain what I ship.',
     ],
   },
   {
@@ -72,11 +70,8 @@ export const experience: Experience[] = [
     startDate: '08/2022',
     endDate: '10/2023',
     responsibilities: [
-      'Executed large-scale IaC modernization: migrated platform infrastructure from AWS CDK to Terraform.',
-      'Developed data ingestion pipelines using AWS SDLF with event-driven orchestration (SQS, SNS, EventBridge) to process incremental and batch loads from multiple source systems.',
-      'Built Salesforce API integration to ingest high-volume daily records into the enterprise Data Lake on S3.',
-      'Implemented data quality validation checks and automated monitoring for ingestion pipelines, improving data integrity and reducing incidents.',
-      'Integrated infrastructure and data components using Python, Step Functions, Lambda, S3, Glue, EMR, Athena and Terraform.',
+      'Made deployments reproducible: migrated the platform to infrastructure as code (Terraform).',
+      'Made ingestion reliable: event-driven pipelines into the company data lake, with quality checks and monitoring.',
     ],
   },
   {
@@ -86,9 +81,7 @@ export const experience: Experience[] = [
     startDate: '10/2021',
     endDate: '08/2022',
     responsibilities: [
-      'Designed and built ETL pipelines using AWS Glue and Databricks to ingest and transform data into the Lakehouse platform.',
-      'Contributed to Lakehouse architecture design, enabling SQL-based data access across teams through Trino.',
-      'Developed and maintained ingestion pipelines for the company Lakehouse platform using Databricks and Trino.',
+      'Helped build the data platform from scratch so teams query with SQL instead of asking for exports.',
     ],
   },
   {
@@ -98,8 +91,7 @@ export const experience: Experience[] = [
     startDate: '02/2021',
     endDate: '10/2021',
     responsibilities: [
-      'Supported data migration and server decommissioning during Walmart Argentina\'s transition to Dorinka, migrating databases to new Oracle Cloud-hosted servers.',
-      'Ensured data integrity during migration of operational databases and warehouse schemas into the new environment.',
+      'Migrated databases to Oracle Cloud with data integrity during the Walmart Argentina to Dorinka transition.',
     ],
   },
   {
@@ -109,7 +101,7 @@ export const experience: Experience[] = [
     startDate: '10/2020',
     endDate: '02/2021',
     responsibilities: [
-      'DirectTV: Developed automation processes for data ingestion and transformation via APIs from multiple external services using Python.',
+      'Automated data ingestion and transformation from external APIs with Python (DirectTV).',
     ],
   },
   {
@@ -119,8 +111,8 @@ export const experience: Experience[] = [
     startDate: '01/2020',
     endDate: '10/2020',
     responsibilities: [
-      'Banco Supervielle: Implemented and tested predictive models in Microsoft SQL Server; developed and tested SQL scripts.',
-      'AGIP: Developed automation processes in Python; built ETL pipelines with Pentaho Data Integration and managed SQL Server databases.',
+      'Banco Supervielle: built and tested predictive models and SQL on SQL Server.',
+      'AGIP: automated processes and ETL with Pentaho on SQL Server.',
     ],
   },
   {
@@ -130,9 +122,7 @@ export const experience: Experience[] = [
     startDate: '09/2019',
     endDate: '01/2020',
     responsibilities: [
-      'Hendel Hogar: Developed SQL Server databases and automated ETL processes using SSIS; created Power BI reports.',
-      'Secretaria de Salud: Developed Oracle databases and ETL processes with Pentaho Data Integration; built Metabase dashboards.',
-      'Wunderman Thompson: Created Power BI reports for marketing analytics.',
+      'Built databases, ETL processes, and BI dashboards (Power BI, Metabase) that clients used.',
     ],
   },
 ];
@@ -142,37 +132,32 @@ export const experience: Experience[] = [
 export const skillCategories: SkillCategory[] = [
   {
     category: 'Cloud & IaC',
-    skills: 'AWS · Terraform · AWS CDK · CloudFormation'.split(' · '),
+    skills: 'AWS · Terraform · AWS CDK · CloudFormation · Lambda · Step Functions · Glue · Athena · SageMaker · S3 · EMR · ECS · ECR · DynamoDB'.split(' · '),
     proficiency: 5,
   },
   {
     category: 'CI/CD & DevOps',
-    skills: 'GitHub Actions · GitLab CI · Docker · Git'.split(' · '),
+    skills: 'GitHub Actions · GitLab CI · CodePipeline · CodeBuild · Bitbucket · Docker · Git · Linux'.split(' · '),
     proficiency: 5,
   },
   {
     category: 'Data Engineering',
-    skills: 'ETL Pipelines · SQL · PySpark · Databricks · Trino'.split(' · '),
-    proficiency: 4,
-  },
-  {
-    category: 'Python',
-    skills: 'Python · Pandas · NumPy · Boto3 · FastAPI'.split(' · '),
+    skills: 'ETL · SQL · PySpark · Databricks · Trino · Airflow · Pentaho · SSIS'.split(' · '),
     proficiency: 4,
   },
   {
     category: 'Databases',
-    skills: 'SQL Server · Oracle · BigQuery · Elasticsearch'.split(' · '),
+    skills: 'SQL Server · Oracle · PostgreSQL · MySQL · Athena · Redshift · BigQuery'.split(' · '),
     proficiency: 4,
   },
   {
     category: 'Platform Engineering',
-    skills: 'Internal Developer Platforms · Observability · Cost Management · Developer Enablement'.split(' · '),
+    skills: 'Internal Developer Platforms · Observability · Developer Enablement'.split(' · '),
     proficiency: 5,
   },
   {
-    category: 'AI Tooling',
-    skills: 'MCP · Agent Orchestration · Multi-agent Workflows · Agentic Coding Tools · opencode · OpenAI APIs · AWS Bedrock'.split(' · '),
+    category: 'AI Engineering',
+    skills: 'LangGraph · Agent Orchestration · AWS Bedrock · opencode · OpenAI APIs'.split(' · '),
     proficiency: 4,
   },
   {
@@ -187,11 +172,15 @@ export const skillCategories: SkillCategory[] = [
 export const education: Education[] = [
   {
     title: 'AWS Certified DevOps Engineer Professional (DOP-C02)',
-    detail: 'In progress · Amazon Web Services',
+    detail: 'In progress · Amazon Web Services · Target Q4 2026',
   },
   {
     title: 'Data Architect',
     detail: 'NTT Data Academy · 2024',
+  },
+  {
+    title: 'Computer Technician',
+    detail: 'Sec. Técnica N°3 · Buenos Aires',
   },
 ];
 
@@ -206,18 +195,18 @@ export const languages: Language[] = [
 
 export const siteConfig: SiteConfig = {
   name: 'Luis Meyehen Paz',
-  role: 'Cloud Engineer',
+  role: 'Cloud & Data Platform Engineer',
   location: 'Buenos Aires, Argentina',
   email: 'luis.m.paz.03@gmail.com',
   linkedin: 'https://linkedin.com/in/luisarg03',
   github: 'https://github.com/luisarg03',
-  availability: 'Currently at Interbank',
+  availability: 'Open to senior roles · notice: immediate',
   summary:
-    'Cloud Engineer with 7+ years building and operating cloud infrastructure, CI/CD pipelines, and data platforms on AWS. Bridges Infrastructure as Code (Terraform, AWS CDK), pipeline automation (GitHub Actions), and data services (Glue, Athena, Databricks) to deliver production platforms. Experience spanning cloud infrastructure, internal developer platforms, cost and workload observability, and agentic developer workflows (multi-agent orchestration, MCP tooling). Track record enabling Data Science and engineering teams through reusable infrastructure, self-service tooling, and platform engineering.',
-  positioning: 'I make data teams ship faster by treating infrastructure as a product.',
+    'Cloud & data platform engineer with 7+ years on AWS. I build platforms, pipelines, and tools that make data teams faster: less waiting on infrastructure, fewer incidents, more shipping. I work close to the team, automate the repetitive, and maintain what I deliver.',
+  positioning: 'I help data teams ship faster.',
   about: {
-    philosophy: 'If a human is doing something twice, a script should be doing it once.',
-    stack: 'Arch + Hyprland · terminal-first · when docs fail, I read the source code',
-    focus: 'Platform engineering × data platforms × AI-assisted workflows',
+    philosophy: 'Keep it simple. Automate repetitive work.',
+    stack: 'Arch + Hyprland · terminal-first · when docs fail, I read the source',
+    focus: 'Cloud platforms, data pipelines, AI-assisted workflows',
   },
 };

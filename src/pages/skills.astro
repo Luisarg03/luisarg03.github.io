@@ -1,14 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-// Curated set — the stack Luis runs every day, rendered as htop processes.
-// `desc` and the meta readouts are page copy (htop chrome), not CV data.
+// Curated set — the tools Luis uses every day, rendered as htop processes.
 const skills = [
   {
     pid: '01',
     name: 'Cloud & IaC',
     stack: 'AWS · Terraform · AWS CDK · CloudFormation',
-    desc: 'Infrastructure as reviewable, versioned code — Terraform and CDK running production workloads for 5+ years.',
+    desc: 'Infrastructure as code. Reproducible environments, no surprises.',
     mem: '1.2G',
     cpu: '2.4%',
     uptime: '5+ yrs',
@@ -18,7 +17,7 @@ const skills = [
     pid: '02',
     name: 'CI/CD & DevOps',
     stack: 'GitHub Actions · GitLab CI · Docker · Git',
-    desc: 'Pipelines that treat every environment as cattle: repeatable, observable, and fast enough that teams actually use them.',
+    desc: 'Pipelines that are fast and reliable, so teams actually use them.',
     mem: '640M',
     cpu: '1.8%',
     uptime: '6+ yrs',
@@ -27,8 +26,8 @@ const skills = [
   {
     pid: '03',
     name: 'Platform Engineering',
-    stack: 'Internal Developer Platforms · Observability · Cost Management · Developer Enablement',
-    desc: "Self-service platforms that turn 'waiting on infra' into a solved problem — catalogs, templates, paved roads.",
+    stack: 'Internal Developer Platforms · Observability · Developer Enablement',
+    desc: 'Self-service tools and monitoring that save teams time.',
     mem: '1.5G',
     cpu: '3.1%',
     uptime: '4+ yrs',
@@ -37,8 +36,8 @@ const skills = [
   {
     pid: '04',
     name: 'Data Engineering',
-    stack: 'ETL Pipelines · SQL · PySpark · Databricks · Trino',
-    desc: 'Event-driven ingestion and lakehouse architectures that keep analysts querying instead of begging for exports.',
+    stack: 'ETL Pipelines · SQL · PySpark · Databricks · Trino · Athena',
+    desc: 'ETL, Lakehouse, and SQL access so analysts can query instead of asking for exports.',
     mem: '2.1G',
     cpu: '4.2%',
     uptime: '5+ yrs',
@@ -46,23 +45,13 @@ const skills = [
   },
   {
     pid: '05',
-    name: 'AI Tooling',
-    stack: 'MCP · Agent Orchestration · Multi-agent Workflows · AWS Bedrock',
-    desc: 'Agentic workflows and MCP tooling that make AI agents useful inside real developer environments.',
+    name: 'AI Engineering',
+    stack: 'LangGraph · Agent Orchestration · AWS Bedrock · opencode · OpenAI APIs',
+    desc: 'LLM-based workflow automation with model fallbacks. Agent experiments in personal projects.',
     mem: '890M',
     cpu: '2.9%',
     uptime: '2+ yrs',
-    path: '~/.luis/ai-tooling',
-  },
-  {
-    pid: '06',
-    name: 'Python',
-    stack: 'Python · Pandas · NumPy · Boto3 · FastAPI',
-    desc: 'The glue that holds it together — FastAPI services, Boto3 automation, and data pipelines.',
-    mem: '512M',
-    cpu: '1.2%',
-    uptime: '8+ yrs',
-    path: '~/.luis/python',
+    path: '~/.luis/ai-eng',
   },
 ];
 ---
@@ -77,8 +66,8 @@ const skills = [
     <div class="container screen-inner">
       <div class="screen-head">
         <p class="eyebrow">htop · skills</p>
-        <h2>What's loaded right now.</h2>
-        <p>The stack I run every day, as a process view — no self-assigned scores, just what's loaded.</p>
+        <h2>The tools I use every day.</h2>
+        <p>No scores, no fluff — just the stack I work with.</p>
       </div>
 
       <div class="terminal htop" data-htop>
