@@ -254,7 +254,7 @@
       { id: 'linkedin', label: 'Open LinkedIn', section: 'Links', action: 'external', value: 'https://linkedin.com/in/luisarg03' },
       { id: 'github', label: 'Open GitHub', section: 'Links', action: 'external', value: 'https://github.com/luisarg03' },
       { id: 'email', label: 'Copy email', section: 'Actions', action: 'clipboard', value: 'luis.m.paz.03@gmail.com' },
-      { id: 'cv', label: 'Download CV', section: 'Actions', action: 'download', value: '/cv.pdf' },
+      { id: 'cv', label: 'Download CV', section: 'Actions', action: 'download', value: '/cv.pdf', filename: 'LuisPaz-CV.pdf' },
     ];
 
     // ── Refs ──────────────────────────────────────────────────────────────
@@ -387,9 +387,15 @@
           case 'clipboard':
             navigator.clipboard.writeText(cmd.value).catch(function () {});
             break;
-          case 'download':
-            window.location.href = cmd.value;
+          case 'download': {
+            const a = document.createElement('a');
+            a.href = cmd.value;
+            if (cmd.filename) a.download = cmd.filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
             break;
+          }
           case 'scroll-bottom':
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             break;
