@@ -1,0 +1,28 @@
+---
+title: "dsh-memory-vault"
+description: "Memoria OKF persistente para DeepSeek Harness: servidor MCP en Python (SQLite FTS5 + Markdown), plugins Cordis memory-mcp / memory-auto y vault starter con templates, type registry y vocabulario de tags."
+repo: "https://github.com/Luisarg03/dsh-memory-vault"
+problem: "DeepSeek Harness no tiene memoria entre sesiones: cada sesión arranca limpia y olvida hechos, decisiones y aprendizajes de las anteriores. El contexto se re-explica o se pierde, y las notas manuales quedan fuera del flujo de trabajo del agente."
+solution: "Servidor MCP en Python respaldado por SQLite FTS5 + vault OKF en Markdown con templates y type registry. Dos plugins Cordis: memory-mcp (wrapper stdio que conecta DSH al vault) y memory-auto (captura automática con digests de sesión y checkpoints en commits/compactions). Los digests corren in-process vía el LLM del propio harness — sin CLI externa ni credenciales almacenadas. Resolución de rutas independiente del cwd: env vars, harness home y profile patch."
+impact:
+  - "Memoria persistente por proyecto: hechos, decisiones, aprendizajes, convenciones y perfil en OKF (Markdown + índice SQLite FTS5)"
+  - "Captura automática: git commits, compactions y fin de sesión disparan digests; checkpoints idle capturan actividad"
+  - "Cero credenciales extra: los digests usan el mismo LLM y key con que DSH ya está configurado"
+  - "Instalación como plugins Cordis: dsh plugin add en un perfil, con override por env / harness home / profile patch"
+tags: ['mcp', 'deepseek-harness', 'dsh-plugin', 'memory', 'sqlite', 'python', 'typescript', 'cordis']
+order: 1
+status: online
+year: 2026
+role: platform engineer
+type: oss
+stack: [python, typescript, sqlite, mcp, cordis]
+termTitle: "dsh-memory-vault — dsh plugin add"
+codeSnippet:
+  lang: bash
+  code: |
+    # dsh-memory-vault — persistent OKF memory for DeepSeek Harness
+    $ dsh plugin --profile demo add @dsh-memory/memory-mcp @dsh-memory/memory-auto
+    $ ls ~/.dsh/memory-vault/projects/   # per-project OKF entries
+links:
+  docs: https://github.com/Luisarg03/dsh-memory-vault/tree/main/docs
+---
