@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-12
+
+### Changed
+
+- The CV now downloads as `luis-meyehen-paz-resume.pdf`, matching the source document
+  name instead of the old `LuisPaz-CV.pdf`. Updated across all five download paths: home,
+  contact (button and link list), experience, command palette, and the `/terminal`
+  `cat cv.pdf` command.
+
+### Fixed
+
+- `cat cv.pdf` in `/terminal` navigated to the file with `location.href`, so the browser
+  saved it under the URL name (`cv.pdf`) rather than a controlled filename. It now uses a
+  named download anchor, consistent with the command palette.
+
 ## [1.0.0] - 2026-09-12
 
 First tagged release. Marks the baseline of the live **"portfolio as OS"** site: seven
@@ -51,5 +66,6 @@ rendered as OS sessions, with `SessionBar.astro` as the single source of navigat
   requirement into `boot-into-content`. The rationale is recorded in the archived
   proposal's Outcome section.
 
-[Unreleased]: https://github.com/Luisarg03/luisarg03.github.io/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Luisarg03/luisarg03.github.io/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/Luisarg03/luisarg03.github.io/releases/tag/v1.0.1
 [1.0.0]: https://github.com/Luisarg03/luisarg03.github.io/releases/tag/v1.0.0
