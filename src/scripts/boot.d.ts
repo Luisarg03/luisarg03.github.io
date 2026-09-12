@@ -13,6 +13,6 @@ declare global {
         frameDelay?: number;
         onComplete?: () => void;
       }
-    ) => { skip: () => void } | null | undefined;
+    ) => void;
   }
 }

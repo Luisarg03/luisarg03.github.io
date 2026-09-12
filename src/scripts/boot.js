@@ -62,21 +62,12 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
       }
     }
 
-    // Handoff burst: flash the noise layer when the final frame renders.
-    // The noise element lives in the host overlay (BootModule); it may be
-    // absent (terminal page, overlay already removed) — no-op then.
-    function triggerBurst() {
-      var overlay = containerEl.closest && containerEl.closest('#boot-overlay');
-      var noise = overlay && overlay.querySelector('.boot-noise');
-      if (noise) noise.classList.add('is-burst');
-    }
-
     function finish() {
       if (completed) return;
       completed = true;
       if (timer) clearTimeout(timer);
       setQuickMode();
-      // Notify the container's listeners (e.g. the homepage overlay).
+      // Notify the container's listeners (the terminal shell swaps to the prompt).
       containerEl.dispatchEvent(new CustomEvent('boot-complete', { bubbles: true }));
       if (onComplete) onComplete();
     }
@@ -88,7 +79,6 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
         return;
       }
       renderLine(frames[frameIndex]);
-      if (frameIndex === frames.length - 1) triggerBurst();
       frameIndex++;
       timer = setTimeout(showNextFrame, frameDelay);
     }
@@ -102,8 +92,6 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
         renderLine(frames[frameIndex]);
         frameIndex++;
       }
-      // The last rendered frame is the final one — fire the burst too.
-      triggerBurst();
       finish();
     }
 
@@ -115,13 +103,9 @@ import { LUIS_BOOT_FRAMES } from './boot-frames.js';
     if (reduceMotion || isQuickMode()) {
       renderAll();
       finish();
-      return null;
+      return;
     }
 
     showNextFrame();
-
-    // Controller for hosts that need to trigger skip from other events
-    // (e.g. the homepage overlay skips on wheel/scroll).
-    return { skip: skip };
   };
 })();
