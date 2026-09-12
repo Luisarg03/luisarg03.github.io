@@ -81,6 +81,25 @@ openspec/                      # OpenSpec changes/specs/archive (spec-driven)
 - Interbank hoy es MLE Plataforma (~8 + 1 lead), no “Cloud Platform Engineer” genérico — rol real: MLE Platform Engineer (entry 10/2023 como Data Engineer).
 - `siteConfig.availability`: `Open to senior cloud / platform roles — notice: immediate`.
 
+## Releases & versioning
+
+Versions follow [Semantic Versioning](https://semver.org) and ship as annotated git tags (`vX.Y.Z`).
+GitHub Pages deploys automatically on every push to `main`, so a tag is a marker in history rather
+than the deploy trigger — tag the commit that was published.
+
+- `MAJOR` — a redesign, or a breaking change to the site's structure or navigation
+- `MINOR` — new pages, sections, or content capabilities
+- `PATCH` — fixes, copy updates, asset swaps
+
+Every release updates `CHANGELOG.md` and keeps `package.json` `version` in sync with the tag.
+
+```sh
+# 1. update CHANGELOG.md (move Unreleased entries into the new version) and package.json
+# 2. commit, then tag the release commit
+git tag -a v1.0.1 -m "v1.0.1 — <summary>"
+git push origin main --follow-tags
+```
+
 ## Custom domain
 
 Replace the placeholder in `public/CNAME` with your domain, then configure DNS and GitHub Pages settings.
