@@ -162,10 +162,16 @@ export class CommandParser {
       if (args.length === 0) {
         return { type: 'output', content: '[ERROR] Usage: cat <file> [file...]', outputType: 'error' };
       }
-      // Special case: cv.pdf triggers download
+      // Special case: cv.pdf downloads the real file (named anchor so the
+      // saved filename is controlled, unlike a plain location.href navigation).
       if (args[0] === 'cv.pdf') {
-        window.location.href = '/cv.pdf';
-        return { type: 'output', content: 'Downloading CV...', outputType: 'success' };
+        const a = document.createElement('a');
+        a.href = '/cv.pdf';
+        a.download = 'luis-meyehen-paz-resume.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return { type: 'output', content: 'Downloading luis-meyehen-paz-resume.pdf...', outputType: 'success' };
       }
       const contents: string[] = [];
       for (const file of args) {
