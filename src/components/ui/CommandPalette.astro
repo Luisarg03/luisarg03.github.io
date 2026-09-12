@@ -244,11 +244,11 @@
 
     // ── Data ──────────────────────────────────────────────────────────────
     const commands = [
-      { id: 'identity', label: 'cd /identity', section: 'Jump', action: 'navigate', value: '/#identity' },
-      { id: 'skills', label: 'cd /skills', section: 'Jump', action: 'navigate', value: '/#htop' },
-      { id: 'experience', label: 'cd /experience', section: 'Jump', action: 'navigate', value: '/#experience' },
-      { id: 'contact', label: 'cd /contact', section: 'Jump', action: 'navigate', value: '/#contact' },
-      { id: 'shutdown', label: 'shutdown', section: 'System', action: 'scroll-bottom', value: '' },
+      { id: 'identity', label: 'cd /identity', section: 'Jump', action: 'navigate', value: '/' },
+      { id: 'journalctl', label: 'cd /journalctl', section: 'Jump', action: 'navigate', value: '/experience' },
+      { id: 'htop', label: 'cd /htop', section: 'Jump', action: 'navigate', value: '/skills' },
+      { id: 'projects', label: 'cd /projects', section: 'Jump', action: 'navigate', value: '/projects' },
+      { id: 'shutdown', label: 'cd /shutdown', section: 'Jump', action: 'navigate', value: '/contact' },
       { id: 'now', label: 'Go to /now', section: 'Pages', action: 'navigate', value: '/now' },
       { id: 'terminal', label: 'Open Terminal', section: 'Pages', action: 'navigate', value: '/terminal' },
       { id: 'linkedin', label: 'Open LinkedIn', section: 'Links', action: 'external', value: 'https://linkedin.com/in/luisarg03' },
@@ -396,9 +396,6 @@
             a.remove();
             break;
           }
-          case 'scroll-bottom':
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            break;
         }
       }, 80);
     }
